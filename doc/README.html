@@ -1,0 +1,1871 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
+<title>Goyamp - The Go Macro Processor for YAML</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install(4);
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Goyamp - The Go Macro Processor for YAML</h1>
+<span id="author">Peter Birch</span><br />
+<span id="email"><code>&lt;<a href="mailto:birchb1024@gmail.com">birchb1024@gmail.com</a>&gt;</code></span><br />
+<span id="revnumber">version 0.1.2,</span>
+<span id="revdate">2019-05-04</span>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>YAML is human friendly data serialization standard. <span class="footnote"><br />[YAML stands for YAML Ain&#8217;t Markup Language. See <a href="https://yaml.org/">https://yaml.org/</a>]<br /></span>  Goyamp is a general-purpose macroprocessor for YAML files.  Both its input and output are YAML. It scans the input for symbols and makes substitutions and expansions on the output. Goyamp is 100% YAML so the syntax for defining and calling macros is YAML also.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tl_dr">TL;DR</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">Input</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> foo
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [who]
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">Hello</span><span style="color: #990000">:</span> who
+<span style="color: #990000">- </span><span style="color: #009900">foo</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">who</span><span style="color: #990000">:</span> World</tt></pre></div></div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">Hello</span><span style="color: #990000">:</span> World</tt></pre></div></div>
+<div class="sect2">
+<h3 id="_quick_start">Quick Start</h3>
+<div class="paragraph"><p>You just want to run it already? OK, use the docker image. Put your first Goyamp file in <code>hello.yaml</code>:</p></div>
+<div class="listingblock">
+<div class="title">hello.yaml</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #FF0000">"Hello {{argv.2}} from Goyamp v{{__VERSION__}}"</span></tt></pre></div></div>
+<div class="paragraph"><p>And run it</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ docker run --rm -u <span style="color: #009900">$(</span>id -u<span style="color: #990000">):</span><span style="color: #009900">$(</span>id -g<span style="color: #990000">)</span> -v <span style="color: #FF0000">"$HOME"</span><span style="color: #990000">:</span>/work docker<span style="color: #990000">.</span>io/birchb<span style="color: #993399">1024</span>/goyamp /work/hello<span style="color: #990000">.</span>yaml <span style="color: #009900">$USER</span></tt></pre></div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_get_started">Get Started</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>GoYamp is a Go program contained in the goyamp module.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+First obtain a binary copy of the Goyamp program. Copies available on GitHub here(<a href="http://https://github.com/birchb1024/goyamp/TODO">http://https://github.com/birchb1024/goyamp/TODO</a>)
+</p>
+</li>
+</ul></div>
+<div class="sect2">
+<h3 id="_installation">Installation</h3>
+<div class="paragraph"><p>TODO</p></div>
+</div>
+<div class="sect2">
+<h3 id="_execution">Execution</h3>
+<div class="paragraph"><p>The program  is run from the command-line giving the input file to parse as the first argument followed by optional arguments to the expansion. The expansion is written to the standard output, which you normally redirect to another file.:</p></div>
+<div class="listingblock">
+<div class="title">Usage</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ goyamp <span style="color: #990000">&lt;</span>myinputfile<span style="color: #990000">&gt;.</span>yaml <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_an_example_pipelines_as_code">An example - Pipelines as Code.</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Supposing we are building some <a href="https://github.com/tomzo/gocd-yaml-config-plugin">GoCD</a> pipeline definitions in YAML each of which uses the same Git repository.  The YAML we have to write looks like this:</p></div>
+<div class="listingblock">
+<div class="title">output.yaml</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">pipelines</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">mypipe1</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">group</span><span style="color: #990000">:</span> mygroup
+<span style="color: #990000">    </span><span style="color: #009900">label_template</span><span style="color: #990000">:</span> ${COUNT}
+<span style="color: #990000">    </span><span style="color: #009900">materials</span><span style="color: #990000">:</span> <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;1&gt;</b></span></span>
+<span style="color: #990000">      </span><span style="color: #009900">mygit</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">branch</span><span style="color: #990000">:</span> master
+<span style="color: #990000">        </span><span style="color: #009900">git</span><span style="color: #990000">:</span> http://my.example.org/mygit.git
+<span style="color: #990000">    </span><span style="color: #009900">stages</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>
+<span style="color: #990000">  </span><span style="color: #009900">mypipe2</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">group</span><span style="color: #990000">:</span> mygroup
+<span style="color: #990000">    </span><span style="color: #009900">label_template</span><span style="color: #990000">:</span> ${COUNT}
+<span style="color: #990000">    </span><span style="color: #009900">materials</span><span style="color: #990000">:</span> <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;1&gt;</b></span></span>
+<span style="color: #990000">      </span><span style="color: #009900">mygit</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">branch</span><span style="color: #990000">:</span> ci
+<span style="color: #990000">        </span><span style="color: #009900">git</span><span style="color: #990000">:</span> http://my.example.org/mygit.git
+<span style="color: #990000">    </span><span style="color: #009900">stages</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">null</span></span></tt></pre></div></div>
+<div class="colist arabic"><ol>
+<li>
+<p>
+Duplicated
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>We don&#8217;t want re-key duplicated code so we define a macro which Goyamp expands whenever it is invoked. Our source code now looks like this:</p></div>
+<div class="listingblock">
+<div class="title">YAML source</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">define</span><span style="color: #990000">:</span> <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;1&gt;</b></span></span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> mygit_repo_url
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span> http://my.example.org/mygit.git
+
+<span style="color: #009900">defmacro</span><span style="color: #990000">:</span> <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;2&gt;</b></span></span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> mygit_materials
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [branch_name]
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+<span style="color: #990000">      </span><span style="color: #009900">mygit</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">git</span><span style="color: #990000">:</span> mygit_repo_url <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;3&gt;</b></span></span>
+<span style="color: #990000">        </span><span style="color: #009900">branch</span><span style="color: #990000">:</span> branch_name
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #009900">pipelines</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">mypipe1</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">group</span><span style="color: #990000">:</span> mygroup
+<span style="color: #990000">    </span><span style="color: #009900">label_template</span><span style="color: #990000">:</span> <span style="color: #FF0000">"${COUNT}"</span>
+<span style="color: #990000">    </span><span style="color: #009900">materials</span><span style="color: #990000">:</span> {mygit_materials: {branch_name: master}} <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;4&gt;</b></span></span>
+<span style="color: #990000">    </span><span style="color: #009900">stages</span><span style="color: #990000">:</span>
+
+<span style="color: #990000">  </span><span style="color: #009900">mypipe2</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">group</span><span style="color: #990000">:</span> mygroup
+<span style="color: #990000">    </span><span style="color: #009900">label_template</span><span style="color: #990000">:</span> <span style="color: #FF0000">"${COUNT}"</span>
+<span style="color: #990000">    </span><span style="color: #009900">materials</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">mygit_materials</span><span style="color: #990000">:</span>
+<span style="color: #990000">            </span><span style="color: #009900">branch_name</span><span style="color: #990000">:</span> ci <span style="font-style: italic"><span style="color: #9A1900"># <b>&lt;5&gt;</b></span></span>
+<span style="color: #990000">    </span><span style="color: #009900">stages</span><span style="color: #990000">:</span></tt></pre></div></div>
+<div class="colist arabic"><ol>
+<li>
+<p>
+simple variable definition
+</p>
+</li>
+<li>
+<p>
+a macro Definition
+</p>
+</li>
+<li>
+<p>
+variable used
+</p>
+</li>
+<li>
+<p>
+a macro call - flow style
+</p>
+</li>
+<li>
+<p>
+a macro call - block style
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>When run through Goyamp, the output is as above. Now we have a single place where the git repository is defined, if we need to change it we can change it once.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_applications">Applications</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This program is general-purpose, it can be used wherever YAML is required. Its first uses were for GoCd pipelines and Ansible playbooks. These are human-readable source code which is a subset of YAML. Hence Goyamp may not be applied to all aspects of YAML especially those which result from data transmission.  We will not be attempting to exercise Goyamp with such inputs.</p></div>
+<div class="paragraph"><p>Since YAML is a superset of JSON it can also be used to generate JSON for, say, Azure ARM files.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_similar_tools">Similar Tools</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Yamp - This is the progenitor of Goyamp, a Python YAML macro processor. Goyamp and Yamp are compatible, however there are some differences due to their respective execution environments. Being a Python program itself, Yamp can call Python functions directly.</p></div>
+<div class="paragraph"><p>There are many great general-purpose macro-processors available, starting with the venerable <code>GPM</code>, through <code>m4</code>, cpp, and lately, Jinja2. However these are predominantly character-based and the programmer has to compute the indentation required by YAML by counting spaces. Like previous authors we started on this course of writing yet another macro-processor primarily for reasons of laziness. Since Goyamp transforms maps and sequences not character strings, indentation is automatic.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_reference">Reference</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This section describes the operation of the processor and the macros available.</p></div>
+<div class="sect2">
+<h3 id="_the_command_line">The Command Line</h3>
+<div class="paragraph"><p>The command to run Goyamp is a single binary executable filename followed by optional arguments. Assuming that <code>goyamp</code> is in the <code>$PATH</code>:</p></div>
+<div class="listingblock">
+<div class="title">Usage</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ goyamp <span style="color: #990000">[</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>Filename <span style="color: #990000">|</span> - <span style="color: #990000">]</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+<div class="paragraph"><p>If the filename is the minus sign <code>-</code> or if there are no arguements, Goamp reads YAML from the standard input, so it serves as a filter. As in</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ echo <span style="color: #FF0000">"[define: {data: {load: test/fixtures/blade-runner.json}}, data.director]"</span> <span style="color: #990000">|</span> goyamp
+- <span style="color: #FF0000">' Ridley Scott'</span></tt></pre></div></div>
+<div class="sect3">
+<h4 id="_file_suffixes">File Suffixes</h4>
+<div class="paragraph"><p>Any file suffix can be used - it is assumed to be YAML. A warning is printed to alert you of a possible input mistake.</p></div>
+<div class="paragraph"><p>In practice &#8216;yaml` sufffix will be recognised by most text editors&#8217; YAML editting mode. You will need to configure your text editor if you use a non-standard suffix.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_docker">Docker</h4>
+<div class="paragraph"><p>A docker image is provided in docker.io (Docker Hub) <a href="https://cloud.docker.com/repository/docker/birchb1024/goyamp">here</a>. This image includes Python and its libraries on a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ docker run --rm -u <span style="color: #009900">$(</span>id -u<span style="color: #990000">):</span><span style="color: #009900">$(</span>id -g<span style="color: #990000">)</span> -v <span style="color: #FF0000">"$HOME"</span><span style="color: #990000">:</span>/work docker<span style="color: #990000">.</span>io/birchb<span style="color: #993399">1024</span>/goyamp <span style="color: #990000">[</span>options<span style="color: #990000">]</span> /work<span style="color: #990000">/</span>{path to your code}<span style="color: #990000">.</span>yaml <span style="color: #990000">[</span>arg1<span style="color: #990000">,</span> arg2<span style="color: #990000">...]</span> <span style="color: #990000">&gt;</span> outputfile<span style="color: #990000">.</span>yaml</tt></pre></div></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_processing">Processing</h3>
+<div class="paragraph"><p>When Goyamp starts, it collects the command-line arguments and assigns the list to the variable <code>argv</code>. It collects the process environment and assigns it to the map variable <code>env</code>. Goyamp then reads the input file, attempts to parse the YAML and holds the resulting data as objects in memory. (If the YAML does not parse Goyamp exits). It recursively scans the objects looking for strings which are the same as defined variables or which contain variables inside the string in curly braces. If it finds a match, it substitutes the object with the variable&#8217;s value.</p></div>
+<div class="paragraph"><p>Goyamp is a substitution engine. It looks for things in it&#8217;s input an when it sees them replaces them with the substitution. The things to look for and the substitutions we call variables and bindings. For example:</p></div>
+<div class="tableblock">
+<table rules="all"
+width="50%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 1. Variables Bindings</caption>
+<col width="50%" />
+<col width="50%" />
+<thead>
+<tr>
+<th align="left" valign="top">Variable Name</th>
+<th align="left" valign="top">Value to substitute</th>
+</tr>
+</thead>
+<tfoot>
+<tr>
+<td align="left" valign="top"><p class="table">mygit_materials</p></td>
+<td align="left" valign="top"><div><div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">args</span><span style="color: #990000">:</span> [branch_name]
+<span style="color: #009900">mygit</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">git</span><span style="color: #990000">:</span> mygit_repo_url
+<span style="color: #990000">        </span><span style="color: #009900">branch</span><span style="color: #990000">:</span> branch_name</tt></pre></div></div></div></td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">mygit_repo_url</p></td>
+<td align="left" valign="top"><div><div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">http</span><span style="color: #990000">:</span>//my.example.org/mygit.git</tt></pre></div></div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>When scanning maps, Goyamp does not expand map keys unless either the map key is explicitly identified as a variable with the <code>^</code> caret character, or the map key is a string with embedded curly braces. In these two special cases Goyamp looks up variables or interpolates the string.</p></div>
+<div class="paragraph"><p>Some special variables contain <em>macros</em> - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this <em>macro expansion</em> <span class="footnote"><br />[But it could actually be a reduction!]<br /></span> ;-).</p></div>
+<div class="paragraph"><p>Goyamp is looking for macro calls with this structure:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>&lt;Macro&gt;:
+   &lt;Argument&gt;: &lt;value&gt;
+   &lt;Argument&gt;: &lt;value&gt;
+    . . .</tt></pre></div></div>
+<div class="paragraph"><p>Some macros have special functions and are built-in to Goyamp. Those are described in the reference section.</p></div>
+<div class="paragraph"><p>Here&#8217;s examples of three kinds of things Goyamp is scanning for replacement:</p></div>
+<div class="listingblock">
+<div class="title">Simple Variables</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> Username
+<span style="color: #990000">-</span> <span style="color: #FF0000">'directory'</span></tt></pre></div></div>
+<div class="listingblock">
+<div class="title">Embeded Variables</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> <span style="color: #FF0000">'The username is {{Username}}'</span></tt></pre></div></div>
+<div class="listingblock">
+<div class="title">Macro Calls</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">add_user</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> Kevin
+<span style="color: #990000">    </span><span style="color: #009900">phone</span><span style="color: #990000">:</span> (<span style="color: #993399">555</span>) <span style="color: #993399">098</span> <span style="color: #993399">880</span></tt></pre></div></div>
+<div class="paragraph"><p>When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output in YAML format. Becuase YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from the input <span class="footnote"><br />[Order-preservation may happen in a future version, but it&#8217;s complicated]<br /></span>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_variables">Variables</h3>
+<div class="paragraph"><p>During processing goyamp maintains a hierarchy of bindings of variable names to variable values. The top level of bindings is the gobal environment. As each macro is applied the application creates a unique environment for the macro variables which is popped when the macro finishes.</p></div>
+<div class="sect3">
+<h4 id="_code_define_code_definition_of_variables"><code>define</code> - Definition of Variables</h4>
+<div class="paragraph"><p>You can define new variable bindings or update existing variables with the <code>define</code> macro. The value can be any YAML expansion. Variable names are expected to be strings.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: age, value: <span style="color: #993399">32</span>}
+<span style="color: #990000">-</span> age
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: age2, value: [age, age]}
+<span style="color: #990000">-</span> age2
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: age2, value: [{define: {name: age, value: <span style="color: #993399">99</span>}}, age]}
+<span style="color: #990000">-</span> age2
+<span style="font-style: italic"><span style="color: #9A1900"># Produces:</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">#- 32</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">#- - 32</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">#  - 32</span></span>
+<span style="font-style: italic"><span style="color: #9A1900">#- - 99</span></span></tt></pre></div></div>
+</div>
+<div class="sect3">
+<h4 id="_scalars">Scalars</h4>
+<div class="paragraph"><p>Variables can contain any YAML scalar, int float, string, True, False and null.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_collections">Collections</h4>
+<div class="paragraph"><p>Variables can contain any YAML collection ie, maps and lists.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_variable_expansion">Variable Expansion</h4>
+<div class="paragraph"><p>When Goyamp scans YAML it looks for variables in the lists and map values. When one is found it is replaced with the current value of variable binding. It searches the stack of macro bindings until the global environment is reached. If no bindng is found the string is output unchanged.</p></div>
+<div class="sect4">
+<h5 id="_variables_embedded_in_strings">Variables Embedded in Strings</h5>
+<div class="paragraph"><p>Inside strings, Goyamp will insert expansions delimited by the double-curlies <code>{{</code> and <code>}}</code>. It&#8217;s looking for variable names.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: X, value: Christopher}
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: AXA, value: <span style="color: #FF0000">'A{{ X }}A'</span>}
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #990000">-</span> AXA
+<span style="font-style: italic"><span style="color: #9A1900"># Produces AChristopherA</span></span></tt></pre></div></div>
+<div class="paragraph"><p>This processing is also done in map keys so that map keys can be computed during the expansion. For example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> loop_variable
+  in : {range: [<span style="color: #993399">1</span>,<span style="color: #993399">3</span>] }
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span>
+    <span style="color: #FF0000">'KEY_{{loop_variable}}'</span>: some step</tt></pre></div></div>
+</div>
+<div class="sect4">
+<h5 id="_interpolation_with_dot_syntax">Interpolation with dot syntax</h5>
+<div class="paragraph"><p>If a string contains periods, such as <code>data.height</code> Goyamp looks for a exactly matching variable name, which is expanded with the value. Otherwise the first item (ie <code>data</code>) is assumed to be a variable name.</p></div>
+<div class="paragraph"><p>If a binding for the first part is found the value of the variable is assumed to be a collection. The other items which we call sub-variables are used to index the collection (ie <code>height</code>). If the collection is a map, the sub-variable name is used as the key. If it is a list the subvariable must evaluate to an integer which is zero-indexed into the list. These subvariable names are also expanded before use so other variables can be used to index the collection.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> { zero: <span style="color: #993399">0</span> }
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> data
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+<span style="color: #990000">        - </span><span style="color: #009900">type</span><span style="color: #990000">:</span> webserver
+<span style="color: #990000">          </span><span style="color: #009900">hostname</span><span style="color: #990000">:</span> web01
+<span style="color: #990000">          </span><span style="color: #009900">ip</span><span style="color: #990000">:</span> <span style="color: #993399">1.1</span>.<span style="color: #993399">2.3</span>
+<span style="color: #990000">        - </span><span style="color: #009900">type</span><span style="color: #990000">:</span> database
+<span style="color: #990000">          </span><span style="color: #009900">hostname</span><span style="color: #990000">:</span> db01
+<span style="color: #990000">          </span><span style="color: #009900">ip</span><span style="color: #990000">:</span> <span style="color: #993399">1.1</span>.<span style="color: #993399">2.2</span>
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {data.<span style="color: #993399">1</span> : Wednesday}
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #990000">-</span> data.<span style="color: #993399">1</span>
+<span style="color: #990000">-</span> data.<span style="color: #993399">1</span>.hostname
+<span style="color: #990000">-</span> data.zero.hostname</tt></pre></div></div>
+<div class="paragraph"><p>Produces</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> Wednesday
+<span style="color: #990000">-</span> db01
+<span style="color: #990000">-</span> web01</tt></pre></div></div>
+</div>
+<div class="sect4">
+<h5 id="_variable_map_keys_with_the_caret">Variable Map Keys with the Caret</h5>
+<div class="paragraph"><p>Normally map keys are not expanded, but with a preceding caret character Goyamp looks up the variable name in the current binding and uses its value. For example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> my-macro
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [ param ]
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+      ^param:
+        LtUaE : RU
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #990000">-</span> my-macro: { param: <span style="color: #993399">42</span> }</tt></pre></div></div>
+<div class="paragraph"><p>Evaluates to:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">42</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">LtUaE</span><span style="color: #990000">:</span> <span style="color: #993399">42</span></tt></pre></div></div>
+<div class="paragraph"><p>This facility even allows macros to be called indirectly since the macro being called is provided by the variable rather than in the code itself. Here&#8217;s an example, although the practical value of this is yet to surface. This code applies four different macros to the same arguments in turn:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> macro
+<span style="color: #990000">  </span><span style="color: #009900">in</span><span style="color: #990000">:</span> [+, range, flatten, quote]
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span>
+    ^macro: [<span style="color: #993399">1</span>, <span style="color: #993399">5</span>]</tt></pre></div></div>
+</div>
+<div class="sect4">
+<h5 id="_defining_multiple_variables">Defining Multiple Variables</h5>
+<div class="paragraph"><p>Declarations don&#8217;t need the <em>name</em> and <em>value</em> keys, and multiple variables are simultaneously bound.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> { quick: <span style="color: #FF0000">'shorthand'</span> }
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> Sara
+<span style="color: #990000">    </span><span style="color: #009900">age</span><span style="color: #990000">:</span> <span style="color: #993399">34</span>
+<span style="color: #990000">    </span><span style="color: #009900">height</span><span style="color: #990000">:</span> <span style="color: #993399">123</span></tt></pre></div></div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_refactoring_goyamp_with_code_undefine_code">Refactoring Goyamp with <code>undefine</code></h4>
+<div class="paragraph"><p>Sometimes a variable needs to be renamed or removed. For example if a Goyamp macro name conflicts with a name used in the
+output format required. The <code>undefine</code> macro removes a variable binding from the current environment. Usage:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">undefine</span><span style="color: #990000">:</span> variablename</tt></pre></div></div>
+<div class="paragraph"><p>Used at the top level
+(outside of a macro) <code>undefine</code> can be used to change the definitions of Goyamp built-in macros themselves. This is done by first assigning a new name with the currently used macro, then undefining the original name. If this is done before any files are included, it can be used to redefine Goyamp syntax. For example we can use <code>plus</code> instead of the <code>+</code> symbol as follows</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">plus</span><span style="color: #990000">:</span> +
+<span style="color: #990000">- </span><span style="color: #009900">undefine</span><span style="color: #990000">:</span> +
+<span style="color: #990000">-</span> {plus: [<span style="color: #993399">1</span>,<span style="color: #993399">2</span>,<span style="color: #993399">3</span>]}</tt></pre></div></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_macros">Macros</h3>
+<div class="paragraph"><p>Macros are re-usable templates of YAML objects that can be called up almost anywhere in the expansion. They differ from variables becuase they have parameters which are used to fill holes in the template. The are similar to functions, but unlike functions their entire text is always the result. By defining oft-repeated YAML fragments in macros repetitive work is avoided. Also a singular macro definition makes maintainance easy since there is a single defintion for a concept which can be easily changed.</p></div>
+<div class="sect3">
+<h4 id="_defining_with_code_defmacro_code">Defining with <code>defmacro</code></h4>
+<div class="paragraph"><p>Macros are defined with the <code>define</code> macro which gives the macro a name and specifies the arguments it has and the expansion to return, the body.  A macro definition looks like this:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> &lt;the name of the macro&gt;
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [&lt;list of argument names&gt;, ...]
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+      &lt;Some YAML to be expanded&gt;</tt></pre></div></div>
+<div class="paragraph"><p>Example - Database upgrade steps:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">name</span><span style="color: #990000">:</span> app-upgrade
+<span style="color: #990000">  </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [appname, dbname]
+<span style="color: #990000">  </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+      Database upgrade for {{ appname }}:
+<span style="color: #990000">        -</span> stop application {{ appname }}
+<span style="color: #990000">        -</span> backup app database {{ dbname }}
+<span style="color: #990000">        -</span> upgrade the database {{ dbname }}
+<span style="color: #990000">        -</span> restart the application {{ appname }}
+<span style="color: #990000">        -</span> smoke test {{ appname }}
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #990000">-</span> {app-upgrade: { appname: Netflix, dbname: db8812}}
+<span style="color: #990000">-</span> app-upgrade:
+<span style="color: #990000">    </span><span style="color: #009900">appname</span><span style="color: #990000">:</span> Stan
+<span style="color: #990000">    </span><span style="color: #009900">dbname</span><span style="color: #990000">:</span> postgres123123</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> Database upgrade for Netflix:
+<span style="color: #990000">  -</span> stop application Netflix
+<span style="color: #990000">  -</span> backup app database db8812
+<span style="color: #990000">  -</span> upgrade the database db8812
+<span style="color: #990000">  -</span> restart the application Netflix
+<span style="color: #990000">  -</span> smoke test Netflix
+<span style="color: #990000">-</span> Database upgrade for Stan:
+<span style="color: #990000">  -</span> stop application Stan
+<span style="color: #990000">  -</span> backup app database postgres123123
+<span style="color: #990000">  -</span> upgrade the database postgres123123
+<span style="color: #990000">  -</span> restart the application Stan
+<span style="color: #990000">  -</span> smoke test Stan</tt></pre></div></div>
+</div>
+<div class="sect3">
+<h4 id="_invoking_calling_macros">Invoking/calling Macros</h4>
+<div class="paragraph"><p>As above, macro calls are just maps with a particular structure:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>&lt;macro name&gt;:
+   &lt;arg1&gt; : &lt;arg <span style="color: #993399">1</span> value&gt;
+   ...
+   &lt;argN&gt; : &lt;arg N value&gt;</tt></pre></div></div>
+</div>
+<div class="sect3">
+<h4 id="_macros_with_variable_arguments">Macros with variable arguments</h4>
+<div class="paragraph"><p>If the arguments in the definition are specified as a string, not a list, the string is the single argument. All the actual arguments at call-time are collected and bound to the variable in a map.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> &lt;the name of the macro&gt;
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> &lt;argument_variable_name&gt;
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+      &lt;Some YAML to be expanded&gt;</tt></pre></div></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-style: italic"><span style="color: #9A1900"># Definition</span></span>
+<span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> package
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> all
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+<span style="color: #990000">      </span><span style="color: #009900">name</span><span style="color: #990000">:</span> all.doc
+<span style="color: #990000">      </span><span style="color: #009900">yum</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">name</span><span style="color: #990000">:</span> apache
+<span style="color: #990000">        </span><span style="color: #009900">state</span><span style="color: #990000">:</span> all.state
+
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="font-style: italic"><span style="color: #9A1900"># Call</span></span>
+<span style="color: #009900">package</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">doc</span><span style="color: #990000">:</span> Install apache
+<span style="color: #990000">  </span><span style="color: #009900">name</span><span style="color: #990000">:</span> httpd
+<span style="color: #990000">  </span><span style="color: #009900">state</span><span style="color: #990000">:</span> latest</tt></pre></div></div>
+<div class="paragraph"><p>Produces</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">name</span><span style="color: #990000">:</span> Install apache
+<span style="color: #009900">yum</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">name</span><span style="color: #990000">:</span> apache
+<span style="color: #990000">  </span><span style="color: #009900">state</span><span style="color: #990000">:</span> latest</tt></pre></div></div>
+<div class="paragraph"><p>The disadvantage of vararg macros is that Goyamp cannot ensure that all the required arguments have been supplied in the call.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_nesting_macros">Nesting Macros</h4>
+<div class="paragraph"><p>Macro calls can be nested i.e. a macro can can contain a call to another in its arguments. Likewise macro definitions can be nested. The macro arguments are lexically scoped, a closure is collected at the time of definition. The macro call executes in the environment in the define-time closure. Macros can call themselves directly or indirectly.</p></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conditional_expansion_with_code_if_then_else_code">Conditional Expansion with <code>if then else</code></h3>
+<div class="paragraph"><p>The <code>if</code> macro renders one value from a choice of two based on whether the condition argument is true. Where true means it&#8217;s <code>true</code> or not <code>false</code> or <code>null</code>. The <code>then</code> argument is expanded if so, otherwise the <code>else</code> argument. It&#8217;s not required to have both <code>then</code> and <code>else</code> arguments - when the condition requires the missing one, it expands to <code>null</code>.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">if</span><span style="color: #990000">:</span> &lt;Booleanish (<span style="font-weight: bold"><span style="color: #0000FF">true</span></span>, <span style="font-weight: bold"><span style="color: #0000FF">false</span></span> or <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>)&gt;
+<span style="color: #009900">then</span><span style="color: #990000">:</span> &lt;value if <span style="font-weight: bold"><span style="color: #0000FF">true</span></span>&gt;
+<span style="color: #009900">else</span><span style="color: #990000">:</span> &lt;value if <span style="font-weight: bold"><span style="color: #0000FF">false</span></span> or <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>&gt;</tt></pre></div></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-style: italic"><span style="color: #9A1900"># Some variable</span></span>
+<span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">application</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> CSIRAC
+<span style="color: #990000">    </span><span style="color: #009900">has_database</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">true</span></span>
+<span style="color: #990000">    </span><span style="color: #009900">arch</span><span style="color: #990000">:</span> valves
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #009900">if</span><span style="color: #990000">:</span> application.has_database
+<span style="color: #009900">then</span><span style="color: #990000">:</span>
+<span style="color: #990000">  -</span> shutdown database
+<span style="color: #009900">else</span><span style="color: #990000">:</span>
+<span style="color: #990000">  -</span> shutdown not required</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> shutdown database</tt></pre></div></div>
+<div class="paragraph"><p>Example - short form</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">if</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">true</span></span>
+<span style="color: #009900">else</span><span style="color: #990000">:</span> <span style="color: #FF0000">'This value if false or Null'</span></tt></pre></div></div>
+<div class="paragraph"><p>Produces <code>null</code></p></div>
+</div>
+<div class="sect2">
+<h3 id="_testing_equality_with_code_code">Testing equality with <code>==</code></h3>
+<div class="paragraph"><p>Macros can have almost any name, this one is the symbol <em>==</em>. It expands to <code>true</code> or <code>false</code> if the items in the list are equal. Most often used inside an enclosing <code>if</code> macro.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>{ ==: [arg1, arg2, ...] }</tt></pre></div></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>{ ==: [<span style="color: #993399">1</span>, <span style="color: #993399">1</span>, <span style="color: #993399">10</span>] }</tt></pre></div></div>
+<div class="paragraph"><p>Produces the value <code>false</code>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_preventing_expansion_with_code_quote_code">Preventing Expansion with <code>quote</code></h3>
+<div class="paragraph"><p>The <code>quote</code> macro does not expand its input arguments returning them unexpanded.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> { data1: { sub: <span style="color: #993399">2</span>}}
+<span style="color: #990000">-</span> data1.sub
+<span style="color: #990000">- </span><span style="color: #009900">quote</span><span style="color: #990000">:</span> data1.sub</tt></pre></div></div>
+<div class="paragraph"><p>Produces</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> <span style="color: #993399">2</span>
+<span style="color: #990000">-</span> data1.sub</tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_looping_with_code_repeat_code">Looping with <code>repeat</code></h3>
+<div class="paragraph"><p>This macro repeatedly expands the same object, either returning a list or a map. If the <code>key</code> argument is present it returns a map, using the <code>key</code> argument as the item&#8217;s key. This must have embedded variables derived from the looping execution otherwise there will be a key collision error. With no <code>key</code> argument, it returns a list.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> &lt;loop variable name&gt;
+<span style="color: #990000">  </span><span style="color: #009900">in</span><span style="color: #990000">:</span> [list of items]
+<span style="color: #990000">  </span><span style="color: #009900">key</span><span style="color: #990000">:</span> &lt;string key with embedded varaibles in {{}}&gt; <span style="font-style: italic"><span style="color: #9A1900"># Optional</span></span>
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span> &lt;any value&gt;</tt></pre></div></div>
+<div class="paragraph"><p>Example - returning a dictionary:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> environment_name
+<span style="color: #990000">  </span><span style="color: #009900">in</span><span style="color: #990000">:</span>
+<span style="color: #990000">    -</span> DEV1
+<span style="color: #990000">    -</span> SVT
+<span style="color: #990000">    -</span> PROD
+<span style="color: #990000">  </span><span style="color: #009900">key</span><span style="color: #990000">:</span> <span style="color: #FF0000">'Deploy_App_{{environment_name}}'</span>
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">stage</span><span style="color: #990000">:</span> step</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">Deploy_App_DEV1</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">stage</span><span style="color: #990000">:</span> step
+<span style="color: #009900">Deploy_App_PROD</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">stage</span><span style="color: #990000">:</span> step
+<span style="color: #009900">Deploy_App_SVT</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">stage</span><span style="color: #990000">:</span> step</tt></pre></div></div>
+<div class="paragraph"><p>Example - returning a list:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> loop_variable
+<span style="color: #990000">  </span><span style="color: #009900">in</span><span style="color: #990000">:</span> {range: [<span style="color: #993399">1</span>,<span style="color: #993399">3</span>]}
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">loop_variable</span><span style="color: #990000">:</span> <span style="color: #FF0000">'KEY_{{loop_variable}}'</span>
+<span style="color: #990000">    </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step
+<span style="color: #990000">    </span><span style="color: #009900">another</span><span style="color: #990000">:</span></tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">another</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>
+<span style="color: #990000">  </span><span style="color: #009900">loop_variable</span><span style="color: #990000">:</span> KEY_1
+<span style="color: #990000">  </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step
+<span style="color: #990000">- </span><span style="color: #009900">another</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>
+<span style="color: #990000">  </span><span style="color: #009900">loop_variable</span><span style="color: #990000">:</span> KEY_2
+<span style="color: #990000">  </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step
+<span style="color: #990000">- </span><span style="color: #009900">another</span><span style="color: #990000">:</span> <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>
+<span style="color: #990000">  </span><span style="color: #009900">loop_variable</span><span style="color: #990000">:</span> KEY_3
+<span style="color: #990000">  </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step</tt></pre></div></div>
+<div class="paragraph"><p>Example - looped list with changing keys. Here the keys and values of a child map are changed. :</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> loop_variable
+<span style="color: #990000">  </span><span style="color: #009900">in</span><span style="color: #990000">:</span> {range: [<span style="color: #993399">12</span>,<span style="color: #993399">13</span>]}
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span>
+    <span style="color: #FF0000">'index_{{loop_variable}}'</span>: { +:  [<span style="color: #993399">100</span>, loop_variable] }
+<span style="color: #990000">    </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">index_12</span><span style="color: #990000">:</span> <span style="color: #993399">112</span>
+<span style="color: #990000">  </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step
+<span style="color: #990000">- </span><span style="color: #009900">index_13</span><span style="color: #990000">:</span> <span style="color: #993399">113</span>
+<span style="color: #990000">  </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step</tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_looping_with_code_range_code">Looping with <code>range</code></h3>
+<div class="paragraph"><p>The <code>range</code> macro substitutes a list of numbers that can be used in <code>repeat</code> macros. (Or anywhere else a list of numbers is needed). The start and end values are passed as a list argument. The range can count up or down, always by one.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">range</span><span style="color: #990000">:</span> [<span style="color: #993399">3</span>,<span style="color: #993399">5</span>]</tt></pre></div></div>
+<div class="paragraph"><p>Produces <code>[3,4,5]</code></p></div>
+<div class="paragraph"><p><code>range</code> also accepts a map object, in which case it expands the sequence of map keys. For example</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {map: {ra: <span style="color: #993399">879</span>, rb: <span style="color: #993399">662</span>}}
+<span style="color: #990000">- </span><span style="color: #009900">range</span><span style="color: #990000">:</span> map</tt></pre></div></div>
+<div class="paragraph"><p>Produces <code>[ra, rb]</code>. This can then be used in repeat to loop over the items in a map. Dot notation is used to expand individual members of the map.
+For example here the loop variable is set to <code>ra</code> then <code>rb</code> which <code>map.keyz</code> resolves to <code>879</code> and <code>662</code>:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">repeat</span><span style="color: #990000">:</span>
+<span style="color: #990000">  </span><span style="color: #009900">for</span><span style="color: #990000">:</span> keyz
+<span style="color: #990000">  </span><span style="color: #009900">in</span><span style="color: #990000">:</span> {range: map}
+<span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span>
+    map.keyz</tt></pre></div></div>
+<div class="paragraph"><p>Be aware that map keys in data (such as <code>ra</code>) might conflict with already defined variables.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_combining_lists_with_code_flatten_code">Combining Lists with <code>flatten</code></h3>
+<div class="paragraph"><p>Sometimes you need to combine lists, perhaps from different macro expansions. The <code>flatten</code> macro combines multiple lists into a single, flat, list. The flattening is recursive. Syntax:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">flatten</span><span style="color: #990000">:</span> &lt; list of objects &gt;</tt></pre></div></div>
+<div class="paragraph"><p>For example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">define</span><span style="color: #990000">:</span> {home-directories: [/home/elvis, /home/madonna]}
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #009900">flatten</span><span style="color: #990000">:</span> [[home-directories], /var, /log]
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #009900">flatten</span><span style="color: #990000">:</span> [<span style="color: #993399">1</span>, <span style="color: #993399">2</span>, [<span style="color: #993399">3</span>], [[<span style="color: #993399">4</span>, <span style="color: #993399">5</span>]], [[[ <span style="color: #993399">6</span>,<span style="color: #993399">7</span>]]] ]</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> /home/elvis
+<span style="color: #990000">-</span> /home/madonna
+<span style="color: #990000">-</span> /var
+<span style="color: #990000">-</span> /log
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #990000">-</span> <span style="color: #993399">1</span>
+<span style="color: #990000">-</span> <span style="color: #993399">2</span>
+<span style="color: #990000">-</span> <span style="color: #993399">3</span>
+<span style="color: #990000">-</span> <span style="color: #993399">4</span>
+<span style="color: #990000">-</span> <span style="color: #993399">5</span>
+<span style="color: #990000">-</span> <span style="color: #993399">6</span>
+<span style="color: #990000">-</span> <span style="color: #993399">7</span></tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_combining_one_level_of_lists_with_code_flatone_code">Combining One Level of Lists with <code>flatone</code></h3>
+<div class="paragraph"><p>The <code>flatone</code> macro combines multiple lists into a single, flat, list. The flattening is <strong>not</strong> recursive, only the first level is flattened. Syntax:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">flatone</span><span style="color: #990000">:</span> &lt; list of objects &gt;</tt></pre></div></div>
+<div class="paragraph"><p>For example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">flatone</span><span style="color: #990000">:</span> [<span style="color: #993399">1</span>, <span style="color: #993399">2</span>, [<span style="color: #993399">3</span>], [[<span style="color: #993399">4</span>, <span style="color: #993399">5</span>]], [[[ <span style="color: #993399">6</span>,<span style="color: #993399">7</span>]]] ]</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> <span style="color: #993399">1</span>
+<span style="color: #990000">-</span> <span style="color: #993399">2</span>
+<span style="color: #990000">-</span> <span style="color: #993399">3</span>
+<span style="color: #990000">-</span> - <span style="color: #993399">4</span>
+<span style="color: #990000">  -</span> <span style="color: #993399">5</span>
+<span style="color: #990000">-</span> - - <span style="color: #993399">6</span>
+<span style="color: #990000">    -</span> <span style="color: #993399">7</span></tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_combining_maps_with_code_merge_code">Combining Maps with <code>merge</code></h3>
+<div class="paragraph"><p>The <code>merge</code> macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Syntax:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">merge</span><span style="color: #990000">:</span> &lt; list of maps &gt;</tt></pre></div></div>
+<div class="paragraph"><p>For example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">merge</span><span style="color: #990000">:</span>
+<span style="color: #990000">  -</span> { a : <span style="color: #993399">1</span> }
+<span style="color: #990000">  -</span> { b : <span style="color: #993399">2</span> }
+<span style="color: #990000">  -</span> { c : <span style="color: #993399">3</span> , a : -<span style="color: #993399">1</span>}</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">a</span><span style="color: #990000">:</span> -<span style="color: #993399">1</span>
+<span style="color: #009900">b</span><span style="color: #990000">:</span> <span style="color: #993399">2</span>
+<span style="color: #009900">c</span><span style="color: #990000">:</span> <span style="color: #993399">3</span></tt></pre></div></div>
+<div class="paragraph"><p>A more complex example shows combining data from multiple sources:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span>
+    network-data:
+<span style="color: #990000">      </span><span style="color: #009900">hostname</span><span style="color: #990000">:</span> tetris.games.org
+<span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> mymacro
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [arg1]
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+<span style="color: #990000">      </span><span style="color: #009900">hostname</span><span style="color: #990000">:</span> arg1
+<span style="color: #990000">      </span><span style="color: #009900">ip</span><span style="color: #990000">:</span> <span style="color: #993399">1.1</span>.<span style="color: #993399">1.1</span>
+<span style="color: #990000">      </span><span style="color: #009900">app</span><span style="color: #990000">:</span> tetris
+<span style="color: #990000">- </span><span style="color: #009900">merge</span><span style="color: #990000">:</span>
+<span style="color: #990000">  -</span> { hostname: tetris.home.org }
+<span style="color: #990000">  -</span> { site: Kansas }
+<span style="color: #990000">  - </span><span style="color: #009900">mymacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">      </span><span style="color: #009900">arg1</span><span style="color: #990000">:</span> tetris
+<span style="color: #990000">  -</span> network-data</tt></pre></div></div>
+<div class="paragraph"><p>Which boils down to:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">app</span><span style="color: #990000">:</span> tetris
+<span style="color: #990000">  </span><span style="color: #009900">hostname</span><span style="color: #990000">:</span> tetris.games.org
+<span style="color: #990000">  </span><span style="color: #009900">ip</span><span style="color: #990000">:</span> <span style="color: #993399">1.1</span>.<span style="color: #993399">1.1</span>
+<span style="color: #990000">  </span><span style="color: #009900">site</span><span style="color: #990000">:</span> Kansas</tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_arithmetic_with_code_code">Arithmetic with <code>+</code></h3>
+<div class="paragraph"><p>The <code>+</code> macro adds a list of numbers, int or float.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>+: [<span style="color: #993399">1</span>,<span style="color: #993399">2</span>,<span style="color: #993399">4</span>,<span style="color: #993399">8</span>]</tt></pre></div></div>
+<div class="paragraph"><p>Produces <code>15</code></p></div>
+</div>
+<div class="sect2">
+<h3 id="_reading_files_with_code_include_code">Reading files with <code>include</code></h3>
+<div class="paragraph"><p></p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">include</span><span style="color: #990000">:</span>
+<span style="color: #990000">-</span> &lt;filename&gt;
+<span style="color: #990000">-</span> &lt;filename&gt;</tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_reading_data_files">Reading Data Files</h3>
+<div class="paragraph"><p>Sometimes you want to use raw data for parameters and variable values. For example you may have an inventory or database of facts. Goyamp can load YAML or JSON data.</p></div>
+<div class="sect3">
+<h4 id="_reading_data_with_code_load_code">Reading Data with <code>load</code></h4>
+<div class="paragraph"><p>The <code>load</code> macro reads a single file of YAML or JSON data and returns the result. No variable substitutions or macro expansions are performed on the data. YAML data is returned as a list, one object for each <em>doc</em>. <span class="footnote"><br />[YAML files are subdivided into <em>docs</em> separated by <em>---</em>]<br /></span></p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>{load: &lt;filename&gt;}</tt></pre></div></div>
+<div class="paragraph"><p>Examples:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: file, value: <span style="color: #FF0000">'load_data.yaml'</span>}
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> somedata
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span> {load: file}
+<span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">movie1</span><span style="color: #990000">:</span> {load: <span style="color: #FF0000">'../test/fixtures/blade-runner.json'</span>}</tt></pre></div></div>
+</div>
+<div class="sect3">
+<h4 id="_loading_shell_script_data">Loading Shell Script Data</h4>
+<div class="paragraph"><p>When you have shell variables in files which you want to use as input to expansion, you can load them into the environment of the Goyamp execution. For example here&#8217;s a script with some dynamic data:</p></div>
+<div class="listingblock">
+<div class="title">data.sh</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">VARIABLE1</span><span style="color: #990000">=</span>value1
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">VARIABLE2</span><span style="color: #990000">=</span><span style="color: #FF0000">"${VARIABLE1}_value2"</span>
+<span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">VARIABLE3</span><span style="color: #990000">=</span><span style="color: #FF0000">"${VARIABLE2}_value3"</span></tt></pre></div></div>
+<div class="paragraph"><p>The shell script must executed to determine the values. To load this into the Goyamp environment, use shell wrappers like this:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ env -i bash --noprofile --norc -c <span style="color: #FF0000">'. data.sh ; echo env | goyamp'</span></tt></pre></div></div>
+<div class="paragraph"><p>How does this work?</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>env -i bash</code> creates a bash process with an empty environment.
+</p>
+</li>
+<li>
+<p>
+<code>--noprofile --norc</code> prevent bash from reading profile files on startup
+</p>
+</li>
+<li>
+<p>
+<code>-c '. data.sh</code> sources the shell script in the current (empty) environment
+</p>
+</li>
+<li>
+<p>
+<code>echo env | goyamp</code> runs Goyamp with an input of just <code>env</code> - this will output all the environment variables
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The YAML output contains the variables we want plus a couple of variables <code>bash</code> always needs:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>PWD<span style="color: #990000">:</span> /home/birchb/workspace/goyamp
+SHLVL<span style="color: #990000">:</span> <span style="color: #FF0000">'1'</span>
+VARIABLE1<span style="color: #990000">:</span> value1
+VARIABLE2<span style="color: #990000">:</span> value1_value2
+VARIABLE3<span style="color: #990000">:</span> value1_value2_value3
+_<span style="color: #990000">:</span> /usr/bin/python</tt></pre></div></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_executing_external_programs_with_code_execute_code">Executing External Programs with <code>execute:</code></h3>
+<div class="paragraph"><p>TODO</p></div>
+</div>
+<div class="sect2">
+<h3 id="_builtin_variables">Builtin Variables</h3>
+<div class="paragraph"><p>Goyamp automatically populates some variables as it executes. These are:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>env</code> - the process environment
+</p>
+</li>
+<li>
+<p>
+<code>argv</code> - the command line arguments
+</p>
+</li>
+<li>
+<p>
+<code>__VERSION__</code> - the Goyamp version number
+</p>
+</li>
+<li>
+<p>
+<code>__FILE__</code> - the current source filename
+</p>
+</li>
+<li>
+<p>
+<code>__PATH__</code> - the current source full pathname
+</p>
+</li>
+<li>
+<p>
+<code>__SOURCE__</code> - the expression passed into the currently executing macro - useful for debugging your macros.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_the_goyamp_go_module">Using the Goyamp Go Module</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>TODO</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_maintenance_of_goyamp">Maintenance of Goyamp</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_build_from_source">Build from Source</h3>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ make<span style="color: #990000">.</span>sh</tt></pre></div></div>
+</div>
+<div class="sect2">
+<h3 id="_code">Code</h3>
+<div class="paragraph"><p>Run the unit tests with <code>cd test; go test</code></p></div>
+</div>
+<div class="sect2">
+<h3 id="_updating_this_document">Updating This Document</h3>
+<div class="paragraph"><p>This document is in <a href="http://www.methods.co.nz/asciidoc/:">AsciiDoc</a> format. Use the Linux <code>asciidoc</code> packages. To Highlight the YAML syntax also install <code>source-highlight</code> and the <a href="https://gist.github.com/zeroyonichihachi/c4952b355bb7a27552a5f23e0c53b65f#file-yaml-lang:">YAML syntax module</a>. Save the HTML version in <code>doc/README.html</code>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_known_issues">Known Issues</h3>
+<div class="paragraph"><p>TODO</p></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Version 0.1.2<br />
+Last updated
+ 2019-06-16 11:29:10 AEST
+</div>
+</div>
+</body>
+</html>
