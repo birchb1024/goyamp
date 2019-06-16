@@ -1,0 +1,40 @@
+#
+# Useful for regression testing all examples.
+#
+---
+# Fake environment
+define:
+  env:
+    USERNAME: peter
+    USER: peter
+---
+defmacro: 
+  name: file_header
+  value: '*************** File: {{__FILE__}} *****************'
+---
+include:
+  - ../examples/alter_keys.yaml
+  - ../examples/arguments.yaml
+  - ../examples/config.yaml
+  - ../examples/flatten.yaml
+  - ../examples/flatten-repeat.yaml
+  - ../examples/foo.yaml
+  - ../examples/for.yaml
+  - ../examples/funny_variables.yaml
+  - ../examples/ifs.yaml
+#  - ../examples/includes.yaml
+#  - ../examples/loader.yaml
+  - ../examples/macros.yaml
+#  - ../examples/multi_define.yaml
+  - ../examples/quote.yaml
+  - ../examples/readme.yaml
+  - ../examples/recursive.yaml
+  - ../examples/repeat.yaml
+  - ../examples/repeat02.yaml
+  - ../examples/repeat-list-keys.yaml
+#  - ../examples/replace.yaml
+  - ../examples/template01.gocd.yaml
+  - ../examples/undefine.yaml
+  - ../examples/varargs.yaml
+  - ../examples/caret.yaml
+  - ../examples/issue06.yaml

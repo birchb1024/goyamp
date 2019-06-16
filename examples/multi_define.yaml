@@ -1,0 +1,36 @@
+file_header:
+---
+# Example of 'bulk' defines
+- define: { X: 23 }
+- X
+- define:
+    a: 1
+    b: { +: [3,4] }
+    c: '{ { a }} { { a }}'
+    d: {pythonz: 'b ** 2'}
+- '{{ a }} {{ b }} {{ c }} {{ d }}'
+---
+# swaps
+- defmacro:
+    name: assert_equal
+    args: [$1, $2]
+    value:
+      if:
+        ==: [$1, $2]
+      else:
+        '{{ ASSERT FAILED }}'
+- define: {x: 2}
+- define: {y: 3}
+- define: {x: y, y: x}
+- assert_equal:
+    $1: '{{ x }} , {{ y }}'
+    $2: '3 , 2'
+---
+# define from a load
+- define: {name: file, value: load_data.yaml}
+#- define: {load: file} # Fails as it should
+- define: {datas: {load: file}}
+#- define: datas.0
+---
+- datas
+- dev

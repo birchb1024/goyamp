@@ -1,0 +1,39 @@
+file_header:
+---
+#
+# Undefine examples
+#
+# Simple example in the top level
+- define:
+    x: 2
+    y: 3
+    z: 4
+- [x, y, z]
+- undefine: y
+- [x, y, z]
+---
+# redefine a macro to a name we want
+- define: 
+    plus: +
+- undefine: +
+- { +: [1,2,3]}
+- {plus: [1,2,3]}
+---
+# undefine works at the lexical scope of the call,
+# so an undefine in a macro affects that level, not higher
+- define: { XZ: 'top level'}
+- defmacro: 
+    name: foo
+    args: 
+    value: 
+      - undefine: XZ
+      - 42
+- foo:
+- XZ
+---
+# another top-level rename
+- define: 
+    deeplist:  [[[6,7]]]
+    renamed: flatone
+- undefine: flatone
+- renamed: [1, 2, [3], [[4, 5]],  deeplist]

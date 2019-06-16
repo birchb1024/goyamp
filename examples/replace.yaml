@@ -1,0 +1,10 @@
+file_header:
+---
+include:
+  - config.yaml
+---
+- define: {name: myenv, value: 1}
+
+---
+
+- config.myenv

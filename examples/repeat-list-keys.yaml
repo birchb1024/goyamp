@@ -1,0 +1,8 @@
+file_header:
+---
+repeat:
+  for: loop_variable
+  in: {range: [12,13]}
+  body:
+    'index_{{loop_variable}}': { +:  [100, loop_variable] }
+    some: step

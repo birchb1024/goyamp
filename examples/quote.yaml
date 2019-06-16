@@ -1,0 +1,29 @@
+file_header:
+---
+- define: { data1: { sub: 2}}
+- data1.sub
+- quote: data1.sub
+- quote:
+    a: data1.sub
+    b: 42
+---
+defmacro:
+    name: foomac
+    args: [a,b]
+    value:
+      - quote: { quote: data1.sub }
+      - quote: [a, b, {quote: a}]
+      - [a, b]
+---
+foomac: { a: 22, b: 33 } 
+---
+define: 
+  bogomac:
+    quote:
+      defmacro:
+        name: foomac2
+        args: [a,b]
+        value: [a, b]
+---
+- bogomac
+- foomac2: {a: 333, b: 22}

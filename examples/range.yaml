@@ -1,0 +1,21 @@
+file_header:
+---
+- range: [1,2]
+- range: ["+1","+2"]
+- range: ["-2","-1"]
+---
+- range: [1,0]
+- range: ["+1","0"]
+- range: ["-1","0"]
+---
+define: {map: {ra: 879, rb: 662}}
+---
+map
+---
+range: map
+---
+repeat:
+  for: $keyz
+  in: {range: map}
+  body:
+    - map.$keyz

@@ -1,0 +1,9 @@
+file_header:
+---
+- define: {x: { two: 2 } }
+- defmacro:
+    name: PRINTNUM
+    args: [ data ]
+    value: { if: { "==": [data, "ONE"] }, then: x.one, else: x.two }
+---
+{ "output": { "test": { PRINTNUM: { data: "TWO" } } } }

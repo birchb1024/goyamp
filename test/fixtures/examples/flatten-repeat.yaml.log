@@ -1,0 +1,15 @@
+---
+file_header: null
+---
+- name: start-all-pcf-automation-tasks
+  plan:
+  - get: bbr-om-installation-pipelinetask
+    trigger: true
+  - get: isolation-segment-s3
+    passed: '[get-new-resources]'
+  - get: metrics-s3
+    passed: '[get-new-resources]'
+  - get: rabbitmq-s3
+    passed: '[get-new-resources]'
+  - get: pcf-automation-image-s3
+    passed: '[get-new-resources]'

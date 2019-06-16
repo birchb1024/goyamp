@@ -1,0 +1,24 @@
+---
+file_header: null
+---
+- one:
+  - a
+  - b
+  - c
+- two: 77
+---
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: Install apache
+    yum:
+      name: apache
+      state: latest
+  vars:
+    http_port: 80
+    max_clients: 200
+---
+- env: perf
+  host: lp123123
+- env: prod
+  host: lpp23423

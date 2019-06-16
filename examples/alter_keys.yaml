@@ -1,0 +1,12 @@
+file_header:
+---
+# Example of substition of map keys.
+#
+
+- define: { name: SOMEVARIABLE, value: 1234 }
+---
+mymap:
+  'Foo_{{SOMEVARIABLE}}': west
+  East_{{SOMEVARIABLE}}: east
+  1236: north
+  1237: south

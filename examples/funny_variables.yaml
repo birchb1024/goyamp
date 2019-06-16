@@ -1,0 +1,12 @@
+file_header:
+---
+# Strange variable names
+
+# variable with whitespace
+- define: {A B : 123}
+- A B
+
+# variable which looks numeric
+- define: {'37' : 123}
+- 37
+

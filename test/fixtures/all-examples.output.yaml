@@ -1,0 +1,540 @@
+---
+'*************** File: alter_keys.yaml *****************'
+---
+mymap:
+  1236: north
+  1237: south
+  East_1234: east
+  Foo_1234: west
+---
+'*************** File: arguments.yaml *****************'
+---
+- c
+- d
+- e
+---
+- a
+- b
+- c
+- d
+- e
+---
+'*************** File: config.yaml *****************'
+---
+'*************** File: flatten.yaml *****************'
+---
+- /home/elvis
+- /home/madonna
+- /var
+- /log
+---
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+---
+a: -1
+b: 2
+c: 3
+---
+- app: tetris
+  hostname: tetris.games.org
+  ip: 1.1.1.1
+  site: Kansas
+---
+'*************** File: flatten-repeat.yaml *****************'
+---
+- name: start-all-pcf-automation-tasks
+  plan:
+  - get: bbr-om-installation-pipelinetask
+    trigger: true
+  - get: isolation-segment-s3
+    passed: '[get-new-resources]'
+  - get: metrics-s3
+    passed: '[get-new-resources]'
+  - get: rabbitmq-s3
+    passed: '[get-new-resources]'
+  - get: pcf-automation-image-s3
+    passed: '[get-new-resources]'
+---
+'*************** File: foo.yaml *****************'
+---
+- foo: 78
+- 12
+---
+'*************** File: for.yaml *****************'
+---
+Deploy_PREIMP:
+- steps: step PREIMP 1
+- steps: step PREIMP 2
+Deploy_PROD:
+- steps: step PROD 1
+- steps: step PROD 2
+---
+'*************** File: funny_variables.yaml *****************'
+---
+- 123
+- 37
+---
+'*************** File: ifs.yaml *****************'
+---
+OK
+---
+OK
+---
+OK
+---
+- 123
+- 4444
+---
+- Goodbye Stage: null
+  approval: success
+  jobs:
+    Job_hi:
+      tasks:
+        resources:
+        - linux
+        tasks:
+        - exec:
+            arguments:
+            - -c
+            - date
+            command: /bin/bash
+            run_if: passed
+---
+'*************** File: macros.yaml *****************'
+---
+- deploy:
+  - boilerplate
+  - shutdown_server: 20 seconds
+  - deploy:
+      facts:
+        hostname: lll123
+        password: 1231231
+        ports:
+        - 21
+        - 22
+        username: jill
+      something: 34
+      timeout: 3 h
+  - intermediate
+  - start server
+- first_port: 21
+- second_port: 22
+---
+- - Args $a1 HELLO WORLD
+  - '__SOURCE__ ''{ macro_with_source : $a-variable  }'''
+---
+'*************** File: quote.yaml *****************'
+---
+- 2
+- data1.sub
+- a: data1.sub
+  b: 42
+---
+- data1.sub
+- - a
+  - b
+  - a
+- - 22
+  - 33
+---
+- - 333
+  - 22
+---
+'*************** File: readme.yaml *****************'
+---
+- Hello: World
+---
+pipelines:
+  mypipe1:
+    group: mygroup
+    label_template: ${COUNT}
+    materials:
+      mygit:
+        branch: master
+        git: http://my.example.org/mygit.git
+    stages: null
+  mypipe2:
+    group: mygroup
+    label_template: ${COUNT}
+    materials:
+      mygit:
+        branch: ci
+        git: http://my.example.org/mygit.git
+    stages: null
+---
+- AChristopherA
+---
+- 32
+- - 32
+  - 32
+- - 99
+---
+- Wednesday
+- db01
+- web01
+---
+- Database upgrade for Netflix:
+  - stop application Netflix
+  - backup app database db8812
+  - upgrade the database db8812
+  - restart the application Netflix
+  - smoke test Netflix
+- Database upgrade for Stan:
+  - stop application Stan
+  - backup app database postgres123123
+  - upgrade the database postgres123123
+  - restart the application Stan
+  - smoke test Stan
+---
+name: Install apache
+yum:
+  name: apache
+  state: latest
+---
+- shutdown database
+---
+Deploy_App_DEV1:
+  stage: step
+Deploy_App_PROD:
+  stage: step
+Deploy_App_SVT:
+  stage: step
+---
+115
+---
+- true
+---
+- 3
+- 4
+- 5
+---
+- /home/elvis
+- /home/madonna
+- /var
+- /log
+---
+'*************** File: recursive.yaml *****************'
+---
+- new:
+    new:
+      new:
+        new:
+          new:
+            new:
+              new:
+                new: null
+                to:
+                - 7
+                - axe
+              to:
+              - 6
+              - axe
+            to:
+            - 5
+            - axe
+          to:
+          - 4
+          - axe
+        to:
+        - 3
+        - axe
+      to:
+      - 2
+      - axe
+    to:
+    - 1
+    - axe
+  to:
+  - 0
+  - axe
+---
+'*************** File: repeat.yaml *****************'
+---
+Deploy_PREIMP:
+- steps: Do PREIMP 1
+- steps: Do PREIMP 2
+Deploy_PROD:
+- steps: Do PROD 1
+- steps: Do PROD 2
+---
+'*************** File: repeat02.yaml *****************'
+---
+- another_item: null
+  loop_variable: KEY_abra
+  some: step
+- another_item: null
+  loop_variable: KEY_ca
+  some: step
+- another_item: null
+  loop_variable: KEY_dabra
+  some: step
+---
+- 1: KEY_1
+  another_item: null
+  some: step
+- 2: KEY_2
+  another_item: null
+  some: step
+- 3: KEY_3
+  another_item: null
+  some: step
+---
+Deploy_App_DEV1:
+  stage: step
+Deploy_App_PROD:
+  stage: step
+Deploy_App_SVT:
+  stage: step
+---
+Deploy_App_1:
+  stage: step
+Deploy_App_2:
+  stage: step
+Deploy_App_3:
+  stage: step
+Deploy_App_4:
+  stage: step
+Deploy_App_5:
+  stage: step
+---
+Deploy_App_DEV1:
+  Start_server_1:
+    stage: run start
+  Start_server_2:
+    stage: run start
+  Start_server_3:
+    stage: run start
+  Start_server_4:
+    stage: run start
+  Start_server_5:
+    stage: run start
+Deploy_App_PROD:
+  Start_server_1:
+    stage: run start
+  Start_server_2:
+    stage: run start
+  Start_server_3:
+    stage: run start
+  Start_server_4:
+    stage: run start
+  Start_server_5:
+    stage: run start
+Deploy_App_SVT:
+  Start_server_1:
+    stage: run start
+  Start_server_2:
+    stage: run start
+  Start_server_3:
+    stage: run start
+  Start_server_4:
+    stage: run start
+  Start_server_5:
+    stage: run start
+---
+'*************** File: repeat-list-keys.yaml *****************'
+---
+- index_12: 112
+  some: step
+- index_13: 113
+  some: step
+---
+'*************** File: template01.gocd.yaml *****************'
+---
+pipelines:
+  Hello_World_1:
+    group: Group_1
+    label_template: ${COUNT}
+    materials:
+      shared:
+        git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
+    stages:
+    - Hello:
+        approval: success
+        jobs:
+          World1:
+            resources:
+            - linux
+            tasks:
+            - exec:
+                arguments:
+                - -c
+                - date
+                command: /bin/bash
+                run_if: passed
+          World2:
+            resources:
+            - linux
+            tasks:
+            - exec:
+                arguments:
+                - -c
+                - date
+                command: /bin/bash
+                run_if: passed
+  Hello_World_2:
+    group: Group_1
+    label_template: ${COUNT}
+    materials:
+      shared:
+        git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
+    stages:
+    - Hello:
+        approval: success
+        jobs:
+          World1:
+            resources:
+            - linux
+            tasks:
+            - exec:
+                arguments:
+                - -c
+                - date
+                command: /bin/bash
+                run_if: passed
+          World2:
+            resources:
+            - linux
+            tasks:
+            - exec:
+                arguments:
+                - -c
+                - date
+                command: /bin/bash
+                run_if: passed
+  Hello_World_3:
+    group: Group_1
+    label_template: ${COUNT}
+    materials:
+      shared:
+        git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
+    stages:
+    - Hello:
+        approval: success
+        jobs:
+          World1:
+            resources:
+            - linux
+            tasks:
+            - exec:
+                arguments:
+                - -c
+                - date
+                command: /bin/bash
+                run_if: passed
+          World2:
+            resources:
+            - linux
+            tasks:
+            - exec:
+                arguments:
+                - -c
+                - date
+                command: /bin/bash
+                run_if: passed
+---
+'*************** File: undefine.yaml *****************'
+---
+- - 2
+  - 3
+  - 4
+- - 2
+  - y
+  - 4
+---
+- +:
+  - 1
+  - 2
+  - 3
+- 6
+---
+- - 42
+- top level
+---
+- - 1
+  - 2
+  - 3
+  - - 4
+    - 5
+  - - - 6
+      - 7
+---
+'*************** File: varargs.yaml *****************'
+---
+- one:
+  - a
+  - b
+  - c
+- two: 77
+---
+- hosts: webservers
+  remote_user: root
+  tasks:
+  - name: Install apache
+    yum:
+      name: apache
+      state: latest
+  vars:
+    http_port: 80
+    max_clients: 200
+---
+- env: perf
+  host: lp123123
+- env: prod
+  host: lpp23423
+---
+- amap:
+    23: 23
+    Label_23: 23
+    X: 23
+---
+- Link9898: 234
+---
+- Link9898:
+  - 1
+  - 4
+---
+- +:
+  - 123
+  - 1000
+---
+- 11:
+  - +:
+    - 100
+    - 11
+  - step
+- 12:
+  - +:
+    - 100
+    - 12
+  - step
+- 13:
+  - +:
+    - 100
+    - 13
+  - step
+---
+- 1:
+  - 12
+  - 100
+- 1.2:
+  - 12
+  - 100
+- true:
+  - 12
+  - 100
+- false:
+  - 12
+  - 100
+- Hellooo:
+  - 12
+  - 100
+---
+'*************** File: issue06.yaml *****************'
+---
+output:
+  test: 2

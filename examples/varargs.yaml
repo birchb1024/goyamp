@@ -1,0 +1,57 @@
+file_header:
+---
+# Macros with variable number or arguments
+
+- defmacro:
+    name: listy
+    args: all
+    value:
+      - one: all.0
+      - two: all.1
+---
+listy:
+  - [a, b, c]
+  - 77
+
+---
+- defmacro:
+    name: package
+    args: all
+    value:
+      name: all.doc
+      yum:
+        name: apache
+        state: all.state
+
+---
+- hosts: webservers
+  vars:
+    http_port: 80
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - package:
+      doc: Install apache
+      name: httpd
+      state: latest
+---
+# Loop over arguements
+- defmacro:
+    name: loopy
+    args: all
+    value:
+       repeat:
+         for: item
+         in: { range: all }
+         body:
+           env: item
+           host: all.item.host
+---
+loopy:
+  perf:
+    host: lp123123
+    size: 190
+  prod:
+    host: lpp23423
+    size: 324
+

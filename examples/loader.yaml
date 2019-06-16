@@ -1,0 +1,17 @@
+file_header:
+---
+- define: {name: file, value: load_data.yaml}
+- define:
+    name: somedata
+    value: {load: file}
+---
+somedata.1.qa1
+---
+- define:
+    movie1: {load: '../test/fixtures/blade-runner.json'}
+- define:
+    movie2: {load: '../test/fixtures/blade-runner-2049.json'}
+---
+- Movie Name = {{movie1.name}}
+- Movie Director = {{movie1.director}}
+- Movie Cast = {{movie1.actors}}

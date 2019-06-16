@@ -1,0 +1,73 @@
+---
+file_header: null
+---
+- Hello: World
+---
+pipelines:
+  mypipe1:
+    group: mygroup
+    label_template: ${COUNT}
+    materials:
+      mygit:
+        branch: master
+        git: http://my.example.org/mygit.git
+    stages: null
+  mypipe2:
+    group: mygroup
+    label_template: ${COUNT}
+    materials:
+      mygit:
+        branch: ci
+        git: http://my.example.org/mygit.git
+    stages: null
+---
+- AChristopherA
+---
+- 32
+- - 32
+  - 32
+- - 99
+---
+- Wednesday
+- db01
+- web01
+---
+- Database upgrade for Netflix:
+  - stop application Netflix
+  - backup app database db8812
+  - upgrade the database db8812
+  - restart the application Netflix
+  - smoke test Netflix
+- Database upgrade for Stan:
+  - stop application Stan
+  - backup app database postgres123123
+  - upgrade the database postgres123123
+  - restart the application Stan
+  - smoke test Stan
+---
+name: Install apache
+yum:
+  name: apache
+  state: latest
+---
+- shutdown database
+---
+Deploy_App_DEV1:
+  stage: step
+Deploy_App_PROD:
+  stage: step
+Deploy_App_SVT:
+  stage: step
+---
+115
+---
+- true
+---
+- 3
+- 4
+- 5
+---
+- /home/elvis
+- /home/madonna
+- /var
+- /log

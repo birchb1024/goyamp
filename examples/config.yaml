@@ -1,0 +1,11 @@
+file_header:
+---
+- define:
+    name: configuration
+    value:
+      - PREIMP:
+          hostname: locahostperf0
+          ports: [80, 443]
+      - QA2:
+          hostname: locahostqa
+          ports: [80, 443]

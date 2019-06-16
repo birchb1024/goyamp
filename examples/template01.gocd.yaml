@@ -1,0 +1,44 @@
+file_header:
+---
+# format_version: 2
+#
+# Usage: PIPELINE_GROUP=1 NUMBER_OF_PIPES=10 python src/yamp.py examples/template01.gocd.yaml
+#
+
+define:
+  env:
+    PIPELINE_GROUP: 1
+    NUMBER_OF_PIPES: 3
+  date_step:
+    - exec:
+        run_if: passed
+        command: /bin/bash
+        arguments:
+        - -c
+        - date
+---
+pipelines:
+  repeat:
+    for: COUNTER
+    in: {range: [1, env.NUMBER_OF_PIPES]}
+    key: Hello_World_{{COUNTER}}
+    body:
+      label_template: ${COUNT}
+      group: Group_{{ env.PIPELINE_GROUP }}
+      materials:
+          shared:
+            git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
+      stages:
+        - Hello:
+            approval: success
+            jobs:
+              repeat:
+                for: job_counter
+                in: [1, 2]
+                key: World{{job_counter}}
+                body:
+                  resources:
+                    - linux
+                  tasks:
+                    date_step
+

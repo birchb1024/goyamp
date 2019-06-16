@@ -1,0 +1,1006 @@
+= Goyamp - The Go Macro Processor for YAML
+Peter Birch <birchb1024@gmail.com>
+v0.1.2, 2019-05-04
+:toc: macro
+:toclevels: 4
+YAML is human friendly data serialization standard. footnote:[YAML stands for YAML Ain't Markup Language. See https://yaml.org/]  Goyamp is a general-purpose macroprocessor for YAML files.  Both its input and output are YAML. It scans the input for symbols and makes substitutions and expansions on the output. Goyamp is 100% YAML so the syntax for defining and calling macros is YAML also.
+
+== TL;DR
+
+.Input
+[source, YAML]
+----
+- defmacro:
+    name: foo
+    args: [who]
+    value:
+        Hello: who
+- foo:
+    who: World
+----
+
+.Output
+[source, YAML]
+----
+- Hello: World
+----
+
+=== Quick Start
+
+You just want to run it already? OK, use the docker image. Put your first Goyamp file in `hello.yaml`:
+
+.hello.yaml
+[source, YAML]
+----
+"Hello {{argv.2}} from Goyamp v{{__VERSION__}}"
+----
+
+And run it
+
+[source, bash]
+----
+$ docker run --rm -u $(id -u):$(id -g) -v "$HOME":/work docker.io/birchb1024/goyamp /work/hello.yaml $USER
+----
+
+== Get Started
+
+GoYamp is a Go program contained in the goyamp module. 
+
+* First obtain a binary copy of the Goyamp program. Copies available on GitHub here(http://https://github.com/birchb1024/goyamp/TODO)
+
+=== Installation
+
+TODO 
+
+=== Execution
+
+The program  is run from the command-line giving the input file to parse as the first argument followed by optional arguments to the expansion. The expansion is written to the standard output, which you normally redirect to another file.:
+
+.Usage
+[source,bash]
+----
+$ goyamp <myinputfile>.yaml [arg1..argn]
+----
+
+== An example - Pipelines as Code.
+
+Supposing we are building some https://github.com/tomzo/gocd-yaml-config-plugin[GoCD] pipeline definitions in YAML each of which uses the same Git repository.  The YAML we have to write looks like this:
+
+.output.yaml
+[source,YAML]
+----
+pipelines:
+  mypipe1:
+    group: mygroup
+    label_template: ${COUNT}
+    materials: # <1>
+      mygit:
+        branch: master
+        git: http://my.example.org/mygit.git
+    stages: null
+  mypipe2:
+    group: mygroup
+    label_template: ${COUNT}
+    materials: # <1>
+      mygit:
+        branch: ci
+        git: http://my.example.org/mygit.git
+    stages: null
+----
+<1> Duplicated
+
+We don't want re-key duplicated code so we define a macro which Goyamp expands whenever it is invoked. Our source code now looks like this:
+
+.YAML source
+[source,YAML]
+----
+define: # <1>
+    name: mygit_repo_url
+    value: http://my.example.org/mygit.git
+
+defmacro: # <2>
+    name: mygit_materials
+    args: [branch_name]
+    value:
+      mygit:
+        git: mygit_repo_url # <3>
+        branch: branch_name
+---
+pipelines:
+  mypipe1:
+    group: mygroup
+    label_template: "${COUNT}"
+    materials: {mygit_materials: {branch_name: master}} # <4>
+    stages:
+
+  mypipe2:
+    group: mygroup
+    label_template: "${COUNT}"
+    materials:
+        mygit_materials:
+            branch_name: ci # <5>
+    stages:
+----
+<1> simple variable definition
+<2> a macro Definition
+<3> variable used
+<4> a macro call - flow style
+<5> a macro call - block style
+
+When run through Goyamp, the output is as above. Now we have a single place where the git repository is defined, if we need to change it we can change it once.
+
+== Applications
+
+This program is general-purpose, it can be used wherever YAML is required. Its first uses were for GoCd pipelines and Ansible playbooks. These are human-readable source code which is a subset of YAML. Hence Goyamp may not be applied to all aspects of YAML especially those which result from data transmission.  We will not be attempting to exercise Goyamp with such inputs.
+
+Since YAML is a superset of JSON it can also be used to generate JSON for, say, Azure ARM files.
+
+== Similar Tools
+
+Yamp - This is the progenitor of Goyamp, a Python YAML macro processor. Goyamp and Yamp are compatible, however there are some differences due to their respective execution environments. Being a Python program itself, Yamp can call Python functions directly.   
+
+There are many great general-purpose macro-processors available, starting with the venerable `GPM`, through `m4`, cpp, and lately, Jinja2. However these are predominantly character-based and the programmer has to compute the indentation required by YAML by counting spaces. Like previous authors we started on this course of writing yet another macro-processor primarily for reasons of laziness. Since Goyamp transforms maps and sequences not character strings, indentation is automatic.
+
+
+== Reference
+
+This section describes the operation of the processor and the macros available.
+
+=== The Command Line
+
+The command to run Goyamp is a single binary executable filename followed by optional arguments. Assuming that `goyamp` is in the `$PATH`:
+
+.Usage
+[source,bash]
+----
+$ goyamp [-debug] [-help] [Filename | - ] [arg1..argn]
+----
+
+If the filename is the minus sign `-` or if there are no arguements, Goamp reads YAML from the standard input, so it serves as a filter. As in
+
+[source,bash]
+----
+$ echo "[define: {data: {load: test/fixtures/blade-runner.json}}, data.director]" | goyamp 
+- ' Ridley Scott'
+----
+
+
+==== File Suffixes
+
+Any file suffix can be used - it is assumed to be YAML. A warning is printed to alert you of a possible input mistake.
+
+In practice `yaml` sufffix will be recognised by most text editors' YAML editting mode. You will need to configure your text editor if you use a non-standard suffix.
+
+==== Docker
+
+A docker image is provided in docker.io (Docker Hub) https://cloud.docker.com/repository/docker/birchb1024/goyamp[here]. This image includes Python and its libraries on a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:
+
+[source, bash]
+----
+$ docker run --rm -u $(id -u):$(id -g) -v "$HOME":/work docker.io/birchb1024/goyamp [options] /work/{path to your code}.yaml [arg1, arg2...] > outputfile.yaml
+----
+
+=== Processing
+
+
+When Goyamp starts, it collects the command-line arguments and assigns the list to the variable `argv`. It collects the process environment and assigns it to the map variable `env`. Goyamp then reads the input file, attempts to parse the YAML and holds the resulting data as objects in memory. (If the YAML does not parse Goyamp exits). It recursively scans the objects looking for strings which are the same as defined variables or which contain variables inside the string in curly braces. If it finds a match, it substitutes the object with the variable's value.
+
+Goyamp is a substitution engine. It looks for things in it's input an when it sees them replaces them with the substitution. The things to look for and the substitutions we call variables and bindings. For example:
+
+.Variables Bindings
+[options="header,footer",width="50%"]
+|=======================
+|Variable Name|Value to substitute
+|mygit_repo_url
+
+a|
+[source,YAML]
+----
+http://my.example.org/mygit.git
+----
+
+|mygit_materials
+
+a|
+[source,YAML]
+----
+args: [branch_name]
+mygit:
+        git: mygit_repo_url
+        branch: branch_name
+----
+
+|=======================
+
+
+When scanning maps, Goyamp does not expand map keys unless either the map key is explicitly identified as a variable with the `^` caret character, or the map key is a string with embedded curly braces. In these two special cases Goyamp looks up variables or interpolates the string.  
+
+Some special variables contain 'macros' - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this 'macro expansion' footnote:[But it could actually be a reduction!] ;-). 
+
+Goyamp is looking for macro calls with this structure:
+
+[source,YAML]
+----
+<Macro>:
+   <Argument>: <value>
+   <Argument>: <value>
+    . . .
+----
+
+Some macros have special functions and are built-in to Goyamp. Those are described in the reference section.
+
+Here's examples of three kinds of things Goyamp is scanning for replacement:
+
+.Simple Variables
+[source,YAML]
+----
+- Username
+- 'directory'
+----
+
+.Embeded Variables
+[source,YAML]
+----
+- 'The username is {{Username}}'
+----
+
+.Macro Calls
+[source,YAML]
+----
+- add_user:
+    name: Kevin
+    phone: (555) 098 880
+----
+
+When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output in YAML format. Becuase YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from the input footnote:[Order-preservation may happen in a future version, but it's complicated].
+
+=== Variables
+
+During processing goyamp maintains a hierarchy of bindings of variable names to variable values. The top level of bindings is the gobal environment. As each macro is applied the application creates a unique environment for the macro variables which is popped when the macro finishes.
+
+==== `define` - Definition of Variables
+
+You can define new variable bindings or update existing variables with the `define` macro. The value can be any YAML expansion. Variable names are expected to be strings.
+
+[source, YAML]
+----
+- define: {name: age, value: 32}
+- age
+- define: {name: age2, value: [age, age]}
+- age2
+- define: {name: age2, value: [{define: {name: age, value: 99}}, age]}
+- age2
+# Produces:
+#- 32
+#- - 32
+#  - 32
+#- - 99
+----
+
+==== Scalars
+
+Variables can contain any YAML scalar, int float, string, True, False and null.
+
+==== Collections
+
+Variables can contain any YAML collection ie, maps and lists.
+
+==== Variable Expansion
+
+When Goyamp scans YAML it looks for variables in the lists and map values. When one is found it is replaced with the current value of variable binding. It searches the stack of macro bindings until the global environment is reached. If no bindng is found the string is output unchanged.
+
+===== Variables Embedded in Strings
+
+Inside strings, Goyamp will insert expansions delimited by the double-curlies `{{` and `}}`. It's looking for variable names.
+
+[source, YAML]
+----
+- define: {name: X, value: Christopher}
+- define: {name: AXA, value: 'A{{ X }}A'}
+---
+- AXA
+# Produces AChristopherA
+----
+
+This processing is also done in map keys so that map keys can be computed during the expansion. For example:
+
+[source, YAML]
+----
+repeat:
+  for: loop_variable
+  in : {range: [1,3] }
+  body:
+    'KEY_{{loop_variable}}': some step
+----
+
+===== Interpolation with dot syntax
+
+If a string contains periods, such as `data.height` Goyamp looks for a exactly matching variable name, which is expanded with the value. Otherwise the first item (ie `data`) is assumed to be a variable name.
+
+If a binding for the first part is found the value of the variable is assumed to be a collection. The other items which we call sub-variables are used to index the collection (ie `height`). If the collection is a map, the sub-variable name is used as the key. If it is a list the subvariable must evaluate to an integer which is zero-indexed into the list. These subvariable names are also expanded before use so other variables can be used to index the collection. 
+
+[source, YAML]
+----
+- define: { zero: 0 }
+- define:
+    name: data
+    value:
+        - type: webserver
+          hostname: web01
+          ip: 1.1.2.3
+        - type: database
+          hostname: db01
+          ip: 1.1.2.2
+- define: {data.1 : Wednesday}
+---
+- data.1
+- data.1.hostname
+- data.zero.hostname
+----
+
+Produces
+
+[source, YAML]
+----
+- Wednesday
+- db01
+- web01
+----
+
+===== Variable Map Keys with the Caret
+
+Normally map keys are not expanded, but with a preceding caret character Goyamp looks up the variable name in the current binding and uses its value. For example:
+
+[source, YAML]
+----
+- defmacro:
+    name: my-macro
+    args: [ param ]
+    value:
+      ^param:
+        LtUaE : RU
+---
+- my-macro: { param: 42 }
+----
+
+Evaluates to:
+
+[source, YAML]
+----
+- 42:
+    LtUaE: 42
+----
+
+This facility even allows macros to be called indirectly since the macro being called is provided by the variable rather than in the code itself. Here's an example, although the practical value of this is yet to surface. This code applies four different macros to the same arguments in turn:
+
+[source, YAML]
+----
+repeat:
+  for: macro
+  in: [+, range, flatten, quote]
+  body:
+    ^macro: [1, 5]
+----
+
+
+===== Defining Multiple Variables
+
+Declarations don't need the 'name' and 'value' keys, and multiple variables are simultaneously bound.
+
+[source,YAML]
+----
+- define: { quick: 'shorthand' }
+- define:
+    name: Sara
+    age: 34
+    height: 123
+----
+
+==== Refactoring Goyamp with `undefine`
+
+Sometimes a variable needs to be renamed or removed. For example if a Goyamp macro name conflicts with a name used in the
+output format required. The `undefine` macro removes a variable binding from the current environment. Usage:
+
+[source,YAML]
+----
+undefine: variablename
+----
+
+Used at the top level
+(outside of a macro) `undefine` can be used to change the definitions of Goyamp built-in macros themselves. This is done by first assigning a new name with the currently used macro, then undefining the original name. If this is done before any files are included, it can be used to redefine Goyamp syntax. For example we can use `plus` instead of the `+` symbol as follows
+
+
+[source,YAML]
+----
+- define: 
+    plus: +
+- undefine: +
+- {plus: [1,2,3]}
+----
+
+=== Macros
+
+Macros are re-usable templates of YAML objects that can be called up almost anywhere in the expansion. They differ from variables becuase they have parameters which are used to fill holes in the template. The are similar to functions, but unlike functions their entire text is always the result. By defining oft-repeated YAML fragments in macros repetitive work is avoided. Also a singular macro definition makes maintainance easy since there is a single defintion for a concept which can be easily changed.
+
+==== Defining with `defmacro`
+
+Macros are defined with the `define` macro which gives the macro a name and specifies the arguments it has and the expansion to return, the body.  A macro definition looks like this:
+
+[source,YAML]
+----
+- defmacro:
+    name: <the name of the macro>
+    args: [<list of argument names>, ...]
+    value:
+      <Some YAML to be expanded>
+----
+
+Example - Database upgrade steps:
+
+[source,YAML]
+----
+defmacro:
+  name: app-upgrade
+  args: [appname, dbname]
+  value:
+      Database upgrade for {{ appname }}:
+        - stop application {{ appname }}
+        - backup app database {{ dbname }}
+        - upgrade the database {{ dbname }}
+        - restart the application {{ appname }}
+        - smoke test {{ appname }}
+---
+- {app-upgrade: { appname: Netflix, dbname: db8812}}
+- app-upgrade:
+    appname: Stan
+    dbname: postgres123123
+----
+
+Produces:
+
+[source,YAML]
+----
+- Database upgrade for Netflix:
+  - stop application Netflix
+  - backup app database db8812
+  - upgrade the database db8812
+  - restart the application Netflix
+  - smoke test Netflix
+- Database upgrade for Stan:
+  - stop application Stan
+  - backup app database postgres123123
+  - upgrade the database postgres123123
+  - restart the application Stan
+  - smoke test Stan
+----
+
+==== Invoking/calling Macros
+
+As above, macro calls are just maps with a particular structure:
+[source, YAML]
+----
+<macro name>: 
+   <arg1> : <arg 1 value>
+   ...
+   <argN> : <arg N value>
+----
+
+==== Macros with variable arguments
+
+If the arguments in the definition are specified as a string, not a list, the string is the single argument. All the actual arguments at call-time are collected and bound to the variable in a map.
+
+[source,YAML]
+----
+- defmacro:
+    name: <the name of the macro>
+    args: <argument_variable_name>
+    value:
+      <Some YAML to be expanded>
+----
+
+Example:
+
+[source,YAML]
+----
+# Definition
+- defmacro:
+    name: package
+    args: all
+    value:
+      name: all.doc
+      yum:
+        name: apache
+        state: all.state
+
+---
+# Call
+package:
+  doc: Install apache
+  name: httpd
+  state: latest
+----
+
+Produces
+
+[source,YAML]
+----
+name: Install apache
+yum:
+  name: apache
+  state: latest
+----
+
+The disadvantage of vararg macros is that Goyamp cannot ensure that all the required arguments have been supplied in the call.  
+
+==== Nesting Macros
+
+Macro calls can be nested i.e. a macro can can contain a call to another in its arguments. Likewise macro definitions can be nested. The macro arguments are lexically scoped, a closure is collected at the time of definition. The macro call executes in the environment in the define-time closure. Macros can call themselves directly or indirectly.
+
+
+
+=== Conditional Expansion with `if then else`
+
+The `if` macro renders one value from a choice of two based on whether the condition argument is true. Where true means it's `true` or not `false` or `null`. The `then` argument is expanded if so, otherwise the `else` argument. It's not required to have both `then` and `else` arguments - when the condition requires the missing one, it expands to `null`.
+
+[source,YAML]
+----
+if: <Booleanish (true, false or null)>
+then: <value if true>
+else: <value if false or null>
+----
+
+Example:
+
+[source,YAML]
+----
+# Some variable
+define:
+  application:
+    name: CSIRAC
+    has_database: true
+    arch: valves
+---
+if: application.has_database
+then:
+  - shutdown database
+else:
+  - shutdown not required
+----
+
+Produces:
+
+[source,YAML]
+----
+- shutdown database
+----
+
+Example - short form
+
+[source,YAML]
+----
+if: true
+else: 'This value if false or Null'
+----
+
+Produces `null`
+
+=== Testing equality with `==`
+
+Macros can have almost any name, this one is the symbol '=='. It expands to `true` or `false` if the items in the list are equal. Most often used inside an enclosing `if` macro.
+
+[source,YAML]
+----
+{ ==: [arg1, arg2, ...] }
+----
+
+Example:
+
+[source,YAML]
+----
+{ ==: [1, 1, 10] }
+----
+
+Produces the value `false`.
+
+=== Preventing Expansion with `quote`
+
+The `quote` macro does not expand its input arguments returning them unexpanded.
+
+Example:
+
+[source,YAML]
+----
+- define: { data1: { sub: 2}}
+- data1.sub
+- quote: data1.sub
+----
+
+Produces
+
+[source,YAML]
+----
+- 2
+- data1.sub
+----
+
+=== Looping with `repeat`
+
+This macro repeatedly expands the same object, either returning a list or a map. If the `key` argument is present it returns a map, using the `key` argument as the item's key. This must have embedded variables derived from the looping execution otherwise there will be a key collision error. With no `key` argument, it returns a list.
+
+[source,YAML]
+----
+repeat:
+  for: <loop variable name>
+  in: [list of items]
+  key: <string key with embedded varaibles in {{}}> # Optional
+  body: <any value>
+----
+
+
+Example - returning a dictionary:
+
+[source,YAML]
+----
+repeat:
+  for: environment_name
+  in:
+    - DEV1
+    - SVT
+    - PROD
+  key: 'Deploy_App_{{environment_name}}'
+  body:
+    stage: step
+----
+
+Produces:
+
+[source,YAML]
+----
+Deploy_App_DEV1:
+  stage: step
+Deploy_App_PROD:
+  stage: step
+Deploy_App_SVT:
+  stage: step
+----
+
+Example - returning a list:
+
+[source,YAML]
+----
+repeat:
+  for: loop_variable
+  in: {range: [1,3]}
+  body:
+    loop_variable: 'KEY_{{loop_variable}}'
+    some: step
+    another:
+----
+
+Produces:
+
+[source,YAML]
+----
+- another: null
+  loop_variable: KEY_1
+  some: step
+- another: null
+  loop_variable: KEY_2
+  some: step
+- another: null
+  loop_variable: KEY_3
+  some: step
+----
+
+Example - looped list with changing keys. Here the keys and values of a child map are changed. :
+
+[source,YAML]
+----
+repeat:
+  for: loop_variable
+  in: {range: [12,13]}
+  body:
+    'index_{{loop_variable}}': { +:  [100, loop_variable] }
+    some: step
+----
+
+Produces:
+
+[source,YAML]
+----
+- index_12: 112
+  some: step
+- index_13: 113
+  some: step
+----
+
+=== Looping with `range`
+
+The `range` macro substitutes a list of numbers that can be used in `repeat` macros. (Or anywhere else a list of numbers is needed). The start and end values are passed as a list argument. The range can count up or down, always by one. 
+
+[source, YAML]
+----
+range: [3,5]
+----
+
+Produces `[3,4,5]`
+
+`range` also accepts a map object, in which case it expands the sequence of map keys. For example
+
+[source, YAML]
+----
+- define: {map: {ra: 879, rb: 662}}
+- range: map
+----
+
+Produces `[ra, rb]`. This can then be used in repeat to loop over the items in a map. Dot notation is used to expand individual members of the map. 
+For example here the loop variable is set to `ra` then `rb` which `map.keyz` resolves to `879` and `662`:
+
+[source, YAML]
+----
+repeat:
+  for: keyz
+  in: {range: map}
+  body:
+    map.keyz
+----
+
+Be aware that map keys in data (such as `ra`) might conflict with already defined variables.   
+
+=== Combining Lists with `flatten`
+
+Sometimes you need to combine lists, perhaps from different macro expansions. The `flatten` macro combines multiple lists into a single, flat, list. The flattening is recursive. Syntax:
+
+[source,YAML]
+----
+flatten: < list of objects >
+----
+
+For example:
+
+[source,YAML]
+----
+define: {home-directories: [/home/elvis, /home/madonna]}
+---
+flatten: [[home-directories], /var, /log]
+---
+flatten: [1, 2, [3], [[4, 5]], [[[ 6,7]]] ]
+----
+
+Produces:
+
+[source,YAML]
+----
+- /home/elvis
+- /home/madonna
+- /var
+- /log
+---
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+----
+
+=== Combining One Level of Lists with `flatone`
+
+The `flatone` macro combines multiple lists into a single, flat, list. The flattening is *not* recursive, only the first level is flattened. Syntax:
+
+[source,YAML]
+----
+flatone: < list of objects >
+----
+
+For example:
+
+[source,YAML]
+----
+flatone: [1, 2, [3], [[4, 5]], [[[ 6,7]]] ]
+----
+
+Produces:
+
+[source,YAML]
+----
+- 1
+- 2
+- 3
+- - 4
+  - 5
+- - - 6
+    - 7
+----
+
+=== Combining Maps with `merge`
+
+The `merge` macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Syntax:
+
+[source,YAML]
+----
+merge: < list of maps >
+----
+
+For example:
+
+[source,YAML]
+----
+merge:
+  - { a : 1 }
+  - { b : 2 }
+  - { c : 3 , a : -1}
+----
+
+Produces:
+
+[source,YAML]
+----
+a: -1
+b: 2
+c: 3
+----
+
+A more complex example shows combining data from multiple sources:
+
+[source,YAML]
+----
+- define:
+    network-data:
+      hostname: tetris.games.org
+- defmacro:
+    name: mymacro
+    args: [arg1]
+    value:
+      hostname: arg1
+      ip: 1.1.1.1
+      app: tetris
+- merge:
+  - { hostname: tetris.home.org }
+  - { site: Kansas }
+  - mymacro:
+      arg1: tetris
+  - network-data
+----
+
+Which boils down to:
+
+[source,YAML]
+----
+- app: tetris
+  hostname: tetris.games.org
+  ip: 1.1.1.1
+  site: Kansas
+----
+
+=== Arithmetic with `+`
+
+The `+` macro adds a list of numbers, int or float.
+
+[source, YAML]
+----
++: [1,2,4,8]
+----
+
+Produces `15`
+
+=== Reading files with `include`
+
+`include` reads and expands the list of Goyamp YAML files in order. The filenames can be the result of prior macro expansion. So derived filenames like "{{ROOT_DIR}}/{{arch}}/config.yaml" are possible.
+
+[source, YAML]
+----
+include:
+- <filename>
+- <filename>
+----
+
+=== Reading Data Files
+
+Sometimes you want to use raw data for parameters and variable values. For example you may have an inventory or database of facts. Goyamp can load YAML or JSON data. 
+
+==== Reading Data with `load`
+
+The `load` macro reads a single file of YAML or JSON data and returns the result. No variable substitutions or macro expansions are performed on the data. YAML data is returned as a list, one object for each 'doc'. footnote:[YAML files are subdivided into 'docs' separated by '---']
+
+[source, YAML]
+----
+{load: <filename>}
+----
+
+Examples:
+
+[source, YAML]
+----
+- define: {name: file, value: 'load_data.yaml'}
+- define:
+    name: somedata
+    value: {load: file}
+- define:
+    movie1: {load: '../test/fixtures/blade-runner.json'}
+----
+
+==== Loading Shell Script Data
+
+When you have shell variables in files which you want to use as input to expansion, you can load them into the environment of the Goyamp execution. For example here's a script with some dynamic data:
+
+.data.sh
+[source,bash]
+----
+export VARIABLE1=value1
+export VARIABLE2="${VARIABLE1}_value2"
+export VARIABLE3="${VARIABLE2}_value3"
+----
+
+The shell script must executed to determine the values. To load this into the Goyamp environment, use shell wrappers like this:
+
+[source,bash]
+----
+$ env -i bash --noprofile --norc -c '. data.sh ; echo env | goyamp'
+----
+
+How does this work?
+
+* `env -i bash` creates a bash process with an empty environment.
+* `--noprofile --norc` prevent bash from reading profile files on startup
+* `-c '. data.sh` sources the shell script in the current (empty) environment
+* `echo env | goyamp` runs Goyamp with an input of just `env` - this will output all the environment variables
+
+The YAML output contains the variables we want plus a couple of variables `bash` always needs:
+
+[source, Shell]
+----
+PWD: /home/birchb/workspace/goyamp
+SHLVL: '1'
+VARIABLE1: value1
+VARIABLE2: value1_value2
+VARIABLE3: value1_value2_value3
+_: /usr/bin/python
+----
+
+
+=== Executing External Programs with `execute:`
+
+TODO
+
+=== Builtin Variables
+
+Goyamp automatically populates some variables as it executes. These are:
+
+* `env` - the process environment
+
+* `argv` - the command line arguments
+
+* `__VERSION__` - the Goyamp version number
+
+* `__FILE__` - the current source filename
+
+* `__PATH__` - the current source full pathname
+
+* `__SOURCE__` - the expression passed into the currently executing macro - useful for debugging your macros.
+
+== Using the Goyamp Go Module
+
+TODO
+
+== Maintenance of Goyamp
+
+=== Build from Source
+
+[source, Shell]
+----
+$ make.sh
+----
+
+=== Code
+
+Run the unit tests with `cd test; go test` 
+
+=== Updating This Document
+
+This document is in http://www.methods.co.nz/asciidoc/:[AsciiDoc] format. Use the Linux `asciidoc` packages. To Highlight the YAML syntax also install `source-highlight` and the https://gist.github.com/zeroyonichihachi/c4952b355bb7a27552a5f23e0c53b65f#file-yaml-lang:[YAML syntax module]. Save the HTML version in `doc/README.html`.
+
+=== Known Issues
+
+TODO

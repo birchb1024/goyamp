@@ -1,0 +1,45 @@
+file_header:
+---
+- defmacro:
+    name: template
+    args: [beginning, middle , end]
+    value:
+      deploy:
+        - boilerplate
+        - beginning
+        - middle
+        - intermediate
+        - end
+- define:
+    name: data
+    value:
+      hostname: lll123
+      ports: [21, 22]
+      username: jill
+      password: 1231231
+
+---
+- template:
+    beginning:
+      shutdown_server: 20 seconds
+    middle:
+      deploy:
+        something: {'+': [23, 11]}
+        timeout: 3 h
+        facts: data
+    end: start server
+- define:
+    name: HTTP
+    value: 1
+- first_port: data.ports.0
+- second_port: data.ports.HTTP
+---
+- defmacro:
+    name: macro_with_source
+    args: $a1
+    value:
+     - "Args $a1 {{$a1}}"
+     - "__SOURCE__ '{{__SOURCE__}}'"
+- define: { $a-variable: HELLO WORLD }
+- macro_with_source: $a-variable
+ 

@@ -1,0 +1,147 @@
+file_header:
+---
+- defmacro:
+    name: foo
+    args: [who]
+    value:
+        Hello: who
+- foo:
+    who: World
+---
+- define: # <1>
+    name: mygit_repo_url
+    value: http://my.example.org/mygit.git
+
+- defmacro: # <2>
+    name: mygit_materials
+    args: [branch_name]
+    value:
+      mygit:
+        git: mygit_repo_url # <3>
+        branch: branch_name
+---
+pipelines:
+  mypipe1: 
+    group: mygroup
+    label_template: "${COUNT}"
+    materials: {mygit_materials: {branch_name: master}} # <4>
+    stages:
+
+  mypipe2: 
+    group: mygroup
+    label_template: "${COUNT}"
+    materials:
+        mygit_materials: 
+            branch_name: ci # <5>
+    stages:
+---
+- define: {name: X, value: Christopher}
+- define: {name: AXA, value: 'A{{ X }}A'}
+---
+- AXA
+# Produces AChristopherA
+---
+#- {python_eval: ' 2**10 '}
+#---
+- define: {name: age, value: 32}
+- age
+- define: {name: age2, value: [age, age]}
+- age2
+- define: {name: age2, value: [{define: {name: age, value: 99}}, age]}
+- age2
+# Produces:
+#- 32
+#- - 32
+#  - 32
+#- - 99
+---
+- define: { zero: 0 }
+- define:
+    name: data
+    value:
+        - type: webserver
+          hostname: web01
+          ip: 1.1.2.3
+        - type: database
+          hostname: db01
+          ip: 1.1.2.2
+- define: {data.1 : Wednesday}
+---
+- data.1
+- data.1.hostname
+- data.zero.hostname
+---
+defmacro:
+  name: app-upgrade
+  args: [appname, dbname]
+  value:
+      Database upgrade for {{ appname }}:
+        - stop application {{ appname }}
+        - backup app database {{ dbname }}
+        - upgrade the database {{ dbname }}
+        - restart the application {{ appname }}
+        - smoke test {{ appname }}
+---
+- {app-upgrade: { appname: Netflix, dbname: db8812}}
+- app-upgrade:
+    appname: Stan
+    dbname: postgres123123
+---
+# Definition
+- defmacro:
+    name: package
+    args: all
+    value:
+      name: all.doc
+      yum:
+        name: apache
+        state: all.state
+
+---
+# Call
+package:
+  doc: Install apache
+  name: httpd
+  state: latest
+---
+# Some variable 
+define:
+  application:
+    name: CSIRAC
+    has_database: true
+    arch: valves
+---
+if: application.has_database
+then:
+  - shutdown database
+else:
+  - shutdown not required
+---
+repeat:
+  for: environment_name
+  in:
+    - DEV1
+    - SVT
+    - PROD
+  key: 'Deploy_App_{{environment_name}}'
+  body:
+    stage: step
+---
++: [1,2,4,8, 100.0]
+---
+- ==: [1,1,1]
+#---
+#- define: {FOO: 2}
+#- python_eval: ' FOO**10 '
+#---
+#- python_eval: 'len(argv)'
+#- python_eval: 'env["USERNAME"].upper()'
+#- python_eval: 'datetime.datetime.now()'
+# - python_eval: 'iter(_ for _ in ()).throw(Exception("{} This is how to raise an exception!".format(env["USERNAME"])))'
+---
+range: [3 , 5]
+---
+define: {home-directories: [/home/elvis, /home/madonna]}
+---
+flatten: [[home-directories], /var, /log]
+...

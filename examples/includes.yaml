@@ -1,0 +1,6 @@
+file_header:
+---
+- define: { name: AVARIABLE, value: macros.yaml }
+---
+include:
+  - AVARIABLE

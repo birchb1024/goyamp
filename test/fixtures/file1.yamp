@@ -1,0 +1,5 @@
+---
+- define:
+    name: $f1
+    value: __FILE__
+- $f1

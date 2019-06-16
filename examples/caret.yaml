@@ -1,0 +1,32 @@
+#
+# Issue 2 - Add caret in map keys
+#
+- define: { X : 23 }
+---
+- amap:
+   ^X : X
+   X : X
+   'Label_{{X}}' : X
+
+- define: {fovvar: Link9898}
+---
+- ^fovvar: 234
+---
+- ^fovvar: [1,4]
+---
+- +: [123, 1000] 
+
+---
+repeat:
+  for: loop_variable
+  in: {range: [11,13]}
+  body:
+    ^loop_variable: 
+    - { +:  [100, loop_variable] }
+    - step
+---
+repeat:
+  for: loop_variable
+  in: [1, 1.2, True, False, null, Hellooo]
+  body:
+    ^loop_variable: [12, 100]

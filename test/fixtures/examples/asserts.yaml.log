@@ -1,0 +1,6 @@
+---
+file_header: null
+---
+- goyamp.abort: 'ASSERT FAILED 12 != 23 { assert_equal : { p1 : 12 , p2 : 23  }  }'
+---
+- goyamp.abort: 'ASSERT FAILED { assert : { that : false  }  }'

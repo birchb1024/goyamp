@@ -1,0 +1,52 @@
+file_header:
+---
+repeat:
+  for: loop_variable
+  in:
+    - abra
+    - ca
+    - dabra
+  body:
+    loop_variable: 'KEY_{{loop_variable}}'
+    some: step
+    another_item:
+---
+repeat:
+  for: loop_variable
+  in: {range: [1,3]}
+  body:
+    ^loop_variable: 'KEY_{{loop_variable}}'
+    some: step
+    another_item:
+---
+repeat:
+  for: loop_variable
+  in:
+    - DEV1
+    - SVT
+    - PROD
+  key: 'Deploy_App_{{loop_variable}}'
+  body:
+    stage: step
+---
+repeat:
+  for: loop_variable
+  in: {range: [1,5]}
+  key: 'Deploy_App_{{loop_variable}}'
+  body:
+    stage: step
+---
+repeat:
+  for: envname
+  in:
+    - DEV1
+    - SVT
+    - PROD
+  key: 'Deploy_App_{{envname}}'
+  body:
+    repeat:
+      for: server
+      in: {range: [1,5]}
+      key: 'Start_server_{{server}}'
+      body:
+        stage: run start

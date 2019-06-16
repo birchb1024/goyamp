@@ -1,0 +1,14 @@
+file_header:
+---
+- env.USER
+- env.USERNAME
+- __FILE__
+---
+- Filename is '{{__FILE__}}'
+- My username is {{env.USER}}
+---
+#- This variable is {{ MISSING }}
+
+
+
+

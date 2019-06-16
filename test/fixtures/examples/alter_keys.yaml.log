@@ -1,0 +1,8 @@
+---
+file_header: null
+---
+mymap:
+  1236: north
+  1237: south
+  East_1234: east
+  Foo_1234: west

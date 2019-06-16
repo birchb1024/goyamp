@@ -1,0 +1,22 @@
+file_header:
+---
+- define:
+    name: X
+    value:
+      k: 78
+      j: 22
+
+- defmacro:
+    name: mac
+    args: [Y]
+    value: Y
+
+- {mac: {Y: {foo: X.k}}}
+
+- if: false
+  then: 23
+  else:
+    if: true
+    then: 12
+    else: 99
+

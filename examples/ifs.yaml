@@ -1,0 +1,48 @@
+file_header:
+---
+if: true
+then: OK
+---
+if: false
+else: OK
+---
+if: null
+then: FAIL
+else: OK
+---
+- define: {name: '123', value: 3333}
+- 123
+- define: {name: $foo, value: 4444}
+- $foo
+---
+if: { '==' : [ argv.2,  hello] }
+then:
+    - HEllo Stage:
+      approval: success
+      jobs:
+        Job_hi:
+          tasks:
+            resources:
+              - linux
+            tasks:
+              - exec:
+                  run_if: passed
+                  command: /bin/bash
+                  arguments:
+                    - -c
+                    - date
+else:
+    - Goodbye Stage:
+      approval: success
+      jobs:
+        Job_hi:
+          tasks:
+            resources:
+              - linux
+            tasks:
+              - exec:
+                  run_if: passed
+                  command: /bin/bash
+                  arguments:
+                    - -c
+                    - date

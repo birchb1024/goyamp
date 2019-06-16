@@ -1,0 +1,25 @@
+file_header:
+---
+- defmacro:
+    name: assert_equal
+    args: [p1, p2]
+    value:
+      if:
+        ==: [p1, p2]
+      else:
+        panic: "ASSERT FAILED {{p1}} != {{p2}} {{__SOURCE__}}"
+---
+- assert_equal:
+    p1: 12
+    p2: 23
+---
+- defmacro:
+    name: assert
+    args: [that]
+    value:
+      if: that
+      else: 
+        panic: "ASSERT FAILED {{__SOURCE__}}"
+---
+- assert: {that: true}
+- assert: {that: false}

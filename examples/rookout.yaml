@@ -1,0 +1,17 @@
+- define:
+    languages: [java, python, js]
+    osVersions: [alpine, debian, ubuntu]
+---
+flatten:
+  - repeat:
+      for: lang
+      in: languages
+      body:
+        repeat:
+          for: os
+          in: osVersions
+          body:
+            - if: { ==: [lang, java]}
+              then: {downloadJavaSDK: 'lang, os'}
+            - runTheBackGroundTask: 'lang, os'
+            - runTheTest: 'lang, os'

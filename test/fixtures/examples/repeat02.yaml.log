@@ -1,0 +1,74 @@
+---
+file_header: null
+---
+- another_item: null
+  loop_variable: KEY_abra
+  some: step
+- another_item: null
+  loop_variable: KEY_ca
+  some: step
+- another_item: null
+  loop_variable: KEY_dabra
+  some: step
+---
+- 1: KEY_1
+  another_item: null
+  some: step
+- 2: KEY_2
+  another_item: null
+  some: step
+- 3: KEY_3
+  another_item: null
+  some: step
+---
+Deploy_App_DEV1:
+  stage: step
+Deploy_App_PROD:
+  stage: step
+Deploy_App_SVT:
+  stage: step
+---
+Deploy_App_1:
+  stage: step
+Deploy_App_2:
+  stage: step
+Deploy_App_3:
+  stage: step
+Deploy_App_4:
+  stage: step
+Deploy_App_5:
+  stage: step
+---
+Deploy_App_DEV1:
+  Start_server_1:
+    stage: run start
+  Start_server_2:
+    stage: run start
+  Start_server_3:
+    stage: run start
+  Start_server_4:
+    stage: run start
+  Start_server_5:
+    stage: run start
+Deploy_App_PROD:
+  Start_server_1:
+    stage: run start
+  Start_server_2:
+    stage: run start
+  Start_server_3:
+    stage: run start
+  Start_server_4:
+    stage: run start
+  Start_server_5:
+    stage: run start
+Deploy_App_SVT:
+  Start_server_1:
+    stage: run start
+  Start_server_2:
+    stage: run start
+  Start_server_3:
+    stage: run start
+  Start_server_4:
+    stage: run start
+  Start_server_5:
+    stage: run start
