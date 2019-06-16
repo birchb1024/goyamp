@@ -25,32 +25,23 @@ YAML is human friendly data serialization standard. footnote:[YAML stands for YA
 - Hello: World
 ----
 
-=== Quick Start
+== Get Started with a Pre-compiled Binary
 
-You just want to run it already? OK, use the docker image. Put your first Goyamp file in `hello.yaml`:
+GoYamp is a Go program contained in the goyamp module. This has been compiled and uploaded to Github and dockerhub.
 
-.hello.yaml
-[source, YAML]
-----
-"Hello {{env.ARGV}} from Goyamp v{{__VERSION__}}"
-----
+=== Download
 
-And run it
+You can download a binary copy of the Goyamp program. Copies are available on GitHub in https://github.com/birchb1024/goyamp/releases:[Releases] in the repository. For example 
 
 [source, bash]
 ----
-$ docker run --rm -u $(id -u):$(id -g) -v "$HOME":/work docker.io/birchb1024/goyamp /work/hello.yaml $USER
+$ curl -L -o goyamp https://github.com/birchb1024/goyamp/releases/download/0.1.3/goyamp
+$ chmod a+x goyamp
 ----
-
-== Get Started
-
-GoYamp is a Go program contained in the goyamp module. 
-
-* First obtain a binary copy of the Goyamp program. Copies available on GitHub here(http://https://github.com/birchb1024/goyamp/TODO)
 
 === Installation
 
-TODO 
+Simply place the binary in your $PATH or update your path to include the directory where you placed it.
 
 === Execution
 
@@ -59,7 +50,33 @@ The program  is run from the command-line giving the input file to parse as the 
 .Usage
 [source,bash]
 ----
-$ goyamp <myinputfile>.yaml [arg1..argn]
+$ goyamp [-help] [-debug]  <myinputfile>.yaml [arg1..argn]
+----
+
+The `-debug` option causes Goyamp to trace its internal execution on stderr.
+
+Put your first Goyamp file in `hello.yaml`:
+
+.hello.yaml
+[source, YAML]
+----
+"Hello {{env.USER}} from Goyamp v{{__VERSION__}}"
+----
+
+And run it
+
+[source, bash]
+----
+$ goyamp hello.yaml
+----
+
+
+== Running from Docker
+
+You just want to use the docker image. 
+[source, bash]
+----
+$ docker run --rm -u $(id -u):$(id -g) -v "$PWD":/work docker.io/birchb1024/goyamp /work/hello.yaml
 ----
 
 == An example - Pipelines as Code.
@@ -128,6 +145,10 @@ pipelines:
 <5> a macro call - block style
 
 When run through Goyamp, the output is as above. Now we have a single place where the git repository is defined, if we need to change it we can change it once.
+
+== More Examples
+
+The source repository has a directory of examples which you can run to observe the behaviour of the features. They are located in https://github.com/birchb1024/goyamp[the Github goyamp repository]. You can clone the soure repo to download them or browse them https://github.com/birchb1024/goyamp/tree/master/examples[here].
 
 == Applications
 

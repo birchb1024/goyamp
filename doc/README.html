@@ -772,40 +772,26 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #990000">- </span><span style="color: #009900">Hello</span><span style="color: #990000">:</span> World</tt></pre></div></div>
-<div class="sect2">
-<h3 id="_quick_start">Quick Start</h3>
-<div class="paragraph"><p>You just want to run it already? OK, use the docker image. Put your first Goyamp file in <code>hello.yaml</code>:</p></div>
-<div class="listingblock">
-<div class="title">hello.yaml</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #FF0000">"Hello {{env.ARGV}} from Goyamp v{{__VERSION__}}"</span></tt></pre></div></div>
-<div class="paragraph"><p>And run it</p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ docker run --rm -u <span style="color: #009900">$(</span>id -u<span style="color: #990000">):</span><span style="color: #009900">$(</span>id -g<span style="color: #990000">)</span> -v <span style="color: #FF0000">"$HOME"</span><span style="color: #990000">:</span>/work docker<span style="color: #990000">.</span>io/birchb<span style="color: #993399">1024</span>/goyamp /work/hello<span style="color: #990000">.</span>yaml <span style="color: #009900">$USER</span></tt></pre></div></div>
-</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_get_started">Get Started</h2>
+<h2 id="_get_started_with_a_pre_compiled_binary">Get Started with a Pre-compiled Binary</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>GoYamp is a Go program contained in the goyamp module.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-First obtain a binary copy of the Goyamp program. Copies available on GitHub here(<a href="http://https://github.com/birchb1024/goyamp/TODO">http://https://github.com/birchb1024/goyamp/TODO</a>)
-</p>
-</li>
-</ul></div>
+<div class="paragraph"><p>GoYamp is a Go program contained in the goyamp module. This has been compiled and uploaded to Github and dockerhub.</p></div>
+<div class="sect2">
+<h3 id="_download">Download</h3>
+<div class="paragraph"><p>You can download a binary copy of the Goyamp program. Copies are available on GitHub in <a href="https://github.com/birchb1024/goyamp/releases:">Releases</a> in the repository. For example</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.1</span><span style="color: #990000">.</span><span style="color: #993399">3</span>/goyamp
+$ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
+</div>
 <div class="sect2">
 <h3 id="_installation">Installation</h3>
-<div class="paragraph"><p>TODO</p></div>
+<div class="paragraph"><p>Simply place the binary in your $PATH or update your path to include the directory where you placed it.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_execution">Execution</h3>
@@ -816,8 +802,36 @@ First obtain a binary copy of the Goyamp program. Copies available on GitHub her
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ goyamp <span style="color: #990000">&lt;</span>myinputfile<span style="color: #990000">&gt;.</span>yaml <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+<pre><tt>$ goyamp <span style="color: #990000">[</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-debug<span style="color: #990000">]</span>  <span style="color: #990000">&lt;</span>myinputfile<span style="color: #990000">&gt;.</span>yaml <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+<div class="paragraph"><p>The <code>-debug</code> option causes Goyamp to trace its internal execution on stderr.</p></div>
+<div class="paragraph"><p>Put your first Goyamp file in <code>hello.yaml</code>:</p></div>
+<div class="listingblock">
+<div class="title">hello.yaml</div>
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #FF0000">"Hello {{env.USER}} from Goyamp v{{__VERSION__}}"</span></tt></pre></div></div>
+<div class="paragraph"><p>And run it</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ goyamp hello<span style="color: #990000">.</span>yaml</tt></pre></div></div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_running_from_docker">Running from Docker</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>You just want to use the docker image.</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>$ docker run --rm -u <span style="color: #009900">$(</span>id -u<span style="color: #990000">):</span><span style="color: #009900">$(</span>id -g<span style="color: #990000">)</span> -v <span style="color: #FF0000">"$PWD"</span><span style="color: #990000">:</span>/work docker<span style="color: #990000">.</span>io/birchb<span style="color: #993399">1024</span>/goyamp /work/hello<span style="color: #990000">.</span>yaml</tt></pre></div></div>
 </div>
 </div>
 <div class="sect1">
@@ -915,6 +929,12 @@ a macro call - block style
 </li>
 </ol></div>
 <div class="paragraph"><p>When run through Goyamp, the output is as above. Now we have a single place where the git repository is defined, if we need to change it we can change it once.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_more_examples">More Examples</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The source repository has a directory of examples which you can run to observe the behaviour of the features. They are located in <a href="https://github.com/birchb1024/goyamp">the Github goyamp repository</a>. You can clone the soure repo to download them or browse them <a href="https://github.com/birchb1024/goyamp/tree/master/examples">here</a>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1864,7 +1884,7 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footer-text">
 Version 0.1.2<br />
 Last updated
- 2019-06-16 11:50:29 AEST
+ 2019-06-16 14:09:16 AEST
 </div>
 </div>
 </body>
