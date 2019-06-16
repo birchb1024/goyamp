@@ -601,7 +601,6 @@ func (tree_typed mapy) expand(bindings *env) yamly {
 		if function.isQuote() {
 			return expanded_result
 		} else {
-			//			fmt.Printf("expanded_result = %#v bindings = %#v\n", expanded_result, bindings)
 			return expanded_result.expand(bindings)
 		}
 
@@ -610,8 +609,8 @@ func (tree_typed mapy) expand(bindings *env) yamly {
 	for k, v := range tree_typed {
 
 		if kstr, ok := k.(stringy); ok {
-			if strings.HasPrefix(string(kstr), "^") {
-				variable_name := kstr[1:]
+			if strings.HasPrefix(string(kstr), "^") { // TODO make a func here
+				variable_name := kstr[1:] // TODO what if kstr = "^"?
 				value, ok := bindings.lookup(variable_name)
 				if !ok {
 					panic(fmt.Sprintf("ERROR: Variable %v not defined in %v", variable_name, tree_typed))
@@ -620,7 +619,7 @@ func (tree_typed mapy) expand(bindings *env) yamly {
 				if !reflect.ValueOf(value).Type().Comparable() {
 					panic(fmt.Sprintf("Unable to use %v as map key, '%v' is not comparable. in %v", variable_name, value, tree_typed))
 				}
-				newdict[value] = expanded
+				newdict[value] = expanded // TODO what if value is already a key in newdict?
 				continue
 			}
 		}
@@ -723,5 +722,3 @@ func expand_stream(input io.Reader, filename string, bindings *env) (err error) 
 		}
 	}
 }
-
-var debugFlag bool = false
