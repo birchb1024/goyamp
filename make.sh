@@ -4,7 +4,8 @@ set -u
 set -x
 version=$(git describe --abbrev)
 
-if [[ "${1}" == "doc" ]]
+args=${1:-bin}
+if [[ "${args}" == "doc" ]]
 then
 	asciidoc README.asciidoc && mv README.html doc
 	exit

@@ -32,7 +32,7 @@ You just want to run it already? OK, use the docker image. Put your first Goyamp
 .hello.yaml
 [source, YAML]
 ----
-"Hello {{argv.2}} from Goyamp v{{__VERSION__}}"
+"Hello {{env.ARGV}} from Goyamp v{{__VERSION__}}"
 ----
 
 And run it
