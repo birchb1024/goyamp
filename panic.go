@@ -5,6 +5,5 @@ package goyamp
 //
 func panic_builtin(tree mapy, args yamly, bindings *env) yamly {
 	panic(args)
-
-	return nily{}
+	// Compiler knows we're paniced so no return is requried.
 }

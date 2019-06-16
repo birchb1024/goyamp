@@ -29,7 +29,7 @@ func (engine *Expander) init(environment []string, argv []string) {
 }
 
 //
-//
+// NewExpander creates a Goyamp macro expansion engine. 
 func NewExpander(commandArgs []string, environment []string, ow io.Writer) Expander {
 
 	ex := Expander{
@@ -41,6 +41,7 @@ func NewExpander(commandArgs []string, environment []string, ow io.Writer) Expan
 	return ex
 }
 
+// ExpandStream reads a stream of YAML and expands it.
 func (engine *Expander) ExpandStream(input io.Reader, filename string) error {
 
 	engine.globals.bind["__FILE__"] = stringy(filename)

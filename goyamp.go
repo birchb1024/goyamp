@@ -46,7 +46,7 @@ func (x booly) expand(binding *env) yamly { return x }
 
 func (x unknowny) expand(binding *env) yamly { return x }
 
-func (x unknowny) String() string { return fmt.Sprintf("unknown: %T %#v", x.x) }
+func (x unknowny) String() string { return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }
 
 func (x nily) String() string { return "null" }
 
@@ -329,7 +329,7 @@ func (run compiledFunction) apply(seen_tree mapy, args yamly, dynamic_bindings *
 }
 
 func (run macroFunction) apply(seen_tree mapy, anyargs yamly, dynamic_bindings *env) yamly {
-	log.Printf("apply:\n   %#v\n   %#v\n   %#v\n   %#v\n", seen_tree, anyargs, run)
+	log.Printf("apply:\n   %#v\n   %#v\n   %#v\n", seen_tree, anyargs, run)
 	//        """
 	//        Given a map of arguments, create a new local environment for this macro expansion, bind the args to the new
 	//        enviroment, then expand the captured body and return the result. If the captured parameters variable is a string, it is
