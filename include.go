@@ -49,9 +49,6 @@ func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
 	//    Read a file of data, no macro expansions.
 	//    :return: the data as read
 	//    """
-	// TODO   validateParams(tree, {'': None}, args, '')
-	//    return expandFile(args, bindings, expandafterload=False)
-	//
 	filename, ok := args.(stringy)
 	if !ok {
 		panic(fmt.Sprintf("ERROR: load was expecting a filename, got '%v'", args))

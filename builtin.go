@@ -12,7 +12,6 @@ import (
 //    """
 //    :return: True or False depending if args are the same.
 //    """
-//    validateParams(tree, {'': None}, args, [1, 2])
 func equalsBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	log.Printf("== %v %v\n", tree, args)
 	argarray, ok := args.(seqy)
@@ -34,7 +33,6 @@ func equalsBuiltin(tree mapy, args yamly, bindings *env) yamly {
 //    """
 //    :return: the sum of the arguments.
 //    """
-//    validateParams(tree, {'': None}, args, [1, 2])
 func plusBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	argarray, ok := args.(seqy)
 	if !ok {
@@ -69,7 +67,6 @@ func plusBuiltin(tree mapy, args yamly, bindings *env) yamly {
 //    """
 //    :return: a list from  statement[0] to statement[1]
 //    """
-//    validateParams(tree, {'range': None}, statement, [1,2])
 func rangeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	switch args := args.(type) {
 	case seqy:
@@ -143,7 +140,6 @@ func flattenBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//    """
 	//    See flattenList
 	//    """
-	//  TODO  validateParams(tree, {'': None}, args, [])
 	return flattenList(args, math.MaxInt32)
 }
 
@@ -151,7 +147,6 @@ func flatoneBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//    """
 	//    See flatList
 	//    """
-	//   TODO validateParams(tree, {'': None}, args, [])
 	return flattenList(args, 1)
 }
 
@@ -165,7 +160,6 @@ func mergeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//    :param bindings:
 	//    :return: new map with merged content
 	//    """
-	//  TODO  validateParams(tree, {'': None}, args, [])
 	result := make(mapy)
 	switch args := args.(type) {
 	case seqy:
@@ -229,7 +223,7 @@ func quoteBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//    """
 	//    :return: the args without expansion
 	//    """
-	// TODO    assertSingleKey(tree)
+	assertSingleKey(tree)
 	return args
 }
 

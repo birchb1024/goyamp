@@ -14,7 +14,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//
 	//    TODO This is all to do...
 	//
-	// TODO    assertSingle_key(tree)
+	assertSingleKey(tree)
 	var command string
 	arguments := []string{}
 	switch args := args.(type) {

@@ -53,7 +53,6 @@ func repeatBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//    :param bindings:
 	//    :return: The Expanse
 	//    """
-	//    TODO validateKeys(['for', 'in', 'body', ('key',)], args)
 	treemap, ok := args.(mapy)
 	if !ok {
 		panic(fmt.Sprintf("Syntax error repeat expects a map, got %v\n", tree))

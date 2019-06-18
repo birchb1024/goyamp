@@ -321,8 +321,40 @@ func (e *env) lookup(any yamly) (yamly, bool) {
 	}
 }
 
-func (r compiledFunction) apply(seenTree mapy, args yamly, dynamicBindings *env) yamly {
-	return r.compiled(seenTree, args, dynamicBindings)
+func (f functionDef) checkArgumentsOrDie(actuals yamly) {
+	log.Printf("checkArgumentsOrDie:\n   %#v\n   %#v\n", f, actuals)
+	if f.varargs {
+		return
+	}
+	switch args := actuals.(type) {
+	case nily:
+		return
+	case mapy:
+
+		if f.parameters == nil {
+			panic(fmt.Sprintf("function parameters are nil!!"))
+		}
+		// Check all params are present
+		missing := seqy{}
+		for _, k := range f.parameters {
+			_, ok := args[k]
+			if !ok {
+				missing = append(missing, k)
+			}
+		}
+		if len(missing) > 0 {
+			panic(fmt.Sprintf("Argument mismatch in %v expected %v got %v", f.name, f.parameters, args))
+		}
+		if len(args) > len(f.parameters) {
+			panic(fmt.Sprintf("To many arguments in %v expected %v got %v", f.name, f.parameters, args))
+		}
+	default:
+		panic(fmt.Sprintf("Expecting argument map for %v, got: %#v", f.name, actuals))
+	}
+}
+
+func (r compiledFunction) apply(seenTree mapy, actuals yamly, dynamicBindings *env) yamly {
+	return r.compiled(seenTree, actuals, dynamicBindings)
 }
 
 func (r macroFunction) apply(seenTree mapy, anyargs yamly, dynamicBindings *env) yamly {
@@ -336,53 +368,34 @@ func (r macroFunction) apply(seenTree mapy, anyargs yamly, dynamicBindings *env)
 	//        :param dynamicBindings: bindings for builtins
 	//        :return:
 	//        """
-	fun := r.fun
 	if len(seenTree) != 1 { // Macros always have a single key
 		panic(fmt.Sprintf("ERROR: too many keys in macro call '%v'", seenTree))
 	}
-	args, ok := anyargs.(mapy)
-	if args != nil && !ok {
-		panic(fmt.Sprintf("Expecting argument map for %v, got: %#v", fun.name, args))
-	}
-	if fun.parameters == nil {
-		panic(fmt.Sprintf("parameters are ni!!!"))
-	}
-	if len(fun.parameters) == 0 && args != nil {
-		panic(fmt.Sprintf("Too many args for %v: %v", fun.name, args))
-	}
-	// Check all params are present
-	if !fun.varargs && len(args) > 0 {
-		missing := seqy{}
-		for _, k := range fun.parameters {
-			_, ok := args[k]
-			if !ok {
-				missing = append(missing, k)
-			}
-		}
-		if len(missing) > 0 {
-			panic(fmt.Sprintf("Argument mismatch in %v expected %v got %v", fun.name, fun.parameters, args))
-		}
-		if len(missing) == 0 && len(args) > len(fun.parameters) {
-			panic(fmt.Sprintf("To many arguments in %v expected %v got %v", fun.name, fun.parameters, args))
-		}
-	}
-	// Now create env for macro call
+	r.fun.checkArgumentsOrDie(anyargs)
+
 	macroEnv := env{
 		engine: dynamicBindings.engine,
-		parent: fun.bindings,
+		parent: r.fun.bindings,
 		bind:   map[string]yamly{"__SOURCE__": seenTree},
 	}
-	if fun.varargs {
-		log.Printf("varags: %v %v\n", args, fun.parameters)
-		varg := fun.parameters[0].(stringy)
+	if r.fun.varargs {
+		log.Printf("varags: %v %v\n", anyargs, r.fun.parameters)
+		varg := r.fun.parameters[0].(stringy)
 		macroEnv.bind[string(varg)] = anyargs
 	} else {
-		for k, v := range args {
-			argname, ok := k.(stringy)
-			if !ok {
-				panic(fmt.Sprintf("arg name %v must be string in %v", k, seenTree))
+		switch args := anyargs.(type) {
+		case mapy:
+			for k, v := range args {
+				argname, ok := k.(stringy)
+				if !ok {
+					panic(fmt.Sprintf("arg name %v must be string in %v", k, seenTree))
+				}
+				macroEnv.bind[string(argname)] = v
 			}
-			macroEnv.bind[string(argname)] = v
+		case nily:
+
+		default:
+			panic(fmt.Sprintf("Expecting argument map or null for %v, got: %#v", r.fun.name, anyargs))
 		}
 	}
 	return r.body.expand(&macroEnv)
@@ -428,49 +441,6 @@ func assertSingleKey(tree yamly) {
 		panic(fmt.Sprintf("Syntax error too many keys in %v", amap))
 	}
 }
-
-// TODO def validateParams(tree, treeProto, args, argsProto):
-//    """
-//    Given a protype for a form and arguments, raise execptions if they dont match.
-//    Checks:
-//        - the number of keys in the tree,
-//        - the type of the args
-//        - the number of agrs if a list
-//
-//    e.g. validateParams({'a': None}, {'a': None}, [1], [1]) is OK
-//    :return: None
-//    """
-//    if len(tree.keys()) != len(treeProto):
-//            raise(interface{}pException('Syntax error incorrect number of keys in {}'.format(tree)))
-//    if type(args) != type(argsProto):
-//            raise(interface{}pException('Syntax error incorrect argument type. Expected {} in {}'.format(type(argsProto), tree)))
-//    if type(args) in [list, dict]:         # Is it someinterface{} with a length?
-//        if len(args) < len(argsProto):
-//                raise(interface{}pException('Syntax error too few arguments. Expected {} in {}'.format(len(argsProto), tree)))
-//
-//TODO def validateKeys(specification, amap):
-//    """
-//    Raise an exception if the keys in the specification are not present in the args, or if there are
-//    additional keys not in the spec. Optional keys are wrapped in a tuple.
-//    Example:
-//       ['for', 'in', ('step')]
-//    """
-//    extras = set(amap.keys())
-//    for key in specification:
-//      if type(key) == str:
-//        if not key in amap:
-//           raise(interface{}pException('Syntax error missing argument {} in {}'.format(key, amap)))
-//        extras.discard(key)
-//      elif type(key) == tuple:
-//         optional = key[0]
-//         if type(optional) != str:
-//            raise(interface{}pException('Invalid spec {}'.format(specification)))
-//         extras.discard(optional)
-//      else:
-//          raise(interface{}pException('Invalid {} spec {}'.format(type(key), specification)))
-//    if len(extras) > 0:
-//        raise(interface{}pException('Unexpected keys {} in {}'.format(extras, amap)))
-//
 
 func any2int(item yamly, errorMessage string) int {
 	switch item := item.(type) {

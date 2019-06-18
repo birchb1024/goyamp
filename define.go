@@ -58,7 +58,7 @@ func undefineBuiltin(tree mapy, args yamly, bindin *env) yamly {
 	//    Remove binding in the current environment only.
 	//    :return: None
 	//    """
-	//  TODO  assertSingleKey(tree)
+	assertSingleKey(tree)
 	if variable, ok := args.(stringy); ok {
 		delete(bindin.bind, string(variable))
 		return nily{}
