@@ -89,7 +89,7 @@ func defmacro_builtin(tree mapy, args yamly, bindin *env) yamly {
 
 	// Collate arguments
 	var macro_params = seqy{} // default is list if no args
-	var varargs bool = false
+	varargs := false
 	macro_p, ok := argst[stringy("args")]
 	if ok {
 		switch theparams := macro_p.(type) {

@@ -102,9 +102,8 @@ func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
 	}
 	if len(result) == 1 {
 		return result[0], nil
-	} else {
-		return result, nil
 	}
+	return result, nil
 }
 
 func load_builtin(tree mapy, args yamly, bindings *env) yamly {

@@ -14,17 +14,20 @@ import (
 	"strings"
 )
 
+//
+// Version provides the Git version tag used in the build of the binary
 var Version string
 
 //
-// 
+//
 type yamly interface {
 	expand(binding *env) yamly
+	declassify() interface{}
 }
 
 //
 // Type nily stands instead of nil
-// to avoid nil.expand() 
+// to avoid nil.expand()
 type nily struct{}
 type booly bool
 type inty int
@@ -50,7 +53,6 @@ func (x unknowny) String() string { return fmt.Sprintf("unknown: %T %#v", x.x, x
 
 func (x nily) String() string { return "null" }
 
-
 // - Engine internals...
 type env struct {
 	bind   map[string]yamly
@@ -58,6 +60,8 @@ type env struct {
 	engine *Expander
 }
 
+// Expander holds the state of the goyamp engine.
+// It is not a singleton type, have as many as you want.
 type Expander struct {
 	globals *env
 	output  io.Writer
@@ -81,14 +85,14 @@ type macroFunction struct {
 	body yamly
 }
 
-func (x macroFunction) expand(binding *env) yamly { return x }
+func (r macroFunction) expand(binding *env) yamly { return r }
 
 type compiledFunction struct {
 	fun      functionDef
 	compiled builtin
 }
 
-func (x compiledFunction) expand(binding *env) yamly { return x }
+func (r compiledFunction) expand(binding *env) yamly { return r }
 
 type runnable interface {
 	isEager() bool
@@ -130,12 +134,12 @@ func (m mapy) String() string {
 	}
 	sort.Strings(keystr)
 
-	var result string = "{"
-	var counter int = 0
+	result := "{"
+	counter := 0
 	for _, ks := range keystr {
 		k := keystr2key[ks]
 		v := m[k]
-		counter += 1
+		counter++
 		result = fmt.Sprintf("%v %v : %v ", result, k, v)
 		if !(counter == len(m)) {
 			result = fmt.Sprintf("%v,", result)
@@ -146,7 +150,7 @@ func (m mapy) String() string {
 }
 
 func (s seqy) String() string {
-	var result string = "["
+	result := "["
 	for i, v := range s {
 		result = fmt.Sprintf("%v %v", result, v)
 		if i != len(s)-1 {
@@ -205,34 +209,28 @@ func classify(x interface{}) yamly {
 
 //
 //
-func declassify(x yamly) interface{} {
-	switch x := x.(type) {
-	case nily:
-		return nil
-	case inty:
-		return int(x)
-	case float64y:
-		return float64(x)
-	case booly:
-		return bool(x)
-	case stringy:
-		return string(x)
-	case mapy:
-		result := map[interface{}]interface{}{}
-		for k, v := range x {
-			result[declassify(k)] = declassify(v)
-		}
-		return result
-	case seqy:
-		result := []interface{}{}
-		for _, v := range x {
-			result = append(result, declassify(v))
-		}
-		return result
-	default:
-		return x
+func (x nily) declassify() interface{}     { return nil }
+func (x inty) declassify() interface{}     { return int(x) }
+func (x float64y) declassify() interface{} { return float64(x) }
+func (x booly) declassify() interface{}    { return bool(x) }
+func (x stringy) declassify() interface{}  { return string(x) }
+func (m mapy) declassify() interface{} {
+	result := map[interface{}]interface{}{}
+	for k, v := range m {
+		result[k.declassify()] = v.declassify()
 	}
+	return result
 }
+func (s seqy) declassify() interface{} {
+	result := []interface{}{}
+	for _, v := range s {
+		result = append(result, v.declassify())
+	}
+	return result
+}
+func (r macroFunction) declassify() interface{}    { return r }
+func (r compiledFunction) declassify() interface{} { return r }
+func (x unknowny) declassify() interface{}         { return x.x }
 
 func (r macroFunction) isEager() bool {
 	log.Printf("isEager: %v", r)
@@ -296,7 +294,7 @@ func interpolate(tree yamly, bindings *env) yamly {
 	return stringy(result)
 }
 
-func (env *env) lookup(any yamly) (yamly, bool) {
+func (e *env) lookup(any yamly) (yamly, bool) {
 	log.Printf("lookup: %#v\n", any)
 	//    """
 	//    Search an environment stack for a binding of key to a value,
@@ -311,25 +309,24 @@ func (env *env) lookup(any yamly) (yamly, bool) {
 	}
 	key := string(keyy)
 	for {
-		val, ok := env.bind[key]
+		val, ok := e.bind[key]
 		if ok {
 			return val, true
 		}
-		if env.parent != nil {
-			env = env.parent
+		if e.parent != nil {
+			e = e.parent
 			continue
-		} else {
-			return nil, false
 		}
+		return nil, false
 	}
 }
 
-func (run compiledFunction) apply(seen_tree mapy, args yamly, dynamic_bindings *env) yamly {
-	return run.compiled(seen_tree, args, dynamic_bindings)
+func (r compiledFunction) apply(seen_tree mapy, args yamly, dynamic_bindings *env) yamly {
+	return r.compiled(seen_tree, args, dynamic_bindings)
 }
 
-func (run macroFunction) apply(seen_tree mapy, anyargs yamly, dynamic_bindings *env) yamly {
-	log.Printf("apply:\n   %#v\n   %#v\n   %#v\n", seen_tree, anyargs, run)
+func (r macroFunction) apply(seen_tree mapy, anyargs yamly, dynamic_bindings *env) yamly {
+	log.Printf("apply:\n   %#v\n   %#v\n   %#v\n", seen_tree, anyargs, r)
 	//        """
 	//        Given a map of arguments, create a new local environment for this macro expansion, bind the args to the new
 	//        enviroment, then expand the captured body and return the result. If the captured parameters variable is a string, it is
@@ -339,7 +336,7 @@ func (run macroFunction) apply(seen_tree mapy, anyargs yamly, dynamic_bindings *
 	//        :param dynamic_bindings: bindings for builtins
 	//        :return:
 	//        """
-	fun := run.fun
+	fun := r.fun
 	if len(seen_tree) != 1 { // Macros always have a single key
 		panic(fmt.Sprintf("ERROR: too many keys in macro call '%v'", seen_tree))
 	}
@@ -388,10 +385,9 @@ func (run macroFunction) apply(seen_tree mapy, anyargs yamly, dynamic_bindings *
 			macro_env.bind[string(argname)] = v
 		}
 	}
-	return run.body.expand(&macro_env)
+	return r.body.expand(&macro_env)
 
 }
-
 
 func expand_str(var_name string, bindings *env) yamly {
 	//    """
@@ -415,9 +411,8 @@ func expand_str(var_name string, bindings *env) yamly {
 			return variable_name // No variable found
 		}
 		return subvar_lookup(var_name, subvar[1:], topvalue, bindings)
-	} else {
-		return variable_name
 	}
+	return variable_name
 }
 
 func assert_single_key(tree yamly) {
@@ -501,13 +496,12 @@ func lookup_caret(key yamly, bindings *env) yamly {
 	keyst := string(keysty)
 	if !strings.HasPrefix(keyst, "^") {
 		return key
-	} else {
-		variable_name := keyst[1:]
-		if value, ok := bindings.lookup(stringy(variable_name)); ok {
-			return value
-		}
-		panic(fmt.Sprintf("caret variable %v not defined in %v", variable_name, key))
 	}
+	variable_name := keyst[1:]
+	if value, ok := bindings.lookup(stringy(variable_name)); ok {
+		return value
+	}
+	panic(fmt.Sprintf("caret variable %v not defined in %v", variable_name, key))
 }
 
 func is_function(tree mapy, bindings *env) (bool, runnable, yamly) {
@@ -533,7 +527,7 @@ func is_function(tree mapy, bindings *env) (bool, runnable, yamly) {
 		return nil, false
 
 	}
-	var k yamly = nil
+	var k yamly
 	if len(tree) == 1 {
 		for key := range tree {
 			k = key // executes once only
@@ -552,7 +546,7 @@ func is_function(tree mapy, bindings *env) (bool, runnable, yamly) {
 	log.Printf("is_function fun not ok => %v\n", fun)
 	// At this point we have len(keys()) > 1 and its not an "if"
 	// so we cannot have a function under any key...
-	for k, _ := range tree {
+	for k := range tree {
 		if _, ok := lookup_function(k); ok {
 			panic(fmt.Sprintf("ERROR: too many keys in macro %v", tree))
 		}
@@ -560,9 +554,9 @@ func is_function(tree mapy, bindings *env) (bool, runnable, yamly) {
 	return false, nil, nil
 }
 
-func (tree seqy) expand(bindings *env) yamly {
+func (s seqy) expand(bindings *env) yamly {
 	newlist := seqy{}
-	for _, item := range tree {
+	for _, item := range s {
 		expanded := item.expand(bindings)
 		if _, nok := expanded.(nily); !nok {
 			newlist = append(newlist, expanded)
@@ -571,24 +565,23 @@ func (tree seqy) expand(bindings *env) yamly {
 	return newlist
 }
 
-func (tree stringy) expand(bindings *env) yamly {
-	result := expand_str(string(tree), bindings)
-	if result == tree {
-		return interpolate(tree, bindings)
+func (x stringy) expand(bindings *env) yamly {
+	result := expand_str(string(x), bindings)
+	if result == x {
+		return interpolate(x, bindings)
 	}
 	if result_str, ok := result.(stringy); ok {
 		return interpolate(result_str.expand(bindings), bindings)
-	} else {
-		return result.expand(bindings)
 	}
+	return result.expand(bindings)
 }
 
-func (tree_typed mapy) expand(bindings *env) yamly {
+func (m mapy) expand(bindings *env) yamly {
 
 	newdict := mapy{}
 
 	// Lookahead for functions. Some have Lazy maps we dont want to expand yet...
-	if ok, function, rhs := is_function(tree_typed, bindings); ok {
+	if ok, function, rhs := is_function(m, bindings); ok {
 		log.Printf("is_function returned => :\n    %v\n    %#v\n    %v\n", ok, function, rhs)
 		var actual_args, expanded_result yamly
 
@@ -597,27 +590,25 @@ func (tree_typed mapy) expand(bindings *env) yamly {
 		} else { // lazy, quote
 			actual_args = rhs
 		}
-		expanded_result = function.apply(tree_typed, actual_args, bindings)
+		expanded_result = function.apply(m, actual_args, bindings)
 		if function.isQuote() {
 			return expanded_result
-		} else {
-			return expanded_result.expand(bindings)
 		}
-
+		return expanded_result.expand(bindings)
 	}
 	// Just a normal map - not a function
-	for k, v := range tree_typed {
+	for k, v := range m {
 
 		if kstr, ok := k.(stringy); ok {
 			if strings.HasPrefix(string(kstr), "^") { // TODO make a func here
 				variable_name := kstr[1:] // TODO what if kstr = "^"?
 				value, ok := bindings.lookup(variable_name)
 				if !ok {
-					panic(fmt.Sprintf("ERROR: Variable %v not defined in %v", variable_name, tree_typed))
+					panic(fmt.Sprintf("ERROR: Variable %v not defined in %v", variable_name, m))
 				}
 				expanded := v.expand(bindings)
 				if !reflect.ValueOf(value).Type().Comparable() {
-					panic(fmt.Sprintf("Unable to use %v as map key, '%v' is not comparable. in %v", variable_name, value, tree_typed))
+					panic(fmt.Sprintf("Unable to use %v as map key, '%v' is not comparable. in %v", variable_name, value, m))
 				}
 				newdict[value] = expanded // TODO what if value is already a key in newdict?
 				continue
@@ -627,7 +618,7 @@ func (tree_typed mapy) expand(bindings *env) yamly {
 		if interp_k != k {
 			// string containing {{ }} - only these keys are expanded
 			if _, ok := newdict[interp_k]; ok {
-				panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interp_k, tree_typed))
+				panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interp_k, m))
 			}
 			newdict[interp_k] = v.expand(bindings)
 			continue
@@ -635,7 +626,7 @@ func (tree_typed mapy) expand(bindings *env) yamly {
 			log.Printf("not interpolating key %#v", k)
 		}
 		if _, ok := newdict[k]; ok {
-			panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interp_k, tree_typed))
+			panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interp_k, m))
 		}
 		newdict[k] = v.expand(bindings)
 	}
@@ -716,7 +707,7 @@ func expand_stream(input io.Reader, filename string, bindings *env) (err error) 
 		enc := yaml.NewEncoder(bindings.engine.output)
 		enc.SetIndent(2)
 		fmt.Fprintln(bindings.engine.output, "---")
-		err = enc.Encode(declassify(expanded))
+		err = enc.Encode(expanded.declassify())
 		if err != nil {
 			return err
 		}

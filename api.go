@@ -20,16 +20,16 @@ func (engine *Expander) init(environment []string, argv []string) {
 		engine: engine,
 		parent: nil,
 		bind: map[string]yamly{
-			"argv": classify(argv),
-			"env":  envMap,
-			"__VERSION__":  stringy(Version),
-			},
+			"argv":        classify(argv),
+			"env":         envMap,
+			"__VERSION__": stringy(Version),
+		},
 	}
 	add_builtins_to_env(engine.globals)
 }
 
 //
-// NewExpander creates a Goyamp macro expansion engine. 
+// NewExpander creates a Goyamp macro expansion engine.
 func NewExpander(commandArgs []string, environment []string, ow io.Writer) Expander {
 
 	ex := Expander{
@@ -48,6 +48,7 @@ func (engine *Expander) ExpandStream(input io.Reader, filename string) error {
 	return expand_stream(input, filename, engine.globals)
 }
 
+// ExpandFile reads a file of YAML given a path
 func (engine *Expander) ExpandFile(filename string) error {
 
 	engine.globals.bind["__FILE__"] = stringy(filename)

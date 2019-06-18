@@ -62,8 +62,7 @@ func execute_builtin(tree mapy, args yamly, bindings *env) yamly {
 	log.Printf("exec: decoder %#v", err)
 	if err != nil && err != io.EOF {
 		return stringy(responsestr)
-	} else {
-		log.Printf("exec: doc %#v", doc)
-		return classify(doc)
 	}
+	log.Printf("exec: doc %#v", doc)
+	return classify(doc)
 }

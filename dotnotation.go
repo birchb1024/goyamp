@@ -48,9 +48,8 @@ func subvar_lookup(original string, vars_list []string, major_variable yamly, bi
 		}
 		if len(vars_list) == 1 {
 			return result
-		} else {
-			return subvar_lookup(original, vars_list[1:], result, bindings)
 		}
+		return subvar_lookup(original, vars_list[1:], result, bindings)
 
 	case seqy:
 		// A Sequence needing an integer index
@@ -72,9 +71,9 @@ func subvar_lookup(original string, vars_list []string, major_variable yamly, bi
 		}
 		if len(vars_list) == 1 { // Last one
 			return major_variable_typed[index]
-		} else {
-			return subvar_lookup(original, vars_list[1:], major_variable_typed[index], bindings)
 		}
+		return subvar_lookup(original, vars_list[1:], major_variable_typed[index], bindings)
+
 	default:
 		panic(fmt.Sprintf("Subvariable data not indexable %#v in %v", major_variable, original))
 	}

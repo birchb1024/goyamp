@@ -62,9 +62,8 @@ func plus_builtin(tree mapy, args yamly, bindings *env) yamly {
 	}
 	if math.Round(sum) == sum {
 		return inty(int(sum))
-	} else {
-		return float64y(sum)
 	}
+	return float64y(sum)
 }
 
 //    """
@@ -95,7 +94,7 @@ func range_builtin(tree mapy, args yamly, bindings *env) yamly {
 		return result
 	case mapy:
 		result := seqy{}
-		for key, _ := range args {
+		for key := range args {
 			result = append(result, key)
 		}
 		sort.Sort(result)
