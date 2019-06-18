@@ -10,11 +10,11 @@ import (
 	"strings"
 )
 
-func execute_builtin(tree mapy, args yamly, bindings *env) yamly {
+func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//
 	//    TODO This is all to do...
 	//
-	// TODO    assert_single_key(tree)
+	// TODO    assertSingle_key(tree)
 	var command string
 	arguments := []string{}
 	switch args := args.(type) {

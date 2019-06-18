@@ -5,8 +5,8 @@ import (
 	"log"
 )
 
-func map_define(defs mapy, bindings *env) yamly {
-	log.Printf("map_define: %v\n", defs)
+func mapDefine(defs mapy, bindings *env) yamly {
+	log.Printf("mapDefine: %v\n", defs)
 	definitions := defs.expand(bindings)
 	defmap, ok := definitions.(mapy)
 	if !ok {
@@ -22,22 +22,22 @@ func map_define(defs mapy, bindings *env) yamly {
 	return nily{}
 }
 
-func define_builtin(tree mapy, args yamly, bindings *env) yamly {
-	log.Printf("define_builtin:\n   %#v\n   %#v\n", tree, args)
+func defineBuiltin(tree mapy, args yamly, bindings *env) yamly {
+	log.Printf("defineBuiltin:\n   %#v\n   %#v\n", tree, args)
 	//    """
 	//    Define one or more variables in the current scope.
 	//    :return: None
 	//    """
-	assert_single_key(tree)
+	assertSingleKey(tree)
 	todefine, aok := args.(mapy)
 	if !aok {
 		panic(fmt.Sprintf("define expects a map in %v got %T", tree, args))
 	}
 	name, nok := todefine[stringy("name")]
 	value, vok := todefine[stringy("value")]
-	log.Printf("define_builtin: nok vok %v %v\n", nok, vok)
+	log.Printf("defineBuiltin: nok vok %v %v\n", nok, vok)
 	if !nok && !vok {
-		return map_define(todefine, bindings)
+		return mapDefine(todefine, bindings)
 	}
 	if !(nok && vok) {
 		panic(fmt.Sprintf("Syntax error '%v' missing keyword in %v", args, tree))
@@ -48,17 +48,17 @@ func define_builtin(tree mapy, args yamly, bindings *env) yamly {
 	}
 	newvalue := value.expand(bindings)
 	bindings.bind[string(namestr)] = newvalue
-	log.Printf("\ndefine_builtin:\n new value for :  %#v\n value:  %#v\n", namestr, newvalue)
+	log.Printf("\ndefineBuiltin:\n new value for :  %#v\n value:  %#v\n", namestr, newvalue)
 	return nily{}
 }
 
-func undefine_builtin(tree mapy, args yamly, bindin *env) yamly {
-	log.Printf("undefine_builtin:\n   %#v\n   %#v\n", tree, args)
+func undefineBuiltin(tree mapy, args yamly, bindin *env) yamly {
+	log.Printf("undefineBuiltin:\n   %#v\n   %#v\n", tree, args)
 	//    """
 	//    Remove binding in the current environment only.
 	//    :return: None
 	//    """
-	//  TODO  assert_single_key(tree)
+	//  TODO  assertSingleKey(tree)
 	if variable, ok := args.(stringy); ok {
 		delete(bindin.bind, string(variable))
 		return nily{}
@@ -66,7 +66,7 @@ func undefine_builtin(tree mapy, args yamly, bindin *env) yamly {
 	panic(fmt.Sprintf("Syntax error was expecting string in %v got %v", tree, args))
 }
 
-func defmacro_builtin(tree mapy, args yamly, bindin *env) yamly {
+func defmacroBuiltin(tree mapy, args yamly, bindin *env) yamly {
 	//    """
 	//    Define a new macro.
 	//    :return: None
@@ -78,49 +78,49 @@ func defmacro_builtin(tree mapy, args yamly, bindin *env) yamly {
 	if !ok {
 		panic("Syntax error defmacro expected a map, got %v")
 	}
-	macro_name, ok := argst[stringy("name")]
+	macroName, ok := argst[stringy("name")]
 	if !ok {
 		panic(fmt.Sprintf("missing names in %v", tree))
 	}
-	macro_name_str, ok := macro_name.(stringy)
+	macroNameStr, ok := macroName.(stringy)
 	if !ok {
-		panic(fmt.Sprintf("in macro %v is not a string", macro_name))
+		panic(fmt.Sprintf("in macro %v is not a string", macroName))
 	}
 
 	// Collate arguments
-	var macro_params = seqy{} // default is list if no args
+	var macroParams = seqy{} // default is list if no args
 	varargs := false
-	macro_p, ok := argst[stringy("args")]
+	macrop, ok := argst[stringy("args")]
 	if ok {
-		switch theparams := macro_p.(type) {
+		switch theparams := macrop.(type) {
 		case nily:
 		case stringy: //varargs
-			macro_params = append(macro_params, theparams)
+			macroParams = append(macroParams, theparams)
 			varargs = true
 		case seqy:
 			for _, k := range theparams {
-				if param_name, ok := k.(stringy); ok {
-					macro_params = append(macro_params, param_name)
+				if paramName, ok := k.(stringy); ok {
+					macroParams = append(macroParams, paramName)
 				} else {
 					panic(fmt.Sprintf("in defmacro args '%#v' is not a string", k))
 				}
 			}
 		default:
-			panic(fmt.Sprintf("in defmacro args '%#v' is not a string", macro_p))
+			panic(fmt.Sprintf("in defmacro args '%#v' is not a string", macrop))
 		}
 	}
-	macro_body, ok := argst[stringy("value")]
-	new_macro := macroFunction{
+	macroBody, ok := argst[stringy("value")]
+	newMacro := macroFunction{
 		fun: functionDef{
-			name:       macro_name_str,
+			name:       macroNameStr,
 			eager:      true,
 			quote:      false,
-			parameters: macro_params,
+			parameters: macroParams,
 			varargs:    varargs,
 			bindings:   bindin,
 		},
-		body: macro_body,
+		body: macroBody,
 	}
-	bindin.bind[string(macro_name_str)] = new_macro
+	bindin.bind[string(macroNameStr)] = newMacro
 	return nily{}
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/birchb1024/goyamp"
 )
 
-func file_runner(output io.Writer, filename string) error {
+func fileRunner(output io.Writer, filename string) error {
 	engine := goyamp.NewExpander(
 		[]string{"A", "B", "C", "D"},
 		[]string{"USERNAME=birchb", "USER=birchb"},
@@ -21,7 +21,7 @@ func file_runner(output io.Writer, filename string) error {
 	return engine.ExpandFile(filename)
 }
 
-func Test_normalExamples(t *testing.T) {
+func TestNormalExamples(t *testing.T) {
 
 	normalExampleFiles := []string{
                 "alter_keys.yaml",
@@ -57,7 +57,7 @@ func Test_normalExamples(t *testing.T) {
 	runTestFiles("Normal examples", normalExampleFiles, t)
 }
 
-func TODO_Test_panicExamples(t *testing.T) {
+func TODOTestPanicExamples(t *testing.T) {
 
     defer func() {
         if r := recover(); r == nil {
@@ -82,7 +82,7 @@ func runTestFiles(name string, fileList []string, t *testing.T) {
 		logPath, _ := filepath.Abs(log)
 		t.Run(name + "_" + filename, func(t *testing.T) {
 			var result bytes.Buffer
-			err := file_runner(&result, path)
+			err := fileRunner(&result, path)
 			if err != nil {
 				t.Error(path, err)
 				return

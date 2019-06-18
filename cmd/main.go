@@ -10,8 +10,8 @@ import (
 	"os"
 )
 
-func helpText(out io.Writer, do_or_not_do bool) {
-	if !do_or_not_do {
+func helpText(out io.Writer, doOrNotDo bool) {
+	if !doOrNotDo {
 		return
 	}
 	usage := `TODO help!`

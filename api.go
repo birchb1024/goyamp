@@ -25,7 +25,7 @@ func (engine *Expander) init(environment []string, argv []string) {
 			"__VERSION__": stringy(Version),
 		},
 	}
-	add_builtins_to_env(engine.globals)
+	addBuiltinsToEnv(engine.globals)
 }
 
 //
@@ -45,12 +45,12 @@ func NewExpander(commandArgs []string, environment []string, ow io.Writer) Expan
 func (engine *Expander) ExpandStream(input io.Reader, filename string) error {
 
 	engine.globals.bind["__FILE__"] = stringy(filename)
-	return expand_stream(input, filename, engine.globals)
+	return expandStream(input, filename, engine.globals)
 }
 
 // ExpandFile reads a file of YAML given a path
 func (engine *Expander) ExpandFile(filename string) error {
 
 	engine.globals.bind["__FILE__"] = stringy(filename)
-	return expand_file(filename, engine.globals)
+	return expandFile(filename, engine.globals)
 }

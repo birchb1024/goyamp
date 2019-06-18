@@ -10,12 +10,12 @@ import (
 	"strings"
 )
 
-func include_builtin(tree mapy, args yamly, bindings *env) yamly {
+func includeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//    """
 	//    Sequentially expand a list of YAML files in the current environment.
 	//    return: None
 	//    """
-	log.Printf("include_builtin: %v %v\n", tree, args)
+	log.Printf("includeBuiltin: %v %v\n", tree, args)
 	if _, nok := args.(nily); nok {
 		return args
 	}
@@ -24,7 +24,7 @@ func include_builtin(tree mapy, args yamly, bindings *env) yamly {
 		for _, x := range arg {
 			maybefile := x.expand(bindings)
 			if filename, ok := maybefile.(stringy); ok {
-				err := expand_file(string(filename), bindings)
+				err := expandFile(string(filename), bindings)
 				if err != nil {
 					log.Fatalf("%v", err)
 				}
@@ -33,7 +33,7 @@ func include_builtin(tree mapy, args yamly, bindings *env) yamly {
 			}
 		}
 	case stringy:
-		err := expand_file(string(arg), bindings)
+		err := expandFile(string(arg), bindings)
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
@@ -44,42 +44,42 @@ func include_builtin(tree mapy, args yamly, bindings *env) yamly {
 }
 
 func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
-	log.Printf("load_builtin %v %v", tree, args)
+	log.Printf("loadBuiltin %v %v", tree, args)
 	//    """
 	//    Read a file of data, no macro expansions.
 	//    :return: the data as read
 	//    """
-	// TODO   validate_params(tree, {'': None}, args, '')
-	//    return expand_file(args, bindings, expandafterload=False)
+	// TODO   validateParams(tree, {'': None}, args, '')
+	//    return expandFile(args, bindings, expandafterload=False)
 	//
 	filename, ok := args.(stringy)
 	if !ok {
 		panic(fmt.Sprintf("ERROR: load was expecting a filename, got '%v'", args))
 	}
 
-	// TOD DRY ... cf include_builtin
-	var current_dir, path string
+	// TOD DRY ... cf includeBuiltin
+	var currentDir, path string
 	var err error
-	current_file, ok := bindings.lookup(stringy("__PATH__"))
-	log.Printf("__PATH__ => %v\n", current_file)
+	currentFile, ok := bindings.lookup(stringy("__PATH__"))
+	log.Printf("__PATH__ => %v\n", currentFile)
 	if !ok {
 		pwd, err := os.Getwd()
 		if err != nil {
 			return nil, err
 		}
-		current_dir = pwd
+		currentDir = pwd
 	} else {
-		current_dir = filepath.Dir(string(current_file.(stringy)))
+		currentDir = filepath.Dir(string(currentFile.(stringy)))
 	}
 	if strings.HasPrefix(string(filename), "/") || string(filename) == "-" {
 		path = string(filename)
 	} else {
-		path, err = filepath.Abs(filepath.Join(current_dir, string(filename))) // resolve relative paths
+		path, err = filepath.Abs(filepath.Join(currentDir, string(filename))) // resolve relative paths
 		if err != nil {
 			return nil, err
 		}
 	}
-	log.Printf("load_builtin path %v", path)
+	log.Printf("loadBuiltin path %v", path)
 	input, err := os.Open(path)
 	if err != nil {
 		log.Printf("open => %v %v %v\n", path, input, err)
@@ -91,7 +91,7 @@ func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
 	for {
 		var doc interface{}
 		err = decoder.Decode(&doc)
-		log.Printf("load_builtin doc %v", doc)
+		log.Printf("loadBuiltin doc %v", doc)
 		if err != nil {
 			break
 		}
@@ -106,11 +106,11 @@ func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
 	return result, nil
 }
 
-func load_builtin(tree mapy, args yamly, bindings *env) yamly {
-	log.Printf("load_builtin %v %v", tree, args)
+func loadBuiltin(tree mapy, args yamly, bindings *env) yamly {
+	log.Printf("loadBuiltin %v %v", tree, args)
 	result, err := loader(tree, args, bindings)
 	if err != nil {
-		panic(fmt.Sprintf("ERROR: load_builtin '%v' %v", args, err))
+		panic(fmt.Sprintf("ERROR: loadBuiltin '%v' %v", args, err))
 	}
 	return result
 }
