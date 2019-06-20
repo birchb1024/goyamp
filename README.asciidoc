@@ -35,7 +35,7 @@ You can download a binary copy of the Goyamp program. Copies are available on Gi
 
 [source, bash]
 ----
-$ curl -L -o goyamp https://github.com/birchb1024/goyamp/releases/download/0.1.3/goyamp
+$ curl -L -o goyamp https://github.com/birchb1024/goyamp/releases/download/@@@VERSION@@@/goyamp
 $ chmod a+x goyamp
 ----
 
