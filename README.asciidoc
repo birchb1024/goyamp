@@ -1,9 +1,9 @@
-= Goyamp - The Go Macro Processor for YAML
+= Goyamp - The Go Macro Processor for YAML and JSON
 Peter Birch <birchb1024@gmail.com>
 v0.1.2, 2019-05-04
 :toc: macro
 :toclevels: 4
-YAML is human friendly data serialization standard. footnote:[YAML stands for YAML Ain't Markup Language. See https://yaml.org/]  Goyamp is a general-purpose macroprocessor for YAML files.  Both its input and output are YAML. It scans the input for symbols and makes substitutions and expansions on the output. Goyamp is 100% YAML so the syntax for defining and calling macros is YAML also.
+Goyamp is a general-purpose macroprocessor for YAML files.  Both its input and output are YAML. It scans the input for symbols and makes substitutions and expansions on the output. Goyamp is 100% YAML so the syntax for defining and calling macros is YAML also. It can also process JSON in and out.
 
 == TL;DR
 
@@ -50,7 +50,7 @@ The program  is run from the command-line giving the input file to parse as the 
 .Usage
 [source,bash]
 ----
-$ goyamp [-help] [-debug]  <myinputfile>.yaml [arg1..argn]
+$ goyamp [-help] [-debug] [-output json] <myinputfile> [arg1..argn]
 ----
 
 The `-debug` option causes Goyamp to trace its internal execution on stderr.
@@ -70,6 +70,28 @@ And run it
 $ goyamp hello.yaml
 ----
 
+=== Working with JSON
+
+JSON is a superset of YAML, so goyamp can read JSON files too. You could define variables and macros in JSON, but most people prefer to code in YAML because it's easier 
+to read. If you want to output JSON, specify the `-output json` command option. 
+
+We use this for generating Azure DevOps pipeline definitions - edit in YAML and generate JSON. You could use this for Azure ARM files or any other JSON.
+
+However remember that YAML is a super-set of JSON, so  you can express things in YAML which are not valid JSON. For example `{ 1: Monday, 2: Tuesday }` 
+has integer map keys and is valid YAML but JSON accepts only strings in map keys. Hence goyamp automatically converts map keys to strings when outputting JSON. Example:
+
+
+.hello.yaml
+[source, YAML]
+----
+$ echo '{ 1: Monday, 2: Tuesday }' | ./goyamp -o json
+{
+    "1": "Monday",
+    "2": "Tuesday"
+}
+----     
+
+JSON only accepts a single top-level object. If you have multiple YAML docs in your expanded code, goyamp will output each one in turn, which is not strictly valid.
 
 == Running from Docker
 
