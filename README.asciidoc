@@ -31,7 +31,7 @@ GoYamp is a Go program contained in the goyamp module. This has been compiled an
 
 === Download
 
-You can download a binary copy of the Goyamp program. Copies are available on GitHub in https://github.com/birchb1024/goyamp/releases:[Releases] in the repository. For example 
+You can download a binary copy of the Goyamp program. Copies are available on GitHub in https://github.com/birchb1024/goyamp/releases[Releases] in the repository. For example 
 
 [source, bash]
 ----
