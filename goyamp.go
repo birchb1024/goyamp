@@ -705,7 +705,7 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 		} else {
 			jsonTree := expanded.declassify(JSON)
 			jenc := json.NewEncoder(bindings.engine.output)
-			jenc.SetIndent("", "    ")
+			jenc.SetIndent("", "  ")
 			err = jenc.Encode(jsonTree)
 			if err != nil {
 				log.Printf("expandSteam: json.Encode %v", err)
