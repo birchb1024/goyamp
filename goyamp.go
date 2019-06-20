@@ -1,6 +1,7 @@
 package goyamp
 
 import (
+	"encoding/json"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
@@ -22,7 +23,7 @@ var Version string
 //
 type yamly interface {
 	expand(binding *env) yamly
-	declassify() interface{}
+	declassify(params ...Syntax) interface{}
 }
 
 //
@@ -63,8 +64,9 @@ type env struct {
 // Expander holds the state of the goyamp engine.
 // It is not a singleton type, have as many as you want.
 type Expander struct {
-	globals *env
-	output  io.Writer
+	globals   *env
+	output    io.Writer
+	outFormat Syntax
 }
 
 func (e env) String() string { return fmt.Sprintf("an environment...") }
@@ -209,28 +211,36 @@ func classify(x interface{}) yamly {
 
 //
 //
-func (x nily) declassify() interface{}     { return nil }
-func (x inty) declassify() interface{}     { return int(x) }
-func (x float64y) declassify() interface{} { return float64(x) }
-func (x booly) declassify() interface{}    { return bool(x) }
-func (x stringy) declassify() interface{}  { return string(x) }
-func (m mapy) declassify() interface{} {
+func (x nily) declassify(...Syntax) interface{}     { return nil }
+func (x inty) declassify(...Syntax) interface{}     { return int(x) }
+func (x float64y) declassify(...Syntax) interface{} { return float64(x) }
+func (x booly) declassify(...Syntax) interface{}    { return bool(x) }
+func (x stringy) declassify(...Syntax) interface{}  { return string(x) }
+func (m mapy) declassify(syntax ...Syntax) interface{} {
+	if len(syntax) > 0 && syntax[0] == JSON {
+		result := map[string]interface{}{}
+		for k, v := range m {
+			result[fmt.Sprintf("%v", k.declassify(syntax...))] = v.declassify(syntax...)
+		}
+		return result
+	}
 	result := map[interface{}]interface{}{}
 	for k, v := range m {
-		result[k.declassify()] = v.declassify()
+		result[k.declassify()] = v.declassify(syntax...)
 	}
 	return result
 }
-func (s seqy) declassify() interface{} {
+
+func (s seqy) declassify(syntax ...Syntax) interface{} {
 	result := []interface{}{}
 	for _, v := range s {
-		result = append(result, v.declassify())
+		result = append(result, v.declassify(syntax...))
 	}
 	return result
 }
-func (r macroFunction) declassify() interface{}    { return r }
-func (r compiledFunction) declassify() interface{} { return r }
-func (x unknowny) declassify() interface{}         { return x.x }
+func (r macroFunction) declassify(...Syntax) interface{}    { return r }
+func (r compiledFunction) declassify(...Syntax) interface{} { return r }
+func (x unknowny) declassify(...Syntax) interface{}         { return x.x }
 
 func (r macroFunction) isEager() bool {
 	log.Printf("isEager: %v", r)
@@ -674,12 +684,23 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 				continue
 			}
 		}
-		enc := yaml.NewEncoder(bindings.engine.output)
-		enc.SetIndent(2)
-		fmt.Fprintln(bindings.engine.output, "---")
-		err = enc.Encode(expanded.declassify())
-		if err != nil {
-			return err
+		if bindings.engine.outFormat == YAML {
+			enc := yaml.NewEncoder(bindings.engine.output)
+			enc.SetIndent(2)
+			fmt.Fprintln(bindings.engine.output, "---")
+			err = enc.Encode(expanded.declassify())
+			if err != nil {
+				return err
+			}
+		} else {
+			jsonTree := expanded.declassify(JSON)
+			jenc := json.NewEncoder(bindings.engine.output)
+			jenc.SetIndent("", "    ")
+			err = jenc.Encode(jsonTree)
+			if err != nil {
+				log.Printf("expandSteam: json.Encode %v", err)
+				return err
+			}
 		}
 	}
 }

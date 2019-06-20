@@ -17,7 +17,8 @@ func fileRunner(output io.Writer, filename string) error {
 	engine := goyamp.NewExpander(
 		[]string{"A", "B", "C", "D"},
 		[]string{"USERNAME=birchb", "USER=birchb"},
-		output)
+		output,
+		goyamp.YAML)
 	return engine.ExpandFile(filename)
 }
 

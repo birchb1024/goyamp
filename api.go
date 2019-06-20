@@ -28,13 +28,21 @@ func (engine *Expander) init(environment []string, argv []string) {
 	addBuiltinsToEnv(engine.globals)
 }
 
+type Syntax int
+
+const (
+	YAML Syntax = iota + 0
+	JSON
+)
+
 //
 // NewExpander creates a Goyamp macro expansion engine.
-func NewExpander(commandArgs []string, environment []string, ow io.Writer) Expander {
+func NewExpander(commandArgs []string, environment []string, ow io.Writer, format Syntax) Expander {
 
 	ex := Expander{
-		globals: nil,
-		output:  ow,
+		globals:   nil,
+		output:    ow,
+		outFormat: format,
 	}
 
 	ex.init(environment, commandArgs)
