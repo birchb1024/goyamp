@@ -1,0 +1,37 @@
+{
+    "file_header": null
+}
+"OK"
+"OK"
+"OK"
+[
+    123,
+    4444
+]
+[
+    {
+        "Goodbye Stage": null,
+        "approval": "success",
+        "jobs": {
+            "Job_hi": {
+                "tasks": {
+                    "resources": [
+                        "linux"
+                    ],
+                    "tasks": [
+                        {
+                            "exec": {
+                                "arguments": [
+                                    "-c",
+                                    "date"
+                                ],
+                                "command": "/bin/bash",
+                                "run_if": "passed"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+]

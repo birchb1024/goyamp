@@ -1,0 +1,35 @@
+{
+	"file_header": [
+		{
+			"define": {
+				"tiles": [
+					"isolation-segment",
+					"metrics",
+					"rabbitmq",
+					"pcf-automation-image"
+				]
+			}
+		},
+		{
+			"name": "start-all-pcf-automation-tasks",
+			"plan": {
+				"flatten": [
+					{
+						"get": "bbr-om-installation-pipelinetask",
+						"trigger": true
+					},
+					{
+						"repeat": {
+							"for": "tile",
+							"in": "tiles",
+							"body": {
+								"get": "{{tile}}-s3",
+								"passed": "[get-new-resources]"
+							}
+						}
+					}
+				]
+			}
+		}
+	]
+}

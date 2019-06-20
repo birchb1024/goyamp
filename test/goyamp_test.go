@@ -13,13 +13,47 @@ import (
 	"github.com/birchb1024/goyamp"
 )
 
-func fileRunner(output io.Writer, filename string) error {
+func fileRunner(output io.Writer, filename string, format goyamp.Syntax) error {
 	engine := goyamp.NewExpander(
 		[]string{"A", "B", "C", "D"},
 		[]string{"USERNAME=birchb", "USER=birchb"},
 		output,
-		goyamp.YAML)
+		format)
 	return engine.ExpandFile(filename)
+}
+
+func runTestFiles(name string, fileList []string, format goyamp.Syntax, t *testing.T) {
+
+	typeFlag := ""
+	if format == goyamp.JSON {
+		typeFlag = "json."
+	}
+	for _, filename := range fileList {
+		path := fmt.Sprintf("../examples/%v", filename)
+		log := fmt.Sprintf("fixtures/examples/%v.%vlog", filename, typeFlag)
+		logPath, _ := filepath.Abs(log)
+		t.Run(name + "_" + filename, func(t *testing.T) {
+			var result bytes.Buffer
+			err := fileRunner(&result, path, format)
+			if err != nil {
+				t.Error(path, err)
+				return
+			}
+			expected, err := ioutil.ReadFile(log)
+			if err != nil {
+				t.Error(path, err)
+				return
+			}
+			if result.String() != string(expected) {
+				err := ioutil.WriteFile("/tmp/"+ filename + ".log", result.Bytes(), 0644)
+				if err != nil {
+					panic(err)
+				}
+				t.Error(fmt.Sprintf("output mismatch:\ndiff /tmp/%v.log %v\n", filename, logPath))
+				return
+			}
+		})
+	}
 }
 
 func TestNormalExamples(t *testing.T) {
@@ -54,8 +88,23 @@ func TestNormalExamples(t *testing.T) {
                 "template01.gocd.yaml",
                 "undefine.yaml",
                 "varargs.yaml",
+                "variety.yaml",
 	}
-	runTestFiles("Normal examples", normalExampleFiles, t)
+	runTestFiles("Normal examples", normalExampleFiles, goyamp.YAML, t)
+}
+
+func TestNormalJSONExamples(t *testing.T) {
+
+	normalExampleFiles := []string{
+                "widgets.json",
+                "items.json",
+                "variety.json",
+                "variety.yaml",
+                "ifs.yaml",
+                "multi_define.yaml",
+                "flatten-repeat.yaml",                
+	}
+	runTestFiles("Normal JSON examples", normalExampleFiles, goyamp.JSON, t)
 }
 
 func TODOTestPanicExamples(t *testing.T) {
@@ -71,39 +120,10 @@ func TODOTestPanicExamples(t *testing.T) {
 	files := []string{
                 "asserts.yaml",
 	}
-	runTestFiles("Panic examples", files, t)
+	runTestFiles("Panic examples", files,  goyamp.YAML, t)
 }
 
 
-func runTestFiles(name string, fileList []string, t *testing.T) {
-
-	for _, filename := range fileList {
-		path := fmt.Sprintf("../examples/%v", filename)
-		log := fmt.Sprintf("fixtures/examples/%v.log", filename)
-		logPath, _ := filepath.Abs(log)
-		t.Run(name + "_" + filename, func(t *testing.T) {
-			var result bytes.Buffer
-			err := fileRunner(&result, path)
-			if err != nil {
-				t.Error(path, err)
-				return
-			}
-			expected, err := ioutil.ReadFile(log)
-			if err != nil {
-				t.Error(path, err)
-				return
-			}
-			if result.String() != string(expected) {
-				err := ioutil.WriteFile("/tmp/"+ filename + ".log", result.Bytes(), 0644)
-				if err != nil {
-					panic(err)
-				}
-				t.Error(fmt.Sprintf("output mismatch:\ndiff /tmp/%v.log %v\n", filename, logPath))
-				return
-			}
-		})
-	}
-}
 
 func TestMain(m *testing.M) {
 	var debugFlag bool

@@ -211,7 +211,7 @@ func classify(x interface{}) yamly {
 
 //
 //
-func (x nily) declassify(...Syntax) interface{}     { return nil }
+func (x nily) declassify(...Syntax) interface{} { return nil }
 func (x inty) declassify(...Syntax) interface{}     { return int(x) }
 func (x float64y) declassify(...Syntax) interface{} { return float64(x) }
 func (x booly) declassify(...Syntax) interface{}    { return bool(x) }
@@ -220,7 +220,12 @@ func (m mapy) declassify(syntax ...Syntax) interface{} {
 	if len(syntax) > 0 && syntax[0] == JSON {
 		result := map[string]interface{}{}
 		for k, v := range m {
-			result[fmt.Sprintf("%v", k.declassify(syntax...))] = v.declassify(syntax...)
+			switch k := k.(type) {
+			case nily:
+				result["null"] = v.declassify(syntax...)
+			default:
+				result[fmt.Sprintf("%v", k.declassify(syntax...))] = v.declassify(syntax...)
+			}
 		}
 		return result
 	}
@@ -537,9 +542,14 @@ func isFunction(tree mapy, bindings *env) (bool, runnable, yamly) {
 func (s seqy) expand(bindings *env) yamly {
 	newlist := seqy{}
 	for _, item := range s {
-		expanded := item.expand(bindings)
-		if _, nok := expanded.(nily); !nok {
-			newlist = append(newlist, expanded)
+		if _, nok := item.(nily); nok {
+			// preserve input nulls ?
+			newlist = append(newlist, item)
+		} else {
+			expanded := item.expand(bindings)
+			if _, nok := expanded.(nily); !nok {
+				newlist = append(newlist, expanded)
+			}
 		}
 	}
 	return newlist

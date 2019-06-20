@@ -1,0 +1,40 @@
+{
+    "file_header": null
+}
+[
+    23,
+    "1 7 { { a }} { { a }} { pythonz : b ** 2  }"
+]
+[
+    [
+        {
+            "dev": {
+                "webserver": {
+                    "hostname": "web02",
+                    "ip": "1.1.2.4"
+                }
+            },
+            "perf0": {
+                "webserver": {
+                    "hostname": "web01",
+                    "ip": "1.1.2.3"
+                }
+            }
+        },
+        {
+            "qa1": {
+                "webserver": {
+                    "hostname": "web04",
+                    "ip": "1.2.2.4"
+                }
+            },
+            "sit": {
+                "webserver": {
+                    "hostname": "web03",
+                    "ip": "1.2.2.3"
+                }
+            }
+        }
+    ],
+    "dev"
+]

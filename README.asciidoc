@@ -1,6 +1,6 @@
 = Goyamp - The Go Macro Processor for YAML and JSON
-Peter Birch <birchb1024@gmail.com>
-v0.1.2, 2019-05-04
+Peter Birch <birchb1024 at gmail.com>
+@@@VERSION@@@, @@@DATE@@@
 :toc: macro
 :toclevels: 4
 Goyamp is a general-purpose macroprocessor for YAML files.  Both its input and output are YAML. It scans the input for symbols and makes substitutions and expansions on the output. Goyamp is 100% YAML so the syntax for defining and calling macros is YAML also. It can also process JSON in and out.
@@ -84,11 +84,14 @@ has integer map keys and is valid YAML but JSON accepts only strings in map keys
 .hello.yaml
 [source, YAML]
 ----
-$ echo '{ 1: Monday, 2: Tuesday }' | ./goyamp -o json
-{
-    "1": "Monday",
-    "2": "Tuesday"
-}
+$ echo '[{ null : Monday, 2: Tuesday }, null]' | ./goyamp -o json
+[
+    {
+        "2": "Tuesday",
+        "null": "Monday"
+    },
+    null
+]
 ----     
 
 JSON only accepts a single top-level object. If you have multiple YAML docs in your expanded code, goyamp will output each one in turn, which is not strictly valid.
@@ -196,7 +199,7 @@ The command to run Goyamp is a single binary executable filename followed by opt
 .Usage
 [source,bash]
 ----
-$ goyamp [-debug] [-help] [Filename | - ] [arg1..argn]
+$ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json] [Filename | - ] [arg1..argn]
 ----
 
 If the filename is the minus sign `-` or if there are no arguements, Goamp reads YAML from the standard input, so it serves as a filter. As in
@@ -207,12 +210,13 @@ $ echo "[define: {data: {load: test/fixtures/blade-runner.json}}, data.director]
 - ' Ridley Scott'
 ----
 
+If the -output option is given, this specifies the output format required. The default is YAML. When `json` is selected , JSON is output subject to the constraints mentioned above.
 
 ==== File Suffixes
 
-Any file suffix can be used - it is assumed to be YAML. A warning is printed to alert you of a possible input mistake.
+Any file suffix can be used - it is assumed to be YAML/JSON.
 
-In practice `yaml` sufffix will be recognised by most text editors' YAML editting mode. You will need to configure your text editor if you use a non-standard suffix.
+In practice `yaml` or `json` sufffixes will be recognised by most text editors editing modes. You will need to configure your text editor if you use a non-standard suffix.
 
 ==== Docker
 
@@ -295,7 +299,11 @@ Here's examples of three kinds of things Goyamp is scanning for replacement:
     phone: (555) 098 880
 ----
 
-When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output in YAML format. Becuase YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from the input footnote:[Order-preservation may happen in a future version, but it's complicated].
+When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output
+in YAML or JSON format. Because YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from 
+the input footnote:[Order-preservation may happen in a future version, but it's complicated].
+
+When the processor sees a null item in an input sequence, these are preserved, however if the null value is the result of a `define:`, `defmacro:` or other expansion which produces null, the null value is stripped from the output. 
 
 === Variables
 
