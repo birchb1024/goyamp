@@ -41,7 +41,7 @@ type unknowny struct {
 	x interface{}
 }
 
-func (x nily) expand(binding *env) yamly { return x }
+func (x nily) expand(binding *env) yamly  { return x }
 func (e empty) expand(binding *env) yamly { return e }
 
 func (x inty) expand(binding *env) yamly { return x }
@@ -213,7 +213,7 @@ func classify(x interface{}) yamly {
 
 //
 //
-func (x nily) declassify(...Syntax) interface{} { return nil }
+func (x nily) declassify(...Syntax) interface{}     { return nil }
 func (e empty) declassify(...Syntax) interface{}    { return "goyamp.EMPTY" }
 func (x inty) declassify(...Syntax) interface{}     { return int(x) }
 func (x float64y) declassify(...Syntax) interface{} { return float64(x) }
@@ -564,6 +564,21 @@ func (x stringy) expand(bindings *env) yamly {
 	return result.expand(bindings)
 }
 
+func expandMapKey(kstr stringy, bindings *env) (yamly, bool) {
+	if strings.HasPrefix(string(kstr), "^") {
+		variableName := kstr[1:]
+		value, ok := bindings.lookup(variableName)
+		if !ok {
+			panic(fmt.Sprintf("ERROR: Variable ^%v is not defined", variableName))
+		}
+		if !reflect.ValueOf(value).Type().Comparable() {
+			panic(fmt.Sprintf("Unable to use %v as map key, '%v' is not comparable.", variableName, value))
+		}
+		return value, true
+	}
+	return nil, false
+}
+
 func (m mapy) expand(bindings *env) yamly {
 
 	newdict := mapy{}
@@ -588,17 +603,12 @@ func (m mapy) expand(bindings *env) yamly {
 	for k, v := range m {
 
 		if kstr, ok := k.(stringy); ok {
-			if strings.HasPrefix(string(kstr), "^") { // TODO make a func here
-				variableName := kstr[1:] // TODO what if kstr = "^"?
-				value, ok := bindings.lookup(variableName)
-				if !ok {
-					panic(fmt.Sprintf("ERROR: Variable %v not defined in %v", variableName, m))
+			keyv, ok := expandMapKey(kstr, bindings)
+			if ok {
+				if _, ok := newdict[keyv]; ok {
+					panic(fmt.Sprintf("ERROR: duplicate map key '%v' computed from '%v' in %v", keyv, kstr, m))
 				}
-				expanded := v.expand(bindings)
-				if !reflect.ValueOf(value).Type().Comparable() {
-					panic(fmt.Sprintf("Unable to use %v as map key, '%v' is not comparable. in %v", variableName, value, m))
-				}
-				newdict[value] = expanded // TODO what if value is already a key in newdict?
+				newdict[keyv] = v.expand(bindings)
 				continue
 			}
 		}

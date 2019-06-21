@@ -57,30 +57,22 @@ func repeatBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	if !ok {
 		panic(fmt.Sprintf("Syntax error repeat expects a map, got %v\n", tree))
 	}
-	// TODO DRY...
-	forClause, ok := treemap[stringy("for")]
-	if !ok {
-		panic(fmt.Sprintf("Syntax error repeat expects a map with 'for', got %v\n", tree))
-	}
+	assertKeys( map[string]bool{"for": true, "in": true, "body": true, "key": false} , treemap)
+	
+	forClause := treemap[stringy("for")]
 	forVariable, ok := forClause.(stringy)
 	if !ok {
 		panic(fmt.Sprintf("Syntax error repeat expects a map with string 'for', got %v", tree))
 	}
 
 	inClause, ok := treemap[stringy("in")]
-	if !ok {
-		panic(fmt.Sprintf("Syntax error repeat expects a map with 'in', got %v", tree))
-	}
 	rangein := inClause.expand(bindings)
 	rangeinList, ok := rangein.(seqy)
 	if !ok {
-		panic(fmt.Sprintf("Syntax error in repeat 'in' is not a sequnce, got %#v in %v", rangein, tree))
+		panic(fmt.Sprintf("Syntax error in repeat 'in' is not a seqeunce, got %#v in %v", rangein, tree))
 	}
 
 	body, ok := treemap[stringy("body")]
-	if !ok {
-		panic(fmt.Sprintf("Syntax error repeat expects a map with 'body', got %v", tree))
-	}
 	loopEnv := env{
 		engine: bindings.engine,
 		parent: bindings,

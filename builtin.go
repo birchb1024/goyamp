@@ -179,36 +179,50 @@ func mergeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	}
 }
 
+func assertKeys(validKeys map[string]bool, tmap mapy) {
+	for x := range tmap {
+		x, ok := x.(stringy)
+		if !ok {
+			panic(fmt.Sprintf("'%v' is not a valid key in %v", x, tmap))
+		}
+		if _, ok := validKeys[string(x)]; !ok {
+			panic(fmt.Sprintf("'%v' is not a valid key in %v", x, tmap))
+		}
+	}
+	for k, mandatory := range validKeys {
+		if mandatory {
+			if _, ok := tmap[stringy(k)]; !ok {
+				panic(fmt.Sprintf("missing key '%v' in %v", mandatory, tmap))
+			}
+		}
+	}
+}
+
 func ifBuiltin(tmap mapy, args yamly, bindings *env) yamly {
 	log.Printf("ifBuiltin %v\n", tmap)
 	//    """
 	//    Conditional expression
 	//    :return: either the expansion of the 'then' or 'else' elements.
 	//    """
+	assertKeys( map[string]bool{"if": true, "then": false, "else": false} , tmap)
 	thenClause, thok := tmap[stringy("then")]
 	elseClause, elok := tmap[stringy("else")]
 	if !thok && !elok {
 		panic(fmt.Sprintf("Syntax error 'then' or 'else' missing in %v", tmap))
 	}
-	if len(tmap) > 3 {
-		//   TODO extras = set(tree.keys()) - set(['if', 'then', 'else'])
-		//   TODO  if extras:
-		panic(fmt.Sprintf("Syntax error extra keys in %v", tmap))
-	}
 	condition := tmap[stringy("if")].expand(bindings)
 	var condBool bool
 	switch condition := condition.(type) {
 	case empty:
-			condBool = false
+		condBool = false
 	case nily:
-			condBool = false
+		condBool = false
 	case booly:
 		condBool = bool(condition)
 	default:
-		condBool = true
+		panic(fmt.Sprintf("If condition not 'true', 'false' or 'null'. Got: '%v' in %v", condition, tmap))
 	}
 	log.Printf("ifBuiltin: condBool %v thok %v elok %v\n", condBool, thok, elok)
-	// TODO       raise(interface{}pException('If condition not "true", "false" or "null". Got: "{}" in {}'.format(condition, tree)))
 	if condBool && thok {
 		expanded := thenClause.expand(bindings)
 		return expanded.expand(bindings)
