@@ -28,8 +28,10 @@ func (engine *Expander) init(environment []string, argv []string) {
 	addBuiltinsToEnv(engine.globals)
 }
 
+// Syntax holds different output format syntaxes
 type Syntax int
 
+// Constants for YAML and JSON syntax
 const (
 	YAML Syntax = iota + 0
 	JSON
