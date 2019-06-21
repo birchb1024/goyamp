@@ -1108,12 +1108,33 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: age2, value: [age, age]}
 <span style="color: #990000">-</span> age2
 <span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: age2, value: [{define: {name: age, value: <span style="color: #993399">99</span>}}, age]}
-<span style="color: #990000">-</span> age2
-<span style="font-style: italic"><span style="color: #9A1900"># Produces:</span></span>
-<span style="font-style: italic"><span style="color: #9A1900">#- 32</span></span>
-<span style="font-style: italic"><span style="color: #9A1900">#- - 32</span></span>
-<span style="font-style: italic"><span style="color: #9A1900">#  - 32</span></span>
-<span style="font-style: italic"><span style="color: #9A1900">#- - 99</span></span></tt></pre></div></div>
+<span style="color: #990000">-</span> age2</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> <span style="color: #993399">32</span>
+<span style="color: #990000">-</span> - <span style="color: #993399">32</span>
+<span style="color: #990000">  -</span> <span style="color: #993399">32</span>
+<span style="color: #990000">-</span> - <span style="color: #993399">99</span></tt></pre></div></div>
+<div class="paragraph"><p>The result of expanding a <code>define</code>, <code>undefine</code> and <code>include</code> is a <em>magic</em> value <code>goyamp.EMPTY</code>. This value is removed automatically from sequences, but may appear in map items if a <code>define</code> has been used there. So it&#8217;s better to use <code>define</code> etc in sequences. When placed in their own document, they disappear completely:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">- </span><span style="color: #009900">define</span><span style="color: #990000">:</span> {name: age, value: <span style="color: #993399">32</span>}
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #990000">-</span> age</tt></pre></div></div>
+<div class="paragraph"><p>Produces:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> <span style="color: #993399">32</span></tt></pre></div></div>
 </div>
 <div class="sect3">
 <h4 id="_scalars">Scalars</h4>
@@ -1901,7 +1922,7 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footer">
 <div id="footer-text">
 Version 0.1.2<br />
-Last updated 2019-06-20 18:02:51 AEST
+Last updated 2019-06-21 16:03:16 AEST
 </div>
 </div>
 </body>

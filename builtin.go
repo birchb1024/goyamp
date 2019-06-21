@@ -198,14 +198,14 @@ func ifBuiltin(tmap mapy, args yamly, bindings *env) yamly {
 	condition := tmap[stringy("if")].expand(bindings)
 	var condBool bool
 	switch condition := condition.(type) {
+	case empty:
+			condBool = false
+	case nily:
+			condBool = false
 	case booly:
 		condBool = bool(condition)
 	default:
-		if _, nok := condition.(nily); nok {
-			condBool = false
-		} else {
-			condBool = true
-		}
+		condBool = true
 	}
 	log.Printf("ifBuiltin: condBool %v thok %v elok %v\n", condBool, thok, elok)
 	// TODO       raise(interface{}pException('If condition not "true", "false" or "null". Got: "{}" in {}'.format(condition, tree)))
@@ -216,7 +216,7 @@ func ifBuiltin(tmap mapy, args yamly, bindings *env) yamly {
 		expanded := elseClause.expand(bindings)
 		return expanded.expand(bindings)
 	}
-	return nily{}
+	return empty{}
 }
 
 func quoteBuiltin(tree mapy, args yamly, bindings *env) yamly {

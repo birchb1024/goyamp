@@ -30,6 +30,7 @@ type yamly interface {
 // Type nily stands instead of nil
 // to avoid nil.expand()
 type nily struct{}
+type empty struct{}
 type booly bool
 type inty int
 type stringy string
@@ -41,6 +42,7 @@ type unknowny struct {
 }
 
 func (x nily) expand(binding *env) yamly { return x }
+func (e empty) expand(binding *env) yamly { return e }
 
 func (x inty) expand(binding *env) yamly { return x }
 
@@ -212,6 +214,7 @@ func classify(x interface{}) yamly {
 //
 //
 func (x nily) declassify(...Syntax) interface{}     { return nil }
+func (e empty) declassify(...Syntax) interface{}    { return "goyamp.EMPTY" }
 func (x inty) declassify(...Syntax) interface{}     { return int(x) }
 func (x float64y) declassify(...Syntax) interface{} { return float64(x) }
 func (x booly) declassify(...Syntax) interface{}    { return bool(x) }
@@ -538,7 +541,7 @@ func (s seqy) expand(bindings *env) yamly {
 	newlist := seqy{}
 	for _, item := range s {
 		expanded := item.expand(bindings)
-		if _, nok := expanded.(nily); !nok {
+		if _, ok := expanded.(empty); !ok {
 			newlist = append(newlist, expanded)
 		}
 	}
@@ -675,8 +678,8 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 		}
 		ya := classify(doc)
 		expanded := ya.expand(bindings)
-		if _, nilok := expanded.(nily); nilok {
-			log.Printf("expandSteam: doc is null\n")
+		if _, eok := expanded.(empty); eok {
+			log.Printf("expandSteam: doc is empty\n")
 			continue
 		}
 		if array, ok := expanded.(seqy); ok {

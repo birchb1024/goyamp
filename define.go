@@ -19,7 +19,7 @@ func mapDefine(defs mapy, bindings *env) yamly {
 		}
 		bindings.bind[string(varname)] = v
 	}
-	return nily{}
+	return empty{}
 }
 
 func defineBuiltin(tree mapy, args yamly, bindings *env) yamly {
@@ -49,7 +49,7 @@ func defineBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	newvalue := value.expand(bindings)
 	bindings.bind[string(namestr)] = newvalue
 	log.Printf("\ndefineBuiltin:\n new value for :  %#v\n value:  %#v\n", namestr, newvalue)
-	return nily{}
+	return empty{}
 }
 
 func undefineBuiltin(tree mapy, args yamly, bindin *env) yamly {
@@ -61,7 +61,7 @@ func undefineBuiltin(tree mapy, args yamly, bindin *env) yamly {
 	assertSingleKey(tree)
 	if variable, ok := args.(stringy); ok {
 		delete(bindin.bind, string(variable))
-		return nily{}
+		return empty{}
 	}
 	panic(fmt.Sprintf("Syntax error was expecting string in %v got %v", tree, args))
 }
@@ -122,5 +122,5 @@ func defmacroBuiltin(tree mapy, args yamly, bindin *env) yamly {
 		body: macroBody,
 	}
 	bindin.bind[string(macroNameStr)] = newMacro
-	return nily{}
+	return empty{}
 }

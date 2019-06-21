@@ -40,7 +40,7 @@ func includeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	default:
 		panic(fmt.Sprintf("ERROR: include was expecting list of filenames, got %#v", args))
 	}
-	return nily{}
+	return empty{}
 }
 
 func loader(tree yamly, args yamly, bindings *env) (yamly, error) {

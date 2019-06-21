@@ -313,12 +313,33 @@ You can define new variable bindings or update existing variables with the `defi
 - age2
 - define: {name: age2, value: [{define: {name: age, value: 99}}, age]}
 - age2
-# Produces:
-#- 32
-#- - 32
-#  - 32
-#- - 99
 ----
+
+Produces:
+
+[source, YAML]
+----
+- 32
+- - 32
+  - 32
+- - 99
+----
+
+The result of expanding a `define`, `undefine` and `include` is a 'magic' value `goyamp.EMPTY`. This value is removed automatically from sequences, but may appear in map items if a `define` has been used there. So it's better to use `define` etc in sequences. When placed in their own document, they disappear completely:
+
+[source, YAML]
+----
+- define: {name: age, value: 32}
+---
+- age
+----
+
+Produces:
+
+[source, YAML]
+----
+- 32
+----  
 
 ==== Scalars
 
