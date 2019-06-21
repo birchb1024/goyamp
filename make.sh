@@ -4,13 +4,17 @@ set -u
 set -x
 version=$(git describe --abbrev)
 
-args=${1:-bin}
-if [[ "${args}" == "doc" ]]
-then
+function buildDocs {
 	cp README.asciidoc /tmp/README.asciidoc
 	sed -i "s;@@@VERSION@@@;${version};" /tmp/README.asciidoc
 	sed -i "s;@@@DATE@@@;$(date +%d.%m.%Y);"  /tmp/README.asciidoc
 	asciidoc /tmp/README.asciidoc && mv /tmp/README.html doc
+}
+
+args=${1:-bin}
+if [[ "${args}" == "doc" ]]
+then
+    buildDocs
 	exit
 fi
 
@@ -21,7 +25,7 @@ go build -o goyamp -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
 if [[ "${args}" == "package" ]]
 then
     mkdir -p pkg
-	asciidoc README.asciidoc && mv README.html doc
+    buildDocs
     tar zcvf pkg/goyamp-${version}.tgz ./goyamp doc/README.html
 	exit
 fi
