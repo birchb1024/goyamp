@@ -24,6 +24,7 @@ var Version string
 type yamly interface {
 	expand(binding *env) yamly
 	declassify(params ...Syntax) interface{}
+	String() string
 }
 
 //
@@ -42,19 +43,25 @@ type unknowny struct {
 }
 
 func (x nily) expand(binding *env) yamly  { return x }
+func (x nily) String() string { return "null" }
+
 func (e empty) expand(binding *env) yamly { return e }
+func (e empty) String() string { return "goyamp.EMPTY" }
 
 func (x inty) expand(binding *env) yamly { return x }
+func (x inty) String() string { return strconv.Itoa(int(x)) }
 
 func (x float64y) expand(binding *env) yamly { return x }
+func (x float64y) String() string { return strconv.FormatFloat(float64(x), 'G', -1, 32) }
 
 func (x booly) expand(binding *env) yamly { return x }
+func (x booly) String() string { if x {return "true"} else {return "false"} }
 
 func (x unknowny) expand(binding *env) yamly { return x }
-
 func (x unknowny) String() string { return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }
 
-func (x nily) String() string { return "null" }
+func (x stringy) String() string { return string(x) }
+
 
 // - Engine internals...
 type env struct {
@@ -112,8 +119,8 @@ func (s seqy) Len() int {
 // Less reports whether the element with
 // index i should sort before the element with index j.
 func (s seqy) Less(i, j int) bool {
-	si := fmt.Sprintf("%v", s[i]) // TODO remove use of fmt
-	sj := fmt.Sprintf("%v", s[j])
+	si := s[i].String()
+	sj := s[j].String()
 	return si < sj
 }
 
@@ -132,7 +139,7 @@ func (m mapy) String() string {
 	keystr := []string{}
 	keystr2key := map[string]yamly{}
 	for k := range m {
-		keyAsString := fmt.Sprintf("%v", k) // TODO
+		keyAsString := k.String()
 		keystr = append(keystr, keyAsString)
 		keystr2key[keyAsString] = k
 	}
@@ -302,12 +309,13 @@ func interpolate(tree yamly, bindings *env) yamly {
 		func(tok string) string {
 			variableName := strings.TrimSpace(tok[2 : len(tok)-2])
 			log.Printf("interpolate: variablename %#v", variableName)
-			value := expandStr(variableName, bindings)
-			log.Printf("interpolate: value, ok %#v %#v", value, ok)
+			// value, ok := bindings.lookup(stringy(variableName))
+			value, ok := expandStr(variableName, bindings)
 			if !ok {
-				panic(fmt.Sprintf("Undefined interpolation variable %v in %v", variableName, astring))
+				panic(fmt.Sprintf("'%v' is not a bound variable in '%v'", variableName, tree))			
 			}
-			return fmt.Sprintf("%v", value) // OK for scalars todo what about collections?
+			log.Printf("interpolate: value, ok %#v %#v", value, ok)
+			return value.String()
 		})
 	return stringy(result)
 }
@@ -420,7 +428,7 @@ func (r macroFunction) apply(seenTree mapy, anyargs yamly, dynamicBindings *env)
 
 }
 
-func expandStr(varName string, bindings *env) yamly {
+func expandStr(varName string, bindings *env) (yamly, bool) {
 	//    """
 	//    Given a simple string variable get its value from the binding, it has dot notation look in the
 	//    variable value for the selection.
@@ -431,7 +439,7 @@ func expandStr(varName string, bindings *env) yamly {
 	variableName := stringy(varName)
 	value, ok := bindings.lookup(variableName)
 	if ok {
-		return value // a simple variable like 'host' or a variable like 'a.c.e' matches first
+		return value, true // a simple variable like 'host' or a variable like 'a.c.e' matches first
 	}
 	//  simple, look for subvariables.
 	subvar := strings.Split(varName, ".")
@@ -439,11 +447,11 @@ func expandStr(varName string, bindings *env) yamly {
 		// It's a dot notation variable like 'host.name'
 		topvalue, ok := bindings.lookup(stringy(subvar[0]))
 		if !ok {
-			return variableName // No variable found
+			return nil, false // No variable found
 		}
-		return subvarLookup(varName, subvar[1:], topvalue, bindings)
+		return subvarLookup(varName, subvar[1:], topvalue, bindings), true
 	}
-	return variableName
+	return nil, false
 }
 
 func assertSingleKey(tree yamly) {
@@ -554,8 +562,8 @@ func (s seqy) expand(bindings *env) yamly {
 }
 
 func (x stringy) expand(bindings *env) yamly {
-	result := expandStr(string(x), bindings)
-	if result == x {
+	result, ok := expandStr(string(x), bindings)
+	if !ok {
 		return interpolate(x, bindings)
 	}
 	if resultStr, ok := result.(stringy); ok {
