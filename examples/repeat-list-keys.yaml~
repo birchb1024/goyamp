@@ -1,7 +1,0 @@
-repeat:
-  for: loop_variable
-  in: {range: [1,3]}
-  body:
-    'KEY_{{loop_variable}}': 2
-    some: step
-    another:

@@ -7,7 +7,10 @@ version=$(git describe --abbrev)
 args=${1:-bin}
 if [[ "${args}" == "doc" ]]
 then
-	asciidoc README.asciidoc && mv README.html doc
+	cp README.asciidoc /tmp/README.asciidoc
+	sed -i "s;@@@VERSION@@@;${version};" /tmp/README.asciidoc
+	sed -i "s;@@@DATE@@@;$(date +%d.%m.%Y);"  /tmp/README.asciidoc
+	asciidoc /tmp/README.asciidoc && mv /tmp/README.html doc
 	exit
 fi
 

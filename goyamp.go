@@ -213,7 +213,7 @@ func classify(x interface{}) yamly {
 
 //
 //
-func (x nily) declassify(...Syntax) interface{}     { return nil }
+func (x nily) declassify(...Syntax) interface{} { return nil }
 func (e empty) declassify(...Syntax) interface{}    { return "goyamp.EMPTY" }
 func (x inty) declassify(...Syntax) interface{}     { return int(x) }
 func (x float64y) declassify(...Syntax) interface{} { return float64(x) }
@@ -223,7 +223,12 @@ func (m mapy) declassify(syntax ...Syntax) interface{} {
 	if len(syntax) > 0 && syntax[0] == JSON {
 		result := map[string]interface{}{}
 		for k, v := range m {
-			result[fmt.Sprintf("%v", k.declassify(syntax...))] = v.declassify(syntax...)
+			switch k := k.(type) {
+			case nily:
+				result["null"] = v.declassify(syntax...)
+			default:
+				result[fmt.Sprintf("%v", k.declassify(syntax...))] = v.declassify(syntax...)
+			}
 		}
 		return result
 	}
@@ -698,7 +703,7 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 		} else {
 			jsonTree := expanded.declassify(JSON)
 			jenc := json.NewEncoder(bindings.engine.output)
-			jenc.SetIndent("", "    ")
+			jenc.SetIndent("", "  ")
 			err = jenc.Encode(jsonTree)
 			if err != nil {
 				log.Printf("expandSteam: json.Encode %v", err)

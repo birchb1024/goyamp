@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Goyamp - The Go Macro Processor for YAML and JSON</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -94,7 +94,9 @@ ul > li > * { color: black; }
   padding: 0;
   margin: 0;
 }
-
+pre {
+  white-space: pre-wrap;
+}
 
 #author {
   color: #527bbd;
@@ -223,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -732,10 +734,9 @@ asciidoc.install(4);
 <body class="article">
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
-<span id="author">Peter Birch</span><br />
-<span id="email"><code>&lt;<a href="mailto:birchb1024@gmail.com">birchb1024@gmail.com</a>&gt;</code></span><br />
-<span id="revnumber">version 0.1.2,</span>
-<span id="revdate">2019-05-04</span>
+<span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
+<span id="revnumber">version 0.2.0-2-g3b0aa46,</span>
+<span id="revdate">21.06.2019</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -752,7 +753,7 @@ asciidoc.install(4);
 <div class="sectionbody">
 <div class="listingblock">
 <div class="title">Input</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -765,7 +766,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">    </span><span style="color: #009900">who</span><span style="color: #990000">:</span> World</tt></pre></div></div>
 <div class="listingblock">
 <div class="title">Output</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -778,13 +779,13 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>GoYamp is a Go program contained in the goyamp module. This has been compiled and uploaded to Github and dockerhub.</p></div>
 <div class="sect2">
 <h3 id="_download">Download</h3>
-<div class="paragraph"><p>You can download a binary copy of the Goyamp program. Copies are available on GitHub in <a href="https://github.com/birchb1024/goyamp/releases:">Releases</a> in the repository. For example</p></div>
+<div class="paragraph"><p>You can download a binary copy of the Goyamp program. Copies are available on GitHub in <a href="https://github.com/birchb1024/goyamp/releases">Releases</a> in the repository. For example</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.1</span><span style="color: #990000">.</span><span style="color: #993399">3</span>/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">0</span>-<span style="color: #993399">2</span>-g3b0aa46/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -796,7 +797,7 @@ $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 <div class="paragraph"><p>The program  is run from the command-line giving the input file to parse as the first argument followed by optional arguments to the expansion. The expansion is written to the standard output, which you normally redirect to another file.:</p></div>
 <div class="listingblock">
 <div class="title">Usage</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -805,14 +806,14 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Put your first Goyamp file in <code>hello.yaml</code>:</p></div>
 <div class="listingblock">
 <div class="title">hello.yaml</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #FF0000">"Hello {{env.USER}} from Goyamp v{{__VERSION__}}"</span></tt></pre></div></div>
 <div class="paragraph"><p>And run it</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -827,15 +828,18 @@ to read. If you want to output JSON, specify the <code>-output json</code> comma
 has integer map keys and is valid YAML but JSON accepts only strings in map keys. Hence goyamp automatically converts map keys to strings when outputting JSON. Example:</p></div>
 <div class="listingblock">
 <div class="title">hello.yaml</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ echo <span style="color: #FF0000">'{ 1: Monday, 2: Tuesday }'</span> | ./goyamp -o json
-{
-    <span style="color: #FF0000">"1"</span>: <span style="color: #FF0000">"Monday"</span>,
-    <span style="color: #FF0000">"2"</span>: <span style="color: #FF0000">"Tuesday"</span>
-}</tt></pre></div></div>
+<pre><tt>$ echo <span style="color: #FF0000">'[{ null : Monday, 2: Tuesday }, null]'</span> | ./goyamp -o json
+[
+    {
+        <span style="color: #FF0000">"2"</span>: <span style="color: #FF0000">"Tuesday"</span>,
+        <span style="color: #FF0000">"null"</span>: <span style="color: #FF0000">"Monday"</span>
+    },
+    <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>
+]</tt></pre></div></div>
 <div class="paragraph"><p>JSON only accepts a single top-level object. If you have multiple YAML docs in your expanded code, goyamp will output each one in turn, which is not strictly valid.</p></div>
 </div>
 </div>
@@ -845,7 +849,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="sectionbody">
 <div class="paragraph"><p>You just want to use the docker image.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -858,7 +862,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Supposing we are building some <a href="https://github.com/tomzo/gocd-yaml-config-plugin">GoCD</a> pipeline definitions in YAML each of which uses the same Git repository.  The YAML we have to write looks like this:</p></div>
 <div class="listingblock">
 <div class="title">output.yaml</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -889,7 +893,7 @@ Duplicated
 <div class="paragraph"><p>We don&#8217;t want re-key duplicated code so we define a macro which Goyamp expands whenever it is invoked. Our source code now looks like this:</p></div>
 <div class="listingblock">
 <div class="title">YAML source</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -978,29 +982,30 @@ a macro call - block style
 <div class="paragraph"><p>The command to run Goyamp is a single binary executable filename followed by optional arguments. Assuming that <code>goyamp</code> is in the <code>$PATH</code>:</p></div>
 <div class="listingblock">
 <div class="title">Usage</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ goyamp <span style="color: #990000">[</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>Filename <span style="color: #990000">|</span> - <span style="color: #990000">]</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+<pre><tt>$ goyamp <span style="color: #990000">[</span>-d<span style="color: #990000">|</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-h<span style="color: #990000">|</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-o<span style="color: #990000">|</span>-output yaml<span style="color: #990000">|</span>json<span style="color: #990000">]</span> <span style="color: #990000">[</span>Filename <span style="color: #990000">|</span> - <span style="color: #990000">]</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
 <div class="paragraph"><p>If the filename is the minus sign <code>-</code> or if there are no arguements, Goamp reads YAML from the standard input, so it serves as a filter. As in</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$ echo <span style="color: #FF0000">"[define: {data: {load: test/fixtures/blade-runner.json}}, data.director]"</span> <span style="color: #990000">|</span> goyamp
 - <span style="color: #FF0000">' Ridley Scott'</span></tt></pre></div></div>
+<div class="paragraph"><p>If the -output option is given, this specifies the output format required. The default is YAML. When <code>json</code> is selected , JSON is output subject to the constraints mentioned above.</p></div>
 <div class="sect3">
 <h4 id="_file_suffixes">File Suffixes</h4>
-<div class="paragraph"><p>Any file suffix can be used - it is assumed to be YAML. A warning is printed to alert you of a possible input mistake.</p></div>
-<div class="paragraph"><p>In practice &#8216;yaml` sufffix will be recognised by most text editors&#8217; YAML editting mode. You will need to configure your text editor if you use a non-standard suffix.</p></div>
+<div class="paragraph"><p>Any file suffix can be used - it is assumed to be YAML/JSON.</p></div>
+<div class="paragraph"><p>In practice <code>yaml</code> or <code>json</code> sufffixes will be recognised by most text editors editing modes. You will need to configure your text editor if you use a non-standard suffix.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_docker">Docker</h4>
 <div class="paragraph"><p>A docker image is provided in docker.io (Docker Hub) <a href="https://cloud.docker.com/repository/docker/birchb1024/goyamp">here</a>. This image includes Python and its libraries on a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1029,7 +1034,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">mygit_materials</p></td>
 <td align="left" valign="top"><div><div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1043,7 +1048,7 @@ http://www.gnu.org/software/src-highlite -->
 <tr>
 <td align="left" valign="top"><p class="table">mygit_repo_url</p></td>
 <td align="left" valign="top"><div><div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1056,7 +1061,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Some special variables contain <em>macros</em> - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this <em>macro expansion</em> <span class="footnote"><br />[But it could actually be a reduction!]<br /></span> ;-).</p></div>
 <div class="paragraph"><p>Goyamp is looking for macro calls with this structure:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1068,7 +1073,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Here&#8217;s examples of three kinds of things Goyamp is scanning for replacement:</p></div>
 <div class="listingblock">
 <div class="title">Simple Variables</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1076,21 +1081,24 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">-</span> <span style="color: #FF0000">'directory'</span></tt></pre></div></div>
 <div class="listingblock">
 <div class="title">Embeded Variables</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #990000">-</span> <span style="color: #FF0000">'The username is {{Username}}'</span></tt></pre></div></div>
 <div class="listingblock">
 <div class="title">Macro Calls</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #990000">- </span><span style="color: #009900">add_user</span><span style="color: #990000">:</span>
 <span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> Kevin
 <span style="color: #990000">    </span><span style="color: #009900">phone</span><span style="color: #990000">:</span> (<span style="color: #993399">555</span>) <span style="color: #993399">098</span> <span style="color: #993399">880</span></tt></pre></div></div>
-<div class="paragraph"><p>When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output in YAML format. Becuase YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from the input <span class="footnote"><br />[Order-preservation may happen in a future version, but it&#8217;s complicated]<br /></span>.</p></div>
+<div class="paragraph"><p>When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output
+in YAML or JSON format. Because YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from
+the input <span class="footnote"><br />[Order-preservation may happen in a future version, but it&#8217;s complicated]<br /></span>.</p></div>
+<div class="paragraph"><p>When the processor sees a null item in an input sequence, these are preserved, however if the null value is the result of a <code>define:</code>, <code>defmacro:</code> or other expansion which produces null, the null value is stripped from the output.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_variables">Variables</h3>
@@ -1099,7 +1107,7 @@ http://www.gnu.org/software/src-highlite -->
 <h4 id="_code_define_code_definition_of_variables"><code>define</code> - Definition of Variables</h4>
 <div class="paragraph"><p>You can define new variable bindings or update existing variables with the <code>define</code> macro. The value can be any YAML expansion. Variable names are expected to be strings.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1151,7 +1159,7 @@ http://www.gnu.org/software/src-highlite -->
 <h5 id="_variables_embedded_in_strings">Variables Embedded in Strings</h5>
 <div class="paragraph"><p>Inside strings, Goyamp will insert expansions delimited by the double-curlies <code>{{</code> and <code>}}</code>. It&#8217;s looking for variable names.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1162,7 +1170,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="font-style: italic"><span style="color: #9A1900"># Produces AChristopherA</span></span></tt></pre></div></div>
 <div class="paragraph"><p>This processing is also done in map keys so that map keys can be computed during the expansion. For example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1177,7 +1185,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>If a string contains periods, such as <code>data.height</code> Goyamp looks for a exactly matching variable name, which is expanded with the value. Otherwise the first item (ie <code>data</code>) is assumed to be a variable name.</p></div>
 <div class="paragraph"><p>If a binding for the first part is found the value of the variable is assumed to be a collection. The other items which we call sub-variables are used to index the collection (ie <code>height</code>). If the collection is a map, the sub-variable name is used as the key. If it is a list the subvariable must evaluate to an integer which is zero-indexed into the list. These subvariable names are also expanded before use so other variables can be used to index the collection.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1198,7 +1206,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">-</span> data.zero.hostname</tt></pre></div></div>
 <div class="paragraph"><p>Produces</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1210,7 +1218,7 @@ http://www.gnu.org/software/src-highlite -->
 <h5 id="_variable_map_keys_with_the_caret">Variable Map Keys with the Caret</h5>
 <div class="paragraph"><p>Normally map keys are not expanded, but with a preceding caret character Goyamp looks up the variable name in the current binding and uses its value. For example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1224,7 +1232,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">-</span> my-macro: { param: <span style="color: #993399">42</span> }</tt></pre></div></div>
 <div class="paragraph"><p>Evaluates to:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1232,7 +1240,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">    </span><span style="color: #009900">LtUaE</span><span style="color: #990000">:</span> <span style="color: #993399">42</span></tt></pre></div></div>
 <div class="paragraph"><p>This facility even allows macros to be called indirectly since the macro being called is provided by the variable rather than in the code itself. Here&#8217;s an example, although the practical value of this is yet to surface. This code applies four different macros to the same arguments in turn:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1246,7 +1254,7 @@ http://www.gnu.org/software/src-highlite -->
 <h5 id="_defining_multiple_variables">Defining Multiple Variables</h5>
 <div class="paragraph"><p>Declarations don&#8217;t need the <em>name</em> and <em>value</em> keys, and multiple variables are simultaneously bound.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1262,7 +1270,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Sometimes a variable needs to be renamed or removed. For example if a Goyamp macro name conflicts with a name used in the
 output format required. The <code>undefine</code> macro removes a variable binding from the current environment. Usage:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1270,7 +1278,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Used at the top level
 (outside of a macro) <code>undefine</code> can be used to change the definitions of Goyamp built-in macros themselves. This is done by first assigning a new name with the currently used macro, then undefining the original name. If this is done before any files are included, it can be used to redefine Goyamp syntax. For example we can use <code>plus</code> instead of the <code>+</code> symbol as follows</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1287,7 +1295,7 @@ http://www.gnu.org/software/src-highlite -->
 <h4 id="_defining_with_code_defmacro_code">Defining with <code>defmacro</code></h4>
 <div class="paragraph"><p>Macros are defined with the <code>define</code> macro which gives the macro a name and specifies the arguments it has and the expansion to return, the body.  A macro definition looks like this:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1298,7 +1306,7 @@ http://www.gnu.org/software/src-highlite -->
       &lt;Some YAML to be expanded&gt;</tt></pre></div></div>
 <div class="paragraph"><p>Example - Database upgrade steps:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1319,7 +1327,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">    </span><span style="color: #009900">dbname</span><span style="color: #990000">:</span> postgres123123</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1340,7 +1348,7 @@ http://www.gnu.org/software/src-highlite -->
 <h4 id="_invoking_calling_macros">Invoking/calling Macros</h4>
 <div class="paragraph"><p>As above, macro calls are just maps with a particular structure:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1353,7 +1361,7 @@ http://www.gnu.org/software/src-highlite -->
 <h4 id="_macros_with_variable_arguments">Macros with variable arguments</h4>
 <div class="paragraph"><p>If the arguments in the definition are specified as a string, not a list, the string is the single argument. All the actual arguments at call-time are collected and bound to the variable in a map.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1364,7 +1372,7 @@ http://www.gnu.org/software/src-highlite -->
       &lt;Some YAML to be expanded&gt;</tt></pre></div></div>
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1386,7 +1394,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  </span><span style="color: #009900">state</span><span style="color: #990000">:</span> latest</tt></pre></div></div>
 <div class="paragraph"><p>Produces</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1405,7 +1413,7 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_conditional_expansion_with_code_if_then_else_code">Conditional Expansion with <code>if then else</code></h3>
 <div class="paragraph"><p>The <code>if</code> macro renders one value from a choice of two based on whether the condition argument is true. Where true means it&#8217;s <code>true</code> or not <code>false</code> or <code>null</code>. The <code>then</code> argument is expanded if so, otherwise the <code>else</code> argument. It&#8217;s not required to have both <code>then</code> and <code>else</code> arguments - when the condition requires the missing one, it expands to <code>null</code>.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1414,7 +1422,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #009900">else</span><span style="color: #990000">:</span> &lt;value if <span style="font-weight: bold"><span style="color: #0000FF">false</span></span> or <span style="font-weight: bold"><span style="color: #0000FF">null</span></span>&gt;</tt></pre></div></div>
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1432,14 +1440,14 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  -</span> shutdown not required</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #990000">-</span> shutdown database</tt></pre></div></div>
 <div class="paragraph"><p>Example - short form</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1451,14 +1459,14 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_testing_equality_with_code_code">Testing equality with <code>==</code></h3>
 <div class="paragraph"><p>Macros can have almost any name, this one is the symbol <em>==</em>. It expands to <code>true</code> or <code>false</code> if the items in the list are equal. Most often used inside an enclosing <code>if</code> macro.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>{ ==: [arg1, arg2, ...] }</tt></pre></div></div>
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1470,7 +1478,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>The <code>quote</code> macro does not expand its input arguments returning them unexpanded.</p></div>
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1479,7 +1487,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">- </span><span style="color: #009900">quote</span><span style="color: #990000">:</span> data1.sub</tt></pre></div></div>
 <div class="paragraph"><p>Produces</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1490,7 +1498,7 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_looping_with_code_repeat_code">Looping with <code>repeat</code></h3>
 <div class="paragraph"><p>This macro repeatedly expands the same object, either returning a list or a map. If the <code>key</code> argument is present it returns a map, using the <code>key</code> argument as the item&#8217;s key. This must have embedded variables derived from the looping execution otherwise there will be a key collision error. With no <code>key</code> argument, it returns a list.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1501,7 +1509,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  </span><span style="color: #009900">body</span><span style="color: #990000">:</span> &lt;any value&gt;</tt></pre></div></div>
 <div class="paragraph"><p>Example - returning a dictionary:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1516,7 +1524,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">    </span><span style="color: #009900">stage</span><span style="color: #990000">:</span> step</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1528,7 +1536,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  </span><span style="color: #009900">stage</span><span style="color: #990000">:</span> step</tt></pre></div></div>
 <div class="paragraph"><p>Example - returning a list:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1541,7 +1549,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">    </span><span style="color: #009900">another</span><span style="color: #990000">:</span></tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1556,7 +1564,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step</tt></pre></div></div>
 <div class="paragraph"><p>Example - looped list with changing keys. Here the keys and values of a child map are changed. :</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1568,7 +1576,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">    </span><span style="color: #009900">some</span><span style="color: #990000">:</span> step</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1581,7 +1589,7 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_looping_with_code_range_code">Looping with <code>range</code></h3>
 <div class="paragraph"><p>The <code>range</code> macro substitutes a list of numbers that can be used in <code>repeat</code> macros. (Or anywhere else a list of numbers is needed). The start and end values are passed as a list argument. The range can count up or down, always by one.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1589,7 +1597,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Produces <code>[3,4,5]</code></p></div>
 <div class="paragraph"><p><code>range</code> also accepts a map object, in which case it expands the sequence of map keys. For example</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1598,7 +1606,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>Produces <code>[ra, rb]</code>. This can then be used in repeat to loop over the items in a map. Dot notation is used to expand individual members of the map.
 For example here the loop variable is set to <code>ra</code> then <code>rb</code> which <code>map.keyz</code> resolves to <code>879</code> and <code>662</code>:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1613,14 +1621,14 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_combining_lists_with_code_flatten_code">Combining Lists with <code>flatten</code></h3>
 <div class="paragraph"><p>Sometimes you need to combine lists, perhaps from different macro expansions. The <code>flatten</code> macro combines multiple lists into a single, flat, list. The flattening is recursive. Syntax:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #009900">flatten</span><span style="color: #990000">:</span> &lt; list of objects &gt;</tt></pre></div></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1631,7 +1639,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #009900">flatten</span><span style="color: #990000">:</span> [<span style="color: #993399">1</span>, <span style="color: #993399">2</span>, [<span style="color: #993399">3</span>], [[<span style="color: #993399">4</span>, <span style="color: #993399">5</span>]], [[[ <span style="color: #993399">6</span>,<span style="color: #993399">7</span>]]] ]</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1652,21 +1660,21 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_combining_one_level_of_lists_with_code_flatone_code">Combining One Level of Lists with <code>flatone</code></h3>
 <div class="paragraph"><p>The <code>flatone</code> macro combines multiple lists into a single, flat, list. The flattening is <strong>not</strong> recursive, only the first level is flattened. Syntax:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #009900">flatone</span><span style="color: #990000">:</span> &lt; list of objects &gt;</tt></pre></div></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #009900">flatone</span><span style="color: #990000">:</span> [<span style="color: #993399">1</span>, <span style="color: #993399">2</span>, [<span style="color: #993399">3</span>], [[<span style="color: #993399">4</span>, <span style="color: #993399">5</span>]], [[[ <span style="color: #993399">6</span>,<span style="color: #993399">7</span>]]] ]</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1682,14 +1690,14 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_combining_maps_with_code_merge_code">Combining Maps with <code>merge</code></h3>
 <div class="paragraph"><p>The <code>merge</code> macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Syntax:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #009900">merge</span><span style="color: #990000">:</span> &lt; list of maps &gt;</tt></pre></div></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1699,7 +1707,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  -</span> { c : <span style="color: #993399">3</span> , a : -<span style="color: #993399">1</span>}</tt></pre></div></div>
 <div class="paragraph"><p>Produces:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1708,7 +1716,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #009900">c</span><span style="color: #990000">:</span> <span style="color: #993399">3</span></tt></pre></div></div>
 <div class="paragraph"><p>A more complex example shows combining data from multiple sources:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1730,7 +1738,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  -</span> network-data</tt></pre></div></div>
 <div class="paragraph"><p>Which boils down to:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1743,7 +1751,7 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_arithmetic_with_code_code">Arithmetic with <code>+</code></h3>
 <div class="paragraph"><p>The <code>+</code> macro adds a list of numbers, int or float.</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1754,7 +1762,7 @@ http://www.gnu.org/software/src-highlite -->
 <h3 id="_reading_files_with_code_include_code">Reading files with <code>include</code></h3>
 <div class="paragraph"><p></p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1769,14 +1777,14 @@ http://www.gnu.org/software/src-highlite -->
 <h4 id="_reading_data_with_code_load_code">Reading Data with <code>load</code></h4>
 <div class="paragraph"><p>The <code>load</code> macro reads a single file of YAML or JSON data and returns the result. No variable substitutions or macro expansions are performed on the data. YAML data is returned as a list, one object for each <em>doc</em>. <span class="footnote"><br />[YAML files are subdivided into <em>docs</em> separated by <em>---</em>]<br /></span></p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>{load: &lt;filename&gt;}</tt></pre></div></div>
 <div class="paragraph"><p>Examples:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1792,7 +1800,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>When you have shell variables in files which you want to use as input to expansion, you can load them into the environment of the Goyamp execution. For example here&#8217;s a script with some dynamic data:</p></div>
 <div class="listingblock">
 <div class="title">data.sh</div>
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1801,7 +1809,7 @@ http://www.gnu.org/software/src-highlite -->
 <span style="font-weight: bold"><span style="color: #0000FF">export</span></span> <span style="color: #009900">VARIABLE3</span><span style="color: #990000">=</span><span style="color: #FF0000">"${VARIABLE2}_value3"</span></tt></pre></div></div>
 <div class="paragraph"><p>The shell script must executed to determine the values. To load this into the Goyamp environment, use shell wrappers like this:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1831,7 +1839,7 @@ http://www.gnu.org/software/src-highlite -->
 </ul></div>
 <div class="paragraph"><p>The YAML output contains the variables we want plus a couple of variables <code>bash</code> always needs:</p></div>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1897,7 +1905,7 @@ _<span style="color: #990000">:</span> /usr/bin/python</tt></pre></div></div>
 <div class="sect2">
 <h3 id="_build_from_source">Build from Source</h3>
 <div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.6
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1921,8 +1929,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.1.2<br />
+Version 0.2.0-2-g3b0aa46<br />
 Last updated 2019-06-21 16:03:16 AEST
+ 2019-06-21 01:03:57 AEST
 </div>
 </div>
 </body>
