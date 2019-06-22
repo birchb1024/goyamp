@@ -1,10 +1,10 @@
 {
 
 	"map keys": {
-		null : "Null",
-		1 : "Integer",
-		12.34 :  "Float",
-		true : "Bool",
+		"null" : "Null",
+		"1" : "Integer",
+		"12.34" :  "Float",
+		"true" : "Bool",
 	},
 	"sequence": [
 		null, 

@@ -64,6 +64,7 @@ func TestNormalExamples(t *testing.T) {
                 "caret.yaml",
                 "config.yaml",
                 "env01.yaml",
+                "execute.yaml",
                 "flatten-repeat.yaml",
                 "flatten.yaml",
                 "foo.yaml",

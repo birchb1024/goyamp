@@ -42,26 +42,30 @@ type unknowny struct {
 	x interface{}
 }
 
-func (x nily) expand(binding *env) yamly  { return x }
-func (x nily) String() string { return "null" }
+func (x nily) expand(binding *env) yamly { return x }
+func (x nily) String() string            { return "null" }
 
 func (e empty) expand(binding *env) yamly { return e }
-func (e empty) String() string { return "goyamp.EMPTY" }
+func (e empty) String() string            { return "goyamp.EMPTY" }
 
 func (x inty) expand(binding *env) yamly { return x }
-func (x inty) String() string { return strconv.Itoa(int(x)) }
+func (x inty) String() string            { return strconv.Itoa(int(x)) }
 
 func (x float64y) expand(binding *env) yamly { return x }
-func (x float64y) String() string { return strconv.FormatFloat(float64(x), 'G', -1, 32) }
+func (x float64y) String() string            { return strconv.FormatFloat(float64(x), 'G', -1, 32) }
 
 func (x booly) expand(binding *env) yamly { return x }
-func (x booly) String() string { if x {return "true"} else {return "false"} }
+func (x booly) String() string {
+	if x {
+		return "true"
+	}
+	return "false"
+}
 
 func (x unknowny) expand(binding *env) yamly { return x }
-func (x unknowny) String() string { return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }
+func (x unknowny) String() string            { return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }
 
 func (x stringy) String() string { return string(x) }
-
 
 // - Engine internals...
 type env struct {
@@ -312,7 +316,7 @@ func interpolate(tree yamly, bindings *env) yamly {
 			// value, ok := bindings.lookup(stringy(variableName))
 			value, ok := expandStr(variableName, bindings)
 			if !ok {
-				panic(fmt.Sprintf("'%v' is not a bound variable in '%v'", variableName, tree))			
+				panic(fmt.Sprintf("'%v' is not a bound variable in '%v'", variableName, tree))
 			}
 			log.Printf("interpolate: value, ok %#v %#v", value, ok)
 			return value.String()
@@ -642,39 +646,46 @@ func (m mapy) expand(bindings *env) yamly {
 func expandFile(filename string, bindings *env) error {
 	log.Printf("expandFile: filename %v\n", filename)
 
-	var currentDir, path, prior string
+	var dirForThisFile, path, priorDir string
 	var err error
-	currentPath, ok := bindings.lookup(stringy("__PATH__")) // Remember prior file
-
+	priorFile, ok := bindings.lookup(stringy("__FILE__"))
 	if !ok {
-		log.Printf("expandFile: __PATH__ => not bound\n")
+		priorFile = stringy("")
+	}
+	d, ok := bindings.lookup(stringy("__DIR__"))
+	if !ok {
+		log.Printf("expandFile: __DIR__ => not bound\n")
 		pwd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
-		currentDir, err = filepath.Abs(pwd)
-		if err != nil {
-			log.Panic(err)
-		}
-	} else {
-		prior = string(currentPath.(stringy))
-		log.Printf("expandFile: __PATH__ => %v\n", prior)
-		currentDir = filepath.Dir(prior)
-	}
-	log.Printf("expandFile: currentDir => %v\n", currentDir)
-
-	if strings.HasPrefix(filename, "/") || filename == "-" {
-		path = filename
-	} else {
-		path, err = filepath.Abs(filepath.Join(currentDir, filename)) // resolve relative paths
+		abs, err := filepath.Abs(pwd)
 		if err != nil {
 			return err
 		}
+		dirForThisFile = filepath.Dir(abs)
+	} else {
+		priorDir = string(d.(stringy))
 	}
-	bindings.bind["__PATH__"] = stringy(path) // New file now
+
+	if filename == "-" {
+		path = "-"
+		dirForThisFile = "."
+	} else if strings.HasPrefix(filename, "/") {
+		path = filename
+		dirForThisFile = filepath.Dir(path)
+	} else {
+		path, err = filepath.Abs(filepath.Join(priorDir, filename)) // resolve relative paths
+		if err != nil {
+			return err
+		}
+		dirForThisFile = filepath.Dir(path)
+	}
+	bindings.bind["__DIR__"] = stringy(dirForThisFile)
 	bindings.bind["__FILE__"] = stringy(filepath.Base(path))
+	log.Printf("expandFile: new __DIR__ => %v\n", dirForThisFile)
 	log.Printf("expandFile: new __FILE__ => %v\n", filepath.Base(path))
-	log.Printf("expandFile: new __PATH__ => %v\n", path)
+
 	input, err := os.Open(path)
 	if err != nil {
 		log.Printf("open => %v %v %v\n", path, input, err)
@@ -684,8 +695,9 @@ func expandFile(filename string, bindings *env) error {
 	if err != nil {
 		return err
 	}
-	bindings.bind["__PATH__"] = currentPath // restore prior file
-	bindings.bind["__FILE__"] = stringy(filepath.Base(prior))
+
+	bindings.bind["__DIR__"] = stringy(priorDir) // restore prior file
+	bindings.bind["__FILE__"] = priorFile
 	return nil
 }
 

@@ -1,7 +1,9 @@
 package goyamp
 
 import (
+	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -15,7 +17,11 @@ func (engine *Expander) init(environment []string, argv []string) {
 		kv := strings.Split(pair, "=")
 		envMap[stringy(kv[0])] = stringy(kv[1])
 	}
-
+	pwd, err := os.Getwd()
+	if err != nil {
+		pwd = "."
+		fmt.Fprintf(os.Stderr, "%v", err)
+	}
 	engine.globals = &env{
 		engine: engine,
 		parent: nil,
@@ -23,6 +29,7 @@ func (engine *Expander) init(environment []string, argv []string) {
 			"argv":        classify(argv),
 			"env":         envMap,
 			"__VERSION__": stringy(Version),
+			"__DIR__":     stringy(pwd),
 		},
 	}
 	addBuiltinsToEnv(engine.globals)

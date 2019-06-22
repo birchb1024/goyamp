@@ -57,8 +57,8 @@ func repeatBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	if !ok {
 		panic(fmt.Sprintf("Syntax error repeat expects a map, got %v\n", tree))
 	}
-	assertKeys( map[string]bool{"for": true, "in": true, "body": true, "key": false} , treemap)
-	
+	assertKeys(map[string]bool{"for": true, "in": true, "body": true, "key": false}, treemap)
+
 	forClause := treemap[stringy("for")]
 	forVariable, ok := forClause.(stringy)
 	if !ok {

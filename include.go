@@ -57,8 +57,8 @@ func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
 	// TOD DRY ... cf includeBuiltin
 	var currentDir, path string
 	var err error
-	currentFile, ok := bindings.lookup(stringy("__PATH__"))
-	log.Printf("__PATH__ => %v\n", currentFile)
+	cd, ok := bindings.lookup(stringy("__DIR__"))
+	log.Printf("__DIR__ => %v\n", cd)
 	if !ok {
 		pwd, err := os.Getwd()
 		if err != nil {
@@ -66,9 +66,9 @@ func loader(tree yamly, args yamly, bindings *env) (yamly, error) {
 		}
 		currentDir = pwd
 	} else {
-		currentDir = filepath.Dir(string(currentFile.(stringy)))
+		currentDir = string(cd.(stringy))
 	}
-	if strings.HasPrefix(string(filename), "/") || string(filename) == "-" {
+	if strings.HasPrefix(string(filename), "/") {
 		path = string(filename)
 	} else {
 		path, err = filepath.Abs(filepath.Join(currentDir, string(filename))) // resolve relative paths

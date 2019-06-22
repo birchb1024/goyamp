@@ -204,7 +204,7 @@ func ifBuiltin(tmap mapy, args yamly, bindings *env) yamly {
 	//    Conditional expression
 	//    :return: either the expansion of the 'then' or 'else' elements.
 	//    """
-	assertKeys( map[string]bool{"if": true, "then": false, "else": false} , tmap)
+	assertKeys(map[string]bool{"if": true, "then": false, "else": false}, tmap)
 	thenClause, thok := tmap[stringy("then")]
 	elseClause, elok := tmap[stringy("else")]
 	if !thok && !elok {

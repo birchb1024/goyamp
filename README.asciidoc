@@ -1048,7 +1048,7 @@ Goyamp automatically populates some variables as it executes. These are:
 
 * `__FILE__` - the current source filename
 
-* `__PATH__` - the current source full pathname
+* `__DIR__` - the directory pathname of the current source file
 
 * `__SOURCE__` - the expression passed into the currently executing macro - useful for debugging your macros.
 
