@@ -274,6 +274,6 @@ func addBuiltinsToEnv(env *env) {
 	addNewBuiltin("flatone", flatoneBuiltin, true, false)
 	addNewBuiltin("merge", mergeBuiltin, true, false)
 	addNewBuiltin("load", loadBuiltin, true, false)
-	addNewBuiltin("execute", executeBuiltin, true, false)
+	addNewBuiltin("execute", executeBuiltin, true, true)
 	addNewBuiltin("panic", panicBuiltin, true, false)
 }

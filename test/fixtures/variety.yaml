@@ -1,0 +1,14 @@
+---
+map keys:
+  true: Bool
+  1: Integer
+  12.34: Float
+  null: "Null"
+#  [1] : Sequence
+sequence:
+- null
+- 1
+- 12.34
+- true
+- - 1
+- a: 1
