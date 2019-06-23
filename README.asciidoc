@@ -220,7 +220,7 @@ In practice `yaml` or `json` sufffixes will be recognised by most text editors e
 
 ==== Docker
 
-A docker image is provided in docker.io (Docker Hub) https://cloud.docker.com/repository/docker/birchb1024/goyamp[here]. This image includes Python and its libraries on a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:
+A docker image is provided in docker.io (Docker Hub) https://cloud.docker.com/repository/docker/birchb1024/goyamp[here]. This image uses a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:
 
 [source, bash]
 ----
