@@ -232,7 +232,7 @@ $ docker run --rm -u $(id -u):$(id -g) -v "$HOME":/work docker.io/birchb1024/goy
 
 When Goyamp starts, it collects the command-line arguments and assigns the list to the variable `argv`. It collects the process environment and assigns it to the map variable `env`. Goyamp then reads the input file, attempts to parse the YAML and holds the resulting data as objects in memory. (If the YAML does not parse Goyamp exits). It recursively scans the objects looking for strings which are the same as defined variables or which contain variables inside the string in curly braces. If it finds a match, it substitutes the object with the variable's value.
 
-Goyamp is a substitution engine. It looks for things in it's input an when it sees them replaces them with the substitution. The things to look for and the substitutions we call variables and bindings. For example:
+Goyamp is a substitution engine. It looks for things in its input an when it sees them replaces them with the substitution. The things to look for and the substitutions we call variables and bindings. For example:
 
 .Variables Bindings
 [options="header,footer",width="50%"]
@@ -262,7 +262,7 @@ mygit:
 
 When scanning maps, Goyamp does not expand map keys unless either the map key is explicitly identified as a variable with the `^` caret character, or the map key is a string with embedded curly braces. In these two special cases Goyamp looks up variables or interpolates the string.  
 
-Some special variables contain 'macros' - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this 'macro expansion' footnote:[But it could actually be a reduction!] ;-). 
+Some special variables contain 'macros' - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this 'macro expansion' footnote:[But it could actually be a reduction!]. 
 
 Goyamp is looking for macro calls with this structure:
 
@@ -303,7 +303,7 @@ When all the objects in the data have been scanned and in some cases, substitute
 in YAML or JSON format. Because YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from 
 the input footnote:[Order-preservation may happen in a future version, but it's complicated].
 
-When the processor sees a null item in an input sequence, these are preserved, however if the null value is the result of a `define:`, `defmacro:` or other expansion which produces null, the null value is stripped from the output. 
+When the processor sees a null item in an input sequence, these are preserved, however if the empty value is the result of a `define:`, `defmacro:` or other expansion which produces null, the null value is stripped from the output. 
 
 === Variables
 
@@ -1289,6 +1289,34 @@ Produces:
   name: Bill Birch
 ----
 
+=== Enforcing Safety with `panic`
+
+When processing becomes more complex you may want to implent checks on input data. The `panic:` macro 
+halts execution and prints a message supplied. With this combined with ==: you can code a variety
+of check macros. For example here is a macro that ends processing if two things do not match:  
+
+[source, YAML]
+----
+defmacro:
+    name: assert_equal
+    args: [p1, p2]
+    value:
+      if:
+        ==: [p1, p2]
+      else:
+        panic: "ASSERT FAILED {{p1}} != {{p2}} {{__SOURCE__}}"
+---
+assert_equal:
+    p1: 12
+    p2: 23
+----
+
+Produces this on stderr: (with a Go backtrace)
+
+[source, shell]
+----
+panic: ASSERT FAILED 12 != 23 { assert_equal : { p1 : 12 , p2 : 23  }  }
+----
 
 === Builtin Variables
 

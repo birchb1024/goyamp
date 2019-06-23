@@ -735,7 +735,7 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.2.2,</span>
+<span id="revnumber">version 0.2.2-1-gc1d1903,</span>
 <span id="revdate">23.06.2019</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
@@ -785,7 +785,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">2</span>/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">2</span>-<span style="color: #993399">1</span>-gc1d1903/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -1003,7 +1003,7 @@ http://www.gnu.org/software/src-highlite -->
 </div>
 <div class="sect3">
 <h4 id="_docker">Docker</h4>
-<div class="paragraph"><p>A docker image is provided in docker.io (Docker Hub) <a href="https://cloud.docker.com/repository/docker/birchb1024/goyamp">here</a>. This image includes Python and its libraries on a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:</p></div>
+<div class="paragraph"><p>A docker image is provided in docker.io (Docker Hub) <a href="https://cloud.docker.com/repository/docker/birchb1024/goyamp">here</a>. This image uses a slim Debian base. To use it you need to map your workspace into the container and use your current user id. In general:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
@@ -1015,7 +1015,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="sect2">
 <h3 id="_processing">Processing</h3>
 <div class="paragraph"><p>When Goyamp starts, it collects the command-line arguments and assigns the list to the variable <code>argv</code>. It collects the process environment and assigns it to the map variable <code>env</code>. Goyamp then reads the input file, attempts to parse the YAML and holds the resulting data as objects in memory. (If the YAML does not parse Goyamp exits). It recursively scans the objects looking for strings which are the same as defined variables or which contain variables inside the string in curly braces. If it finds a match, it substitutes the object with the variable&#8217;s value.</p></div>
-<div class="paragraph"><p>Goyamp is a substitution engine. It looks for things in it&#8217;s input an when it sees them replaces them with the substitution. The things to look for and the substitutions we call variables and bindings. For example:</p></div>
+<div class="paragraph"><p>Goyamp is a substitution engine. It looks for things in its input an when it sees them replaces them with the substitution. The things to look for and the substitutions we call variables and bindings. For example:</p></div>
 <div class="tableblock">
 <table rules="all"
 width="50%"
@@ -1058,7 +1058,7 @@ http://www.gnu.org/software/src-highlite -->
 </table>
 </div>
 <div class="paragraph"><p>When scanning maps, Goyamp does not expand map keys unless either the map key is explicitly identified as a variable with the <code>^</code> caret character, or the map key is a string with embedded curly braces. In these two special cases Goyamp looks up variables or interpolates the string.</p></div>
-<div class="paragraph"><p>Some special variables contain <em>macros</em> - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this <em>macro expansion</em> <span class="footnote"><br />[But it could actually be a reduction!]<br /></span> ;-).</p></div>
+<div class="paragraph"><p>Some special variables contain <em>macros</em> - these must be within a map of their own, with a value containing a map of arguments which can contain anything. Normally a macro will contain more than the original, so we call this <em>macro expansion</em> <span class="footnote"><br />[But it could actually be a reduction!]<br /></span>.</p></div>
 <div class="paragraph"><p>Goyamp is looking for macro calls with this structure:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.8
@@ -1098,7 +1098,7 @@ http://www.gnu.org/software/src-highlite -->
 <div class="paragraph"><p>When all the objects in the data have been scanned and in some cases, substituted, Goyamp outputs the new object tree on the standard output
 in YAML or JSON format. Because YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from
 the input <span class="footnote"><br />[Order-preservation may happen in a future version, but it&#8217;s complicated]<br /></span>.</p></div>
-<div class="paragraph"><p>When the processor sees a null item in an input sequence, these are preserved, however if the null value is the result of a <code>define:</code>, <code>defmacro:</code> or other expansion which produces null, the null value is stripped from the output.</p></div>
+<div class="paragraph"><p>When the processor sees a null item in an input sequence, these are preserved, however if the empty value is the result of a <code>define:</code>, <code>defmacro:</code> or other expansion which produces null, the null value is stripped from the output.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_variables">Variables</h3>
@@ -2135,6 +2135,36 @@ http://www.gnu.org/software/src-highlite -->
 </div>
 </div>
 <div class="sect2">
+<h3 id="_enforcing_safety_with_code_panic_code">Enforcing Safety with <code>panic</code></h3>
+<div class="paragraph"><p>When processing becomes more complex you may want to implent checks on input data. The <code>panic:</code> macro
+halts execution and prints a message supplied. With this combined with ==: you can code a variety
+of check macros. For example here is a macro that ends processing if two things do not match:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> assert_equal
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [p1, p2]
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span>
+<span style="color: #990000">      </span><span style="color: #009900">if</span><span style="color: #990000">:</span>
+        ==: [p1, p2]
+<span style="color: #990000">      </span><span style="color: #009900">else</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">panic</span><span style="color: #990000">:</span> <span style="color: #FF0000">"ASSERT FAILED {{p1}} != {{p2}} {{__SOURCE__}}"</span>
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #009900">assert_equal</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">p1</span><span style="color: #990000">:</span> <span style="color: #993399">12</span>
+<span style="color: #990000">    </span><span style="color: #009900">p2</span><span style="color: #990000">:</span> <span style="color: #993399">23</span></tt></pre></div></div>
+<div class="paragraph"><p>Produces this on stderr: (with a Go backtrace)</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>panic<span style="color: #990000">:</span> ASSERT FAILED <span style="color: #993399">12</span> <span style="color: #990000">!=</span> <span style="color: #993399">23</span> { assert_equal <span style="color: #990000">:</span> { p1 <span style="color: #990000">:</span> <span style="color: #993399">12</span> <span style="color: #990000">,</span> p2 <span style="color: #990000">:</span> <span style="color: #993399">23</span>  }  }</tt></pre></div></div>
+</div>
+<div class="sect2">
 <h3 id="_builtin_variables">Builtin Variables</h3>
 <div class="paragraph"><p>Goyamp automatically populates some variables as it executes. These are:</p></div>
 <div class="ulist"><ul>
@@ -2236,9 +2266,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.2.2<br />
+Version 0.2.2-1-gc1d1903<br />
 Last updated
- 2019-06-23 17:11:42 AEST
+ 2019-06-23 21:02:09 AEST
 </div>
 </div>
 </body>

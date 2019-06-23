@@ -1,6 +1,6 @@
 file_header:
 ---
-- defmacro:
+defmacro:
     name: assert_equal
     args: [p1, p2]
     value:
@@ -9,11 +9,11 @@ file_header:
       else:
         panic: "ASSERT FAILED {{p1}} != {{p2}} {{__SOURCE__}}"
 ---
-- assert_equal:
+assert_equal:
     p1: 12
     p2: 23
 ---
-- defmacro:
+defmacro:
     name: assert
     args: [that]
     value:
