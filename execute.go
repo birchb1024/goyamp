@@ -1,6 +1,7 @@
 package goyamp
 
 import (
+	"os"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -36,7 +37,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	responseType := "lines"
 	requestType := "lines"
 	request := []byte{}
-	environment := []string{}
+	environment := os.Environ()
 	arguments := []string{}
 
 	switch args := args.(type) {
@@ -52,12 +53,16 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 		a, aok := args[stringy("args")]
 		if aok {
 			clst, ok := a.(seqy)
-			if ok {
+			if !ok {
+				panic(fmt.Sprintf("execute: '%v' is not a valid args sequence", a))
+			} else {
 				for _, v := range clst {
 					arguments = append(arguments, v.String())
+					log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
 				}
 			}
 		}
+		log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
 
 		directory = argString(tree, args, "directory", "")
 		requestType = argString(tree, args, "request-type", "lines")
@@ -80,6 +85,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 			}
 		}
 
+		log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
 		if req, eok := args[stringy("request")]; eok {
 			switch requestType {
 			case "string":
@@ -109,6 +115,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 					panic(fmt.Sprintf("execute: '%v' could not be encoded as JSON", req))
 				}
 				request = buf.Bytes()
+
 			case "yaml":
 				var buf bytes.Buffer
 				y := req.declassify()
@@ -119,6 +126,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 					panic(fmt.Sprintf("execute: '%v' could not be encoded as YAML!", req))
 				}
 				request = buf.Bytes()
+
 			default:
 				panic(fmt.Sprintf("'%v' is not a valid request-type", requestType))
 			}
@@ -128,7 +136,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 		panic(fmt.Sprintf("execute args are not string or map %v", args))
 	}
 
-	log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v'", command, directory, environment, requestType, responseType, string(request))
+	log.Printf("execute: '%v' '%#v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
 	if command == "" {
 		panic(fmt.Sprintf("execute has no string command %v", args))
 	}
@@ -139,7 +147,9 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	if request != nil {
 		cmd.Stdin = bytes.NewReader(request)
 	}
+	log.Printf("execute: '%#v'", cmd)
 	response, err := cmd.Output()
+	log.Printf("execute: '%#v'", cmd)
 	if err != nil {
 		if err, ok := err.(*exec.ExitError); ok {
 			panic(fmt.Sprintf("%v %v", err.Error(), string(err.Stderr)))
@@ -152,6 +162,8 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	responsestr := string(response)
 	log.Printf("exec: response %#v", responsestr)
 	switch responseType {
+	case "string":
+		return stringy(strings.TrimSpace(responsestr))
 	case "lines":
 		lineslice := strings.Split(responsestr, "\n")
 		result := seqy{}
@@ -163,6 +175,13 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 			}
 		}
 		return result
+	case "json":
+		var doc interface{}
+		err := json.Unmarshal(response, &doc)
+		if err != nil {
+			panic(fmt.Sprintf("execute response was not JSON '%v'", err))
+		}
+		return classify(doc)
 	case "yaml":
 		decoder := yaml.NewDecoder(bytes.NewReader(response))
 		var doc interface{}
@@ -171,15 +190,6 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 			panic(fmt.Sprintf("execute response was not YAML '%v'", err))
 		}
 		return classify(doc)
-	case "json":
-		var doc interface{}
-		err := json.Unmarshal(response, &doc)
-		if err != nil {
-			panic(fmt.Sprintf("execute response was not JSON '%v'", err))
-		}
-		return classify(doc)
-	case "string":
-		return stringy(responsestr)
 	default:
 		panic(fmt.Sprintf("execute unknown response type '%v'", responseType))
 	}
