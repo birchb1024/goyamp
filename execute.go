@@ -26,9 +26,7 @@ func argString(tree yamly, args mapy, name string, defaul string) string {
 
 func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	log.Printf("exec: %v", args)
-	//
-	//    TODO This is all to do...
-	//
+
 	validResponseType := map[string]bool{"lines": true, "yaml": true, "json": true, "string": true}
 	validRequestType := map[string]bool{"lines": true, "yaml": true, "json": true, "string": true}
 	assertSingleKey(tree)

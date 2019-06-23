@@ -14,11 +14,25 @@ func helpText(out io.Writer, doOrNotDo bool) {
 	if !doOrNotDo {
 		return
 	}
-	usage := `TODO help!`
-	fmt.Fprint(out, " [File]\n\n")
-	flag.CommandLine.SetOutput(out)
-	flag.PrintDefaults()
-	flag.CommandLine.SetOutput(nil)
+	usage := `
+USAGE:
+
+ $ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json] [Filename | - ] [arg1..argn]
+
+	-
+	Filename:    If the filename is the minus sign '-' or if there are no arguments, Goamp reads YAML from the standard input. 
+	
+	arg1-argn:   are passed to the processor in the 'argv' variable.
+	
+	-o
+	-output:     If the -output option specifies the output format required. The options are yaml or json. the default is YAML.
+	
+	-d
+	-debug:      prints a trace of internal execution.
+	
+	-h
+	-help:       Prints this text.
+`
 	fmt.Fprintln(out, usage)
 	os.Exit(0)
 }
