@@ -1,0 +1,11 @@
+#
+# Get Aussis weather data - first record
+#
+define: 
+    $weather:
+        execute:
+            command: curl
+            args: [http://www.bom.gov.au/fwo/IDV60901/IDV60901.95936.json]
+            response-type: json
+---
+$weather.observations.data.0

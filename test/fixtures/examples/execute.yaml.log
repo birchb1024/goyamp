@@ -1,5 +1,5 @@
 ---
-|
+|-
   {
     "name": "Blade Runner",
     "year": 1982,
@@ -30,7 +30,7 @@
 - Hello World
 - Hello Universe
 ---
-|
+|-
   arguments A B C D
 
   environment
@@ -94,7 +94,7 @@ Hello World
 Hello Universe: 2
 Hello World: 1
 ---
-|
+|-
   {
     "map keys": {
       "1": "Integer",
@@ -120,15 +120,15 @@ Hello World: 1
   Hello World: 1
 - true
 ---
-|
+|-
   Hello World
   Hello Universe
 ---
-|
+|-
   Hello World
   Hello Universe
 ---
-|
+|-
   map keys:
     true: Bool
     1: Integer

@@ -1,0 +1,142 @@
+execute: cat test/fixtures/blade-runner.json
+---
+execute:
+    command: "ls"
+    args: [ -1 ]
+    response-type: lines
+---
+execute:
+    command: "ls"
+    args: [ -1 ]
+    response-type: string
+---
+execute:
+    command: cat
+    directory: "{{env.PWD}}/test/fixtures"
+    args: [ blade-runner.json ]
+    response-type: json
+---
+execute:
+    command: {quote: /usr/bin/env}
+    environment: 
+        exec-test-1: 1
+        exec-test-2: 2
+    response-type: lines
+---
+execute:
+    command: cat
+    directory: "{{env.PWD}}/test/fixtures"
+    args: [ variety.yaml ]
+    response-type: yaml
+---
+execute:
+    command: cat
+    directory: "{{env.PWD}}/test/fixtures"
+    args: [ variety.json ]
+    response-type: json
+---
+execute:
+    command: cat
+    request-type: string
+    response-type: string
+    request: "Hello World"
+---
+execute:
+    command: cat
+    request-type: string
+    response-type: lines
+    request: |
+        Hello World
+        Hello Universe
+---
+execute:
+    command: cat
+    request-type: json
+    response-type: json
+    request:
+        Hello World: 1
+        Hello Universe: 2
+---
+execute:
+    command: cat
+    request-type: json
+    response-type: string
+    request:
+        map keys:
+          true: Bool
+          1: Integer
+          12.34: Float
+          null: "Null"
+        #  [1] : Sequence
+        sequence:
+        - null
+        - 1
+        - 12.34
+        - true
+        - - 1
+        - a: 1
+---
+- define:
+    $request: 
+        Hello World: 1
+        Hello Universe: 2
+    $result:
+        execute:
+            command: cat
+            request-type: json
+            response-type: json
+            request: $request
+- $result
+- {==: [$request, $result]}
+---
+execute:
+    command: cat
+    request-type: lines
+    response-type: string
+    request:
+            - Hello World
+            - Hello Universe
+---
+execute:
+    command: cat
+    request-type: lines
+    response-type: string
+    request: |
+            Hello World
+            Hello Universe
+---
+execute:
+    command: cat
+    request-type: yaml
+    response-type: string
+    request:
+        map keys:
+          true: Bool
+          1: Integer
+          12.34: Float
+          null: "Null"
+        sequence:
+        - null
+        - 1
+        - 12.34
+        - true
+        - - 1
+        - a: 1
+---
+execute:
+    command: cat
+    request-type: yaml
+    response-type: yaml
+    request:
+        map keys:
+          true: Bool
+          1: Integer
+          12.34: Float
+          null: "Null"
+        sequence:
+        - null
+        - 1
+        - 12.34
+        - true
+        - - 1
+        - a: 1

@@ -1,0 +1,4 @@
+execute:
+    command: facter
+    args: [--json, processors]
+    response-type: json

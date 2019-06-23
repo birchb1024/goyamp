@@ -1,0 +1,14 @@
+#
+# Hit the github API for commit hostory records, then filter by 'jq'
+#
+execute:
+    command: jq
+    args: ["[.[] | {message: .commit.message, name: .commit.committer.name}]"]
+    request-type: json
+    response-type: json
+    request:
+        execute:
+            command: curl
+            args: ["https://api.github.com/repos/birchb1024/goyamp/commits?per_page=3"]
+            response-type: json
+        

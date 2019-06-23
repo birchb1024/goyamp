@@ -1034,7 +1034,261 @@ _: /usr/bin/python
 
 === Executing External Programs with `execute:`
 
-TODO
+The `execute` builtin runs subprocesses and sends data to and from them. The syntax has two forms, the first takes a string argument: 
+
+[source, yaml]
+----
+execute: <command string>
+----
+
+The result is expanded as a string.  
+
+The second form allows full control over the execution:
+
+[source, yaml]
+----
+execute:
+	command: <path to executable>
+	args: <a sequence of strings>
+	environment: < a map of strings containing an environment for the process> 
+	directory: <a path string>
+	response-type: "string"|"lines"|"json"|"yaml"
+	request-type: "string"|"lines"|"json"|"yaml"
+	request: <any yaml>
+----
+
+After execution, the stdout of the process is returned as the result without further processing. 
+
+Each argument is used as follows
+
+*command*
+
+This is the name of the file to be run, which should on the `$PATH` or be an absolute path.
+
+*args*
+
+These are the command-line arguments in a seqence of strings. 
+
+*environment*
+
+By default, the environment of the subprocess is inherited from the goyamp process. The environment variables for the command can be set with `environment`. 
+When provided, a new empty environment is created, overriding the parent process environment. For example
+
+[source, yaml]
+----
+execute:
+    command: some-script.sh
+    environment:
+        USER: fakeuser
+        PATH: /sbin
+----
+
+To _add_ to the environment use `merge:`
+
+[source, yaml]
+----
+execute:
+    command: <path to executable>
+    args: <a sequence of strings>
+    environment:
+        merge:
+            - env
+            - MYVARIABLE: 1
+              MYOTHERONE: 2
+----
+ 
+*directory*
+
+The command is run from the directory specified. The default is the users's current directory. Example:
+
+[source, yaml]
+----
+execute:
+    command: cat
+    directory: "{{__DIR__}}/../test/fixtures"
+    args: [ blade-runner.json ]
+    response-type: json
+----
+
+*response-type*
+
+When the process runs, output is sent to it's standard output, we'll call that the 'response'. Goyamp reads the response and parses it. `response-type` specifies how goyamp should handle the response from the sub-process. The default is `lines`. The values are:
+
+* `string` - all the response is returned as a single string. Useful for programs like`date`,
+* `lines` - a sequence is returned, containing one item for each line of the response,
+* `json` - the response is expected to be JSON, it is parsed and returned,
+* `yaml` - the response is YAML, the first 'document' in the response is parsed and returned.
+
+*request-type*
+
+Before the process runs, goyamp serialises the `request` data ready to send on the standard input. We'call this data the 'request'.  `request-type` specifies how goyamp should print the data. The default is `lines`, the options are:
+
+* `string` - the request is serialised as a single string. Useful for programs like 'bash' which can execute a multi-line string. This provides a way to embed scripts in goyamp files.
+* `lines` - a sequence is expected, each item is printed on a seperate line. 
+* `json` - the request is converted to JSON,
+* `yaml` - the request is converted to YAML.
+
+
+==== Examples of `execute:`
+===== Examples of `response-type`s 
+_string_
+
+[source, shell]
+----
+$ echo '{execute: {command: date, args: [+%d.%m.%Y], response-type: string}}' | ./goyamp
+---
+23.06.2019
+----
+
+_lines_ here we get a sequence of ip addresses:
+
+[source, YAML]
+----
+execute:
+    command: bash
+    request-type: string
+    request: nmap -n -sL 192.168.0.0/30 | grep 'Nmap scan report for' | awk '{print $5}'
+    response-type: lines
+----
+
+Which produces:
+
+[source, YAML]
+----
+- 192.168.0.0
+- 192.168.0.1
+- 192.168.0.2
+- 192.168.0.3
+----
+
+_json_ in this example we extract information about the CPUS on the machine
+
+[source, YAML]
+----
+execute:
+    command: facter
+    args: [--json, processors]
+    response-type: json
+----
+
+Produces:
+
+[source, YAML]
+----
+processors:
+  count: 2
+  models:
+  - Intel(R) Core(TM)2 Duo CPU     P8400  @ 2.26GHz
+  - Intel(R) Core(TM)2 Duo CPU     P8400  @ 2.26GHz
+  physicalcount: 1
+----
+
+_yaml_ example:
+
+[source, YAML]
+----
+execute:
+    command: cat
+    directory: $fixtures
+    args: [ variety.yaml ]
+    response-type: yaml
+----
+
+===== Examples of `response-type`s 
+
+_string_ Here's a multipline Python script to print a list of dates embedded in YAML
+
+[source, YAML]
+----
+execute:
+    command: python
+    response-type: lines
+    request-type: string
+    request: |
+        from datetime import timedelta, date
+        
+        def daterange(start_date, end_date):
+            for n in range(int ((end_date - start_date).days)):
+                yield start_date + timedelta(n)
+        
+        start_date = date(2019, 1, 1)
+        end_date = date(2019, 1, 5)
+        for single_date in daterange(start_date, end_date):
+            print single_date.strftime("%Y-%m-%d")
+----
+
+Produces:
+
+[source, YAML]
+----
+- "2019-01-01"
+- "2019-01-02"
+- "2019-01-03"
+- "2019-01-04"
+----
+
+_lines_ Here we sort a list of hostnames in a sequence, and get that back as a sequence:
+
+[source, YAML]
+----
+defmacro:
+    name: $sort
+    args: $items
+    value:    
+        execute:
+            command: sort
+            response-type: lines
+            request-type: lines
+            request: $items
+---
+$sort:
+    - ip-12-34-56-78.us-west-2.compute.internal
+    - ec2-12-43-56-78.ap-southeast-2.compute.amazonaws.com
+    - ip-12-34-56-78.us-east-2.compute.internal
+    - ip-12-34-65-99.us-west-2.compute.internal
+    - ec2-12-34-56-78.ap-southeast-2.compute.amazonaws.com
+----
+
+Produces:
+
+[source, YAML]
+----
+- ec2-12-34-56-78.ap-southeast-2.compute.amazonaws.com
+- ec2-12-43-56-78.ap-southeast-2.compute.amazonaws.com
+- ip-12-34-56-78.us-east-2.compute.internal
+- ip-12-34-56-78.us-west-2.compute.internal
+- ip-12-34-65-99.us-west-2.compute.internal
+----
+
+_json_ In this example we use curl to get JSON data from the GitHub API - a set of commit messages. 
+Then we send the data as JSON to 'jq' which filters it. 
+
+[source, YAML]
+----
+execute:
+    command: jq
+    args: ["[.[] | {message: .commit.message, name: .commit.committer.name}]"]
+    request-type: json
+    response-type: json
+    request:
+        execute:
+            command: curl
+            args: ["https://api.github.com/repos/birchb1024/goyamp/commits?per_page=3"]
+            response-type: json
+----
+
+Produces:
+
+[source, YAML]
+----
+- message: Add execute. Change from __PATH__ to __DIR__. Add pwd as __DIR__
+  name: Peter William Birch
+- message: Additions to execute (still in progress)
+  name: Peter William Birch
+- message: Add Stringer() to yamly. Fail on undefined in {{}}
+  name: Bill Birch
+----
+
 
 === Builtin Variables
 
@@ -1054,8 +1308,35 @@ Goyamp automatically populates some variables as it executes. These are:
 
 == Using the Goyamp Go Module
 
-TODO
 
+The goymap Go module can be used as a component to other programs. The 'main' of goyamp itself uses the modules API and can be used as an example. Here is a simplified version:
+
+[source, Go]
+----
+
+    // Import the module
+    import (
+    	"github.com/birchb1024/goyamp"
+    )
+
+    // Create an instance of the macro-processor engine
+    // providing a list of command arguments, an environment, an output writer and an output format flag. 
+    
+    engine := goyamp.NewExpander(commandArgs, os.Environ(), os.Stdout, outFormat)
+
+    // either process a stream, giving a Reader
+    err := engine.ExpandStream(os.Stdin, "-") 
+    if err != nil {
+            panic(err)
+    }
+
+    // or process a file
+    err := engine.ExpandFile("examples/macros.yaml")
+    if err != nil {
+            panic(err)
+    }
+
+----
 == Maintenance of Goyamp
 
 === Build from Source

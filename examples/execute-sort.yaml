@@ -1,0 +1,16 @@
+defmacro:
+    name: $sort
+    args: $items
+    value:    
+        execute:
+            command: sort
+            response-type: lines
+            request-type: lines
+            request: $items
+---
+$sort:
+    - ip-12-34-56-78.us-west-2.compute.internal
+    - ec2-12-43-56-78.ap-southeast-2.compute.amazonaws.com
+    - ip-12-34-56-78.us-east-2.compute.internal
+    - ip-12-34-65-99.us-west-2.compute.internal
+    - ec2-12-34-56-78.ap-southeast-2.compute.amazonaws.com

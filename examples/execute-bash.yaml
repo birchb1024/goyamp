@@ -1,0 +1,22 @@
+#
+# Send a script to the shell for execution
+#
+execute:
+    command: bash
+    request-type: string
+    request: nmap -n -sL 192.168.0.0/30 | grep 'Nmap scan report for' | awk '{print $5}'
+    response-type: lines
+---
+define: 
+    $ip-addresses:
+        execute:
+            command: bash
+            request-type: string
+            request: nmap -n -sL 192.168.0.0/29 | grep 'Nmap scan report for' | awk '{print $5}'
+            response-type: lines
+---
+repeat:
+    for: $ip
+    in: $ip-addresses
+    body: "Configure {{$ip}} ..." 
+        
