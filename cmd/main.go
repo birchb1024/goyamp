@@ -95,9 +95,9 @@ func main() {
 	}
 	if err != nil {
 		if debugFlag {
-			fmt.Printf("Error: %+v\n", err)
+			fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
 			return
 		}
-		fmt.Printf("Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 	}
 }
