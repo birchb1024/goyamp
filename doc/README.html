@@ -735,8 +735,8 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.2.2-1-gc1d1903,</span>
-<span id="revdate">23.06.2019</span>
+<span id="revnumber">version 0.2.3-1-g48b32ed,</span>
+<span id="revdate">27.09.2019</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -785,7 +785,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">2</span>-<span style="color: #993399">1</span>-gc1d1903/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">3</span>-<span style="color: #993399">1</span>-g48b32ed/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -802,7 +802,7 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$ goyamp <span style="color: #990000">[</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-output json<span style="color: #990000">]</span> <span style="color: #990000">&lt;</span>myinputfile<span style="color: #990000">&gt;</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
-<div class="paragraph"><p>The <code>-debug</code> option causes Goyamp to trace its internal execution on stderr.</p></div>
+<div class="paragraph"><p>The <code>-debug</code> option causes Goyamp to trace its internal execution on stderr and print a backtrace on errors.</p></div>
 <div class="paragraph"><p>Put your first Goyamp file in <code>hello.yaml</code>:</p></div>
 <div class="listingblock">
 <div class="title">hello.yaml</div>
@@ -2156,13 +2156,14 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #009900">assert_equal</span><span style="color: #990000">:</span>
 <span style="color: #990000">    </span><span style="color: #009900">p1</span><span style="color: #990000">:</span> <span style="color: #993399">12</span>
 <span style="color: #990000">    </span><span style="color: #009900">p2</span><span style="color: #990000">:</span> <span style="color: #993399">23</span></tt></pre></div></div>
-<div class="paragraph"><p>Produces this on stderr: (with a Go backtrace)</p></div>
+<div class="paragraph"><p>Produces this on stderr:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>panic<span style="color: #990000">:</span> ASSERT FAILED <span style="color: #993399">12</span> <span style="color: #990000">!=</span> <span style="color: #993399">23</span> { assert_equal <span style="color: #990000">:</span> { p1 <span style="color: #990000">:</span> <span style="color: #993399">12</span> <span style="color: #990000">,</span> p2 <span style="color: #990000">:</span> <span style="color: #993399">23</span>  }  }</tt></pre></div></div>
+<div class="paragraph"><p>With the <code>-d</code> command-line option, a backtrace is also printed.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_builtin_variables">Builtin Variables</h3>
@@ -2266,9 +2267,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.2.2-1-gc1d1903<br />
+Version 0.2.3-1-g48b32ed<br />
 Last updated
- 2019-06-23 21:02:09 AEST
+ 2019-09-27 16:01:07 AEST
 </div>
 </div>
 </body>

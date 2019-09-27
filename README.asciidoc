@@ -53,7 +53,7 @@ The program  is run from the command-line giving the input file to parse as the 
 $ goyamp [-help] [-debug] [-output json] <myinputfile> [arg1..argn]
 ----
 
-The `-debug` option causes Goyamp to trace its internal execution on stderr.
+The `-debug` option causes Goyamp to trace its internal execution on stderr and print a backtrace on errors.
 
 Put your first Goyamp file in `hello.yaml`:
 
@@ -1318,7 +1318,7 @@ Produces this on stderr:
 panic: ASSERT FAILED 12 != 23 { assert_equal : { p1 : 12 , p2 : 23  }  }
 ----
 
-With the `-d` commnd-line option, a backtrace is also printed.
+With the `-d` command-line option, a backtrace is also printed.
 
 === Builtin Variables
 
