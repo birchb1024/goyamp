@@ -1311,12 +1311,14 @@ assert_equal:
     p2: 23
 ----
 
-Produces this on stderr: (with a Go backtrace)
+Produces this on stderr: 
 
 [source, shell]
 ----
 panic: ASSERT FAILED 12 != 23 { assert_equal : { p1 : 12 , p2 : 23  }  }
 ----
+
+With the `-d` commnd-line option, a backtrace is also printed.
 
 === Builtin Variables
 

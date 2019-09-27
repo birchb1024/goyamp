@@ -94,6 +94,10 @@ func main() {
 		err = engine.ExpandFile(flag.Arg(0))
 	}
 	if err != nil {
-		panic(fmt.Sprintf("error: %v", err))
+		if debugFlag {
+			fmt.Printf("Error: %+v\n", err)
+			return
+		}
+		fmt.Printf("Error: %v\n", err)
 	}
 }

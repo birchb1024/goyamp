@@ -76,7 +76,7 @@ func defmacroBuiltin(tree mapy, args yamly, bindin *env) yamly {
 	}
 	argst, ok := args.(mapy)
 	if !ok {
-		panic("Syntax error defmacro expected a map, got %v")
+		panic(fmt.Sprintf("Syntax error defmacro expected a map, got %v", args))
 	}
 	macroName, ok := argst[stringy("name")]
 	if !ok {

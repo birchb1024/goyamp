@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -59,15 +60,23 @@ func NewExpander(commandArgs []string, environment []string, ow io.Writer, forma
 }
 
 // ExpandStream reads a stream of YAML and expands it.
-func (engine *Expander) ExpandStream(input io.Reader, filename string) error {
-
+func (engine *Expander) ExpandStream(input io.Reader, filename string) (err error) {
+	defer func() {
+	  if r := recover(); r != nil {
+	    err = errors.New(fmt.Sprintf("%+v", r))
+	  }
+	}()
 	engine.globals.bind["__FILE__"] = stringy(filename)
 	return expandStream(input, filename, engine.globals)
 }
 
 // ExpandFile reads a file of YAML given a path
-func (engine *Expander) ExpandFile(filename string) error {
-
+func (engine *Expander) ExpandFile(filename string) (err error) {
+	defer func() {
+	  if r := recover(); r != nil {
+	    err = errors.New(fmt.Sprintf("%+v", r))
+	  }
+	}()
 	engine.globals.bind["__FILE__"] = stringy(filename)
 	return expandFile(filename, engine.globals)
 }
