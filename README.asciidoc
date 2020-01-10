@@ -50,7 +50,7 @@ The program  is run from the command-line giving the input file to parse as the 
 .Usage
 [source,bash]
 ----
-$ goyamp [-help] [-debug] [-output json] <myinputfile> [arg1..argn]
+$ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json|lines] [Filename | - ] [arg1..argn]
 ----
 
 The `-debug` option causes Goyamp to trace its internal execution on stderr and print a backtrace on errors.
@@ -199,18 +199,18 @@ The command to run Goyamp is a single binary executable filename followed by opt
 .Usage
 [source,bash]
 ----
-$ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json] [Filename | - ] [arg1..argn]
+$ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json|lines] [Filename | - ] [arg1..argn]
 ----
 
-If the filename is the minus sign `-` or if there are no arguements, Goamp reads YAML from the standard input, so it serves as a filter. As in
+If the filename is the minus sign `-` or if there are no arguments, Goamp reads YAML from the standard input, so it serves as a filter. As in
 
 [source,bash]
 ----
-$ echo "[define: {data: {load: test/fixtures/blade-runner.json}}, data.director]" | goyamp 
+$ echo "[define: {data: {load: test/fixtures/blade-runner.json}}, data.directory]" | goyamp 
 - ' Ridley Scott'
 ----
 
-If the -output option is given, this specifies the output format required. The default is YAML. When `json` is selected , JSON is output subject to the constraints mentioned above.
+If the -output option is given, this specifies the output format required. The default is YAML. When `json` is selected , JSON is output subject to the constraints mentioned above. When `lines` is selected, any top level list is printed with no surrounding syntax. Top-level map objects are printed in JSON format on one line. 'line' mode suits downstream Unix programs which expect simple lines, we use it to generate `bash` scripts or data for `awk`.
 
 ==== File Suffixes
 
