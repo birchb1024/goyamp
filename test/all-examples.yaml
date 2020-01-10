@@ -33,6 +33,7 @@ include:
   - ../examples/repeat.yaml
   - ../examples/repeat02.yaml
   - ../examples/repeat-list-keys.yaml
+  - ../examples/repeat-map.yaml
   - ../examples/replace.yaml
   - ../examples/template01.gocd.yaml
   - ../examples/undefine.yaml

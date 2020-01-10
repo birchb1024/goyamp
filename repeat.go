@@ -3,6 +3,7 @@ package goyamp
 import (
 	"fmt"
 	"log"
+	"sort"
 )
 
 func repeatMap(tree yamly, forvariablename stringy, keyvar yamly, rangeList seqy, body yamly, bindings *env) yamly {
@@ -67,9 +68,19 @@ func repeatBuiltin(tree mapy, args yamly, bindings *env) yamly {
 
 	inClause, ok := treemap[stringy("in")]
 	rangein := inClause.expand(bindings)
-	rangeinList, ok := rangein.(seqy)
-	if !ok {
-		panic(fmt.Sprintf("Syntax error in repeat 'in' is not a seqeunce, got %#v in %v", rangein, tree))
+	rangeinList := seqy{}
+	switch item := rangein.(type) {
+	case seqy:
+		rangeinList = item
+	case mapy:
+		// Convert to sorted list of keys
+		rangeinList = make([]yamly, 0, len(item))
+		for k := range item {
+			rangeinList = append(rangeinList, k)
+		}
+		sort.Sort(rangeinList)
+	default:
+		panic(fmt.Sprintf("Syntax error in repeat 'in' is not a map or sequence, got %#v in %v", rangein, tree))
 	}
 
 	body, ok := treemap[stringy("body")]
