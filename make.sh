@@ -27,6 +27,6 @@ if [[ "${args}" == "package" ]]
 then
     mkdir -p pkg
     buildDocs
-    tar zcvf pkg/goyamp-${version}.tgz ./goyamp ./goyamp.exe doc/README.html
+    tar zcvf pkg/goyamp-${version}.tgz ./goyamp ./goyamp.exe doc/README.html examples
 	exit
 fi
