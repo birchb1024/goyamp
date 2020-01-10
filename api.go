@@ -2,9 +2,9 @@ package goyamp
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"io"
 	"os"
-	"github.com/pkg/errors"
 	"strings"
 )
 
@@ -43,6 +43,7 @@ type Syntax int
 const (
 	YAML Syntax = iota + 0
 	JSON
+	LINES
 )
 
 //
@@ -62,9 +63,9 @@ func NewExpander(commandArgs []string, environment []string, ow io.Writer, forma
 // ExpandStream reads a stream of YAML and expands it.
 func (engine *Expander) ExpandStream(input io.Reader, filename string) (err error) {
 	defer func() {
-	  if r := recover(); r != nil {
-	    err = errors.New(fmt.Sprintf("%+v", r))
-	  }
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("%+v", r))
+		}
 	}()
 	engine.globals.bind["__FILE__"] = stringy(filename)
 	return expandStream(input, filename, engine.globals)
@@ -73,9 +74,9 @@ func (engine *Expander) ExpandStream(input io.Reader, filename string) (err erro
 // ExpandFile reads a file of YAML given a path
 func (engine *Expander) ExpandFile(filename string) (err error) {
 	defer func() {
-	  if r := recover(); r != nil {
-	    err = errors.New(fmt.Sprintf("%+v", r))
-	  }
+		if r := recover(); r != nil {
+			err = errors.New(fmt.Sprintf("%+v", r))
+		}
 	}()
 	engine.globals.bind["__FILE__"] = stringy(filename)
 	return expandFile(filename, engine.globals)

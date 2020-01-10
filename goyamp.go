@@ -730,6 +730,16 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 			if err != nil {
 				return err
 			}
+		} else if bindings.engine.outFormat == LINES {
+			switch s := expanded.(type) {
+			case seqy:
+				for _, item := range s {
+					fmt.Println(item.String())
+				}
+			default:
+				fmt.Println(s.String())
+			}
+
 		} else {
 			jsonTree := expanded.declassify(JSON)
 			jenc := json.NewEncoder(bindings.engine.output)

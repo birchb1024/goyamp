@@ -1,13 +1,13 @@
 package goyamp
 
 import (
-	"os"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"io"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 )

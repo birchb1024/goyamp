@@ -17,19 +17,19 @@ func helpText(out io.Writer, doOrNotDo bool) {
 	usage := `
 USAGE:
 
- $ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json] [Filename | - ] [arg1..argn]
+ $ goyamp [-d|-debug] [-h|-help] [-o|-output yaml|json|lines] [Filename | - ] [arg1..argn]
 
 	-
 	Filename:    If the filename is the minus sign '-' or if there are no arguments, Goamp reads YAML from the standard input. 
-	
+
 	arg1-argn:   are passed to the processor in the 'argv' variable.
-	
+
 	-o
-	-output:     If the -output option specifies the output format required. The options are yaml or json. the default is YAML.
-	
+	-output:     If the -output option specifies the output format required. The options are yaml, json or lines. the default is YAML.
+
 	-d
 	-debug:      prints a trace of internal execution.
-	
+
 	-h
 	-help:       Prints this text.
 `
@@ -51,8 +51,8 @@ func main() {
 		switchString string
 		defaul string
 		description string
-		}{ "output", "yaml", "output format: json"}
-		
+		}{ "output", "yaml", "output format: json/yaml/lines"}
+
 	flag.StringVar(&outputFormatVar, string(odf.switchString[0]), odf.defaul, odf.description)
 	flag.StringVar(&outputFormatVar, odf.switchString, odf.defaul, odf.description)
 
@@ -62,12 +62,14 @@ func main() {
 	flag.Parse()
 	helpText(os.Stderr, help)
 
-	outFormat := goyamp.YAML 
+	outFormat := goyamp.YAML
 	switch outputFormatVar {
-	case "json": 
+	case "json":
 		outFormat = goyamp.JSON
-	case "yaml": 
+	case "yaml":
 		outFormat = goyamp.YAML
+	case "lines":
+		outFormat = goyamp.LINES
 	default:
 		log.Fatalf("error: unknown output syntax '%v'", outputFormatVar)
 	}
