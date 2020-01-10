@@ -1,11 +1,15 @@
 #
-# Get Aussis weather data - first record
+# Get Aussie weather data - first record
 #
-define: 
+define:
     $weather:
         execute:
             command: curl
             args: [http://www.bom.gov.au/fwo/IDV60901/IDV60901.95936.json]
             response-type: json
 ---
-$weather.observations.data.0
+repeat:
+  for: $atom
+  in: [name, local_date_time, air_temp, gust_kmh, press_msl]
+  body:
+    '{{ $atom }} = {{ $weather.observations.data.0.$atom }}'
