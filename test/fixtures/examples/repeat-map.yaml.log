@@ -1,5 +1,0 @@
----
-- key = a, value = 1
-- key = b, value = 2
-- key = c, value = [ 1, 2 ]
-- 'key = d, value = { d1 : fu , d2 : bar  }'

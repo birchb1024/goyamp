@@ -84,7 +84,6 @@ func TestNormalExamples(t *testing.T) {
                 "repeat02.yaml",
                 "repeat-list-keys.yaml",
                 "repeat.yaml",
-                "repeat-map.yaml",
                 "replace.yaml",
                 "rookout.yaml",
                 "template01.gocd.yaml",
