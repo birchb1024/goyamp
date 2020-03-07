@@ -557,6 +557,32 @@ As above, macro calls are just maps with a particular structure:
    <argN> : <arg N value>
 ----
 
+==== Macros with no arguments
+
+You can define macros with no arguments at all. Macros can be shorthand for expressions where you compose variables together, run conditions or other processing. The macro has access to all variables in scope where it was defined. For example here is a macro to concatenete variables to make a URL. In this example the macro uses the global (top-level) variables 'base-url' and 'module'.  
+
+Example:
+
+[source,YAML]
+----
+# Definition
+- defmacro:
+    name: api-url
+    value: "{{base-url}}/{{module}}/list"
+---
+# Call
+api-get:
+  url: {api-url: } # must have a space after the ':' !
+----
+
+Produces
+
+[source,YAML]
+----
+- api-get:
+    url: https://foo.org/api/users/list
+----
+
 ==== Macros with variable arguments
 
 If the arguments in the definition are specified as a string, not a list, the string is the single argument. All the actual arguments at call-time are collected and bound to the variable in a map.

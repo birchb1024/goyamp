@@ -1,0 +1,6 @@
+---
+- https://foo.org/api/users/list
+- api-get:
+    url: https://foo.org/api/users/list
+---
+- https://bar.com/api/users/list

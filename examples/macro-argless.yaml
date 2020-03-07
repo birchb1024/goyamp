@@ -1,0 +1,28 @@
+#
+# Macro without arguments can access variables in the scope where the macro was defined
+#
+# use globals
+#
+- define:
+    base-url: https://foo.org/api
+    module: 'users'
+- defmacro:
+    name: api-url
+    value: "{{base-url}}/{{module}}/list"
+- {api-url: } # ==> https://foo.org/api/users/list
+- api-get:
+    url: {api-url: } # must have a space after the ':' !
+---
+#
+# define within a lexical scope, this time it uses the base-url of the some-context macro, but the global module
+#
+defmacro:
+  name: some-context
+  args: base-url
+  value: 
+      - defmacro:
+          name: api-url
+          value: "{{base-url}}/{{module}}/list"
+      - {api-url: }
+---
+{some-context: https://bar.com/api} # ==> - https://bar.com/api/users/list

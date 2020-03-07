@@ -26,6 +26,7 @@ include:
   - ../examples/includes.yaml
   - ../examples/loader.yaml
   - ../examples/macros.yaml
+  - ../examples/macro-argless.yaml
   - ../examples/multi_define.yaml
   - ../examples/quote.yaml
   - ../examples/readme.yaml

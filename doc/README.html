@@ -735,8 +735,8 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.2.3-1-g48b32ed,</span>
-<span id="revdate">27.09.2019</span>
+<span id="revnumber">version 0.2.3-8-gc4d304e,</span>
+<span id="revdate">07.03.2020</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -785,7 +785,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">3</span>-<span style="color: #993399">1</span>-g48b32ed/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">3</span>-<span style="color: #993399">8</span>-gc4d304e/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -801,7 +801,7 @@ $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ goyamp <span style="color: #990000">[</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-output json<span style="color: #990000">]</span> <span style="color: #990000">&lt;</span>myinputfile<span style="color: #990000">&gt;</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+<pre><tt>$ goyamp <span style="color: #990000">[</span>-d<span style="color: #990000">|</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-h<span style="color: #990000">|</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-o<span style="color: #990000">|</span>-output yaml<span style="color: #990000">|</span>json<span style="color: #990000">|</span>lines<span style="color: #990000">]</span> <span style="color: #990000">[</span>Filename <span style="color: #990000">|</span> - <span style="color: #990000">]</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
 <div class="paragraph"><p>The <code>-debug</code> option causes Goyamp to trace its internal execution on stderr and print a backtrace on errors.</p></div>
 <div class="paragraph"><p>Put your first Goyamp file in <code>hello.yaml</code>:</p></div>
 <div class="listingblock">
@@ -986,16 +986,16 @@ a macro call - block style
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ goyamp <span style="color: #990000">[</span>-d<span style="color: #990000">|</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-h<span style="color: #990000">|</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-o<span style="color: #990000">|</span>-output yaml<span style="color: #990000">|</span>json<span style="color: #990000">]</span> <span style="color: #990000">[</span>Filename <span style="color: #990000">|</span> - <span style="color: #990000">]</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
-<div class="paragraph"><p>If the filename is the minus sign <code>-</code> or if there are no arguements, Goamp reads YAML from the standard input, so it serves as a filter. As in</p></div>
+<pre><tt>$ goyamp <span style="color: #990000">[</span>-d<span style="color: #990000">|</span>-debug<span style="color: #990000">]</span> <span style="color: #990000">[</span>-h<span style="color: #990000">|</span>-help<span style="color: #990000">]</span> <span style="color: #990000">[</span>-o<span style="color: #990000">|</span>-output yaml<span style="color: #990000">|</span>json<span style="color: #990000">|</span>lines<span style="color: #990000">]</span> <span style="color: #990000">[</span>Filename <span style="color: #990000">|</span> - <span style="color: #990000">]</span> <span style="color: #990000">[</span>arg1<span style="color: #990000">..</span>argn<span style="color: #990000">]</span></tt></pre></div></div>
+<div class="paragraph"><p>If the filename is the minus sign <code>-</code> or if there are no arguments, Goamp reads YAML from the standard input, so it serves as a filter. As in</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ echo <span style="color: #FF0000">"[define: {data: {load: test/fixtures/blade-runner.json}}, data.director]"</span> <span style="color: #990000">|</span> goyamp
+<pre><tt>$ echo <span style="color: #FF0000">"[define: {data: {load: test/fixtures/blade-runner.json}}, data.directory]"</span> <span style="color: #990000">|</span> goyamp
 - <span style="color: #FF0000">' Ridley Scott'</span></tt></pre></div></div>
-<div class="paragraph"><p>If the -output option is given, this specifies the output format required. The default is YAML. When <code>json</code> is selected , JSON is output subject to the constraints mentioned above.</p></div>
+<div class="paragraph"><p>If the -output option is given, this specifies the output format required. The default is YAML. When <code>json</code> is selected , JSON is output subject to the constraints mentioned above. When <code>lines</code> is selected, any top level list is printed with no surrounding syntax. Top-level map objects are printed in JSON format on one line. <em>line</em> mode suits downstream Unix programs which expect simple lines, we use it to generate <code>bash</code> scripts or data for <code>awk</code>.</p></div>
 <div class="sect3">
 <h4 id="_file_suffixes">File Suffixes</h4>
 <div class="paragraph"><p>Any file suffix can be used - it is assumed to be YAML/JSON.</p></div>
@@ -1356,6 +1356,32 @@ http://www.gnu.org/software/src-highlite -->
    &lt;arg1&gt; : &lt;arg <span style="color: #993399">1</span> value&gt;
    ...
    &lt;argN&gt; : &lt;arg N value&gt;</tt></pre></div></div>
+</div>
+<div class="sect3">
+<h4 id="_macros_with_no_arguments">Macros with no arguments</h4>
+<div class="paragraph"><p>You can define macros with no arguments at all. Macros can be shorthand for expressions where you compose variables together, run conditions or other processing. The macro has access to all variables in scope where it was defined. For example here is a macro to concatenete variables to make a URL. In this example the macro uses the global (top-level) variables <em>base-url</em> and <em>module</em>.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="font-style: italic"><span style="color: #9A1900"># Definition</span></span>
+<span style="color: #990000">- </span><span style="color: #009900">defmacro</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">name</span><span style="color: #990000">:</span> api-url
+<span style="color: #990000">    </span><span style="color: #009900">value</span><span style="color: #990000">:</span> <span style="color: #FF0000">"{{base-url}}/{{module}}/list"</span>
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="font-style: italic"><span style="color: #9A1900"># Call</span></span>
+api-get:
+<span style="color: #990000">  </span><span style="color: #009900">url</span><span style="color: #990000">:</span> {api-url: } <span style="font-style: italic"><span style="color: #9A1900"># must have a space after the ':' !</span></span></tt></pre></div></div>
+<div class="paragraph"><p>Produces</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> api-get:
+<span style="color: #990000">    </span><span style="color: #009900">url</span><span style="color: #990000">:</span> https://foo.org/api/users/list</tt></pre></div></div>
 </div>
 <div class="sect3">
 <h4 id="_macros_with_variable_arguments">Macros with variable arguments</h4>
@@ -2267,9 +2293,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.2.3-1-g48b32ed<br />
+Version 0.2.3-8-gc4d304e<br />
 Last updated
- 2019-09-27 16:01:07 AEST
+ 2020-03-07 17:16:56 AEDT
 </div>
 </div>
 </body>
