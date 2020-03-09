@@ -19,14 +19,6 @@ execute:
     response-type: json
 ---
 execute:
-    command: bash
-    args: [ -c , "/usr/bin/env | grep 'exectest' | sort" ]
-    environment: 
-        exectest1: 1
-        exectest2: 2
-    response-type: lines
----
-execute:
     command: cat
     directory: $fixtures
     args: [ variety.yaml ]
@@ -143,3 +135,23 @@ execute:
         - true
         - - 1
         - a: 1
+---
+execute:
+    command: bash
+    args: [ -c , "/usr/bin/env | grep 'exectest' | sort" ]
+    response-type: lines
+    environment: 
+        exectest1: 1
+        exectest2: 2
+---
+define:
+    some_int_variable1: 2342
+    some_string_variable1: Hello World
+---
+execute:
+    command: bash
+    args: [ -c , '/usr/bin/env -i - inherit1=$some_int_variable1 inherit2="$some_string_variable1" env' ]
+    response-type: lines
+    environment:
+        some_int_variable1: 2342
+        some_string_variable1: Hello World

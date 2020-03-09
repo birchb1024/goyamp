@@ -735,8 +735,8 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.2.4,</span>
-<span id="revdate">07.03.2020</span>
+<span id="revnumber">version 0.2.4-1-gc337a6e,</span>
+<span id="revdate">09.03.2020</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -785,7 +785,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">4</span>/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.2</span><span style="color: #990000">.</span><span style="color: #993399">4</span>-<span style="color: #993399">1</span>-gc337a6e/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -1896,20 +1896,18 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #009900">execute</span><span style="color: #990000">:</span>
 <span style="color: #990000">        </span><span style="color: #009900">command</span><span style="color: #990000">:</span> &lt;path to executable&gt;
 <span style="color: #990000">        </span><span style="color: #009900">args</span><span style="color: #990000">:</span> &lt;a sequence of strings&gt;
-<span style="color: #990000">        </span><span style="color: #009900">environment</span><span style="color: #990000">:</span> &lt; a map of strings containing an environment for the process&gt;
+<span style="color: #990000">        </span><span style="color: #009900">environment</span><span style="color: #990000">:</span> &lt; a map of strings containing an environment additions for the process&gt;
 <span style="color: #990000">        </span><span style="color: #009900">directory</span><span style="color: #990000">:</span> &lt;a path string&gt;
-        response-type: <span style="color: #FF0000">"string"</span>|<span style="color: #FF0000">"lines"</span>|<span style="color: #FF0000">"json"</span>|<span style="color: #FF0000">"yaml"</span>
-        request-type: <span style="color: #FF0000">"string"</span>|<span style="color: #FF0000">"lines"</span>|<span style="color: #FF0000">"json"</span>|<span style="color: #FF0000">"yaml"</span>
+        response-type: <span style="color: #FF0000">"string"</span>|<span style="color: #FF0000">"lines"</span>|<span style="color: #FF0000">"json"</span>|<span style="color: #FF0000">"yaml"</span> - default <span style="color: #FF0000">"lines"</span>
+        request-type: <span style="color: #FF0000">"string"</span>|<span style="color: #FF0000">"lines"</span>|<span style="color: #FF0000">"json"</span>|<span style="color: #FF0000">"yaml"</span> - default <span style="color: #FF0000">"lines"</span>
 <span style="color: #990000">        </span><span style="color: #009900">request</span><span style="color: #990000">:</span> &lt;any yaml&gt;</tt></pre></div></div>
-<div class="paragraph"><p>After execution, the stdout of the process is returned as the result without further processing.</p></div>
-<div class="paragraph"><p>Each argument is used as follows</p></div>
+<div class="paragraph"><p>After execution, the stdout of the process is returned as the result processed according to the response-type value. Each argument is used as follows</p></div>
 <div class="paragraph"><p><strong>command</strong></p></div>
 <div class="paragraph"><p>This is the name of the file to be run, which should on the <code>$PATH</code> or be an absolute path.</p></div>
 <div class="paragraph"><p><strong>args</strong></p></div>
 <div class="paragraph"><p>These are the command-line arguments in a seqence of strings.</p></div>
 <div class="paragraph"><p><strong>environment</strong></p></div>
-<div class="paragraph"><p>By default, the environment of the subprocess is inherited from the goyamp process. The environment variables for the command can be set with <code>environment</code>.
-When provided, a new empty environment is created, overriding the parent process environment. For example</p></div>
+<div class="paragraph"><p>By default, the environment of the subprocess is inherited from the goyamp process. Additional environment variables for the command can be set with <code>environment</code>. If the variable already exists the values overwrite existing ones.</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
@@ -1918,22 +1916,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><span style="color: #009900">execute</span><span style="color: #990000">:</span>
 <span style="color: #990000">    </span><span style="color: #009900">command</span><span style="color: #990000">:</span> some-script.sh
 <span style="color: #990000">    </span><span style="color: #009900">environment</span><span style="color: #990000">:</span>
-<span style="color: #990000">        </span><span style="color: #009900">USER</span><span style="color: #990000">:</span> fakeuser
-<span style="color: #990000">        </span><span style="color: #009900">PATH</span><span style="color: #990000">:</span> /sbin</tt></pre></div></div>
-<div class="paragraph"><p>To <em>add</em> to the environment use <code>merge:</code></p></div>
-<div class="listingblock">
-<div class="content"><!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><span style="color: #009900">execute</span><span style="color: #990000">:</span>
-<span style="color: #990000">    </span><span style="color: #009900">command</span><span style="color: #990000">:</span> &lt;path to executable&gt;
-<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> &lt;a sequence of strings&gt;
-<span style="color: #990000">    </span><span style="color: #009900">environment</span><span style="color: #990000">:</span>
-<span style="color: #990000">        </span><span style="color: #009900">merge</span><span style="color: #990000">:</span>
-<span style="color: #990000">            -</span> env
-<span style="color: #990000">            - </span><span style="color: #009900">MYVARIABLE</span><span style="color: #990000">:</span> <span style="color: #993399">1</span>
-<span style="color: #990000">              </span><span style="color: #009900">MYOTHERONE</span><span style="color: #990000">:</span> <span style="color: #993399">2</span></tt></pre></div></div>
+<span style="color: #990000">        </span><span style="color: #009900">USER</span><span style="color: #990000">:</span> overwrites old USER
+<span style="color: #990000">        </span><span style="color: #009900">X</span><span style="color: #990000">:</span> A new variable</tt></pre></div></div>
 <div class="paragraph"><p><strong>directory</strong></p></div>
 <div class="paragraph"><p>The command is run from the directory specified. The default is the users&#8217;s current directory. Example:</p></div>
 <div class="listingblock">
@@ -1996,6 +1980,34 @@ http://www.gnu.org/software/src-highlite -->
 </ul></div>
 <div class="sect3">
 <h4 id="_examples_of_code_execute_code">Examples of <code>execute:</code></h4>
+<div class="sect4">
+<h5 id="_an_empty_environment">An empty environment</h5>
+<div class="paragraph"><p>To build an empty environment use the Linux <code>env -i</code> command in a subshell. For example:</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #009900">define</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">some_int_variable1</span><span style="color: #990000">:</span> <span style="color: #993399">2342</span>
+<span style="color: #990000">    </span><span style="color: #009900">some_string_variable1</span><span style="color: #990000">:</span> Hello World
+<span style="font-weight: bold"><span style="color: #000000">---</span></span>
+<span style="color: #009900">execute</span><span style="color: #990000">:</span>
+<span style="color: #990000">    </span><span style="color: #009900">command</span><span style="color: #990000">:</span> bash
+<span style="color: #990000">    </span><span style="color: #009900">args</span><span style="color: #990000">:</span> [ -c , <span style="color: #FF0000">'/usr/bin/env -i - inherit1=$some_int_variable1 inherit2="$some_string_variable1" env'</span> ]
+    response-type: lines
+<span style="color: #990000">    </span><span style="color: #009900">environment</span><span style="color: #990000">:</span>
+<span style="color: #990000">        </span><span style="color: #009900">some_int_variable1</span><span style="color: #990000">:</span> <span style="color: #993399">2342</span>
+<span style="color: #990000">        </span><span style="color: #009900">some_string_variable1</span><span style="color: #990000">:</span> Hello World</tt></pre></div></div>
+<div class="paragraph"><p>Produces</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">-</span> inherit1=<span style="color: #993399">2342</span>
+<span style="color: #990000">-</span> inherit2=Hello World</tt></pre></div></div>
+</div>
 <div class="sect4">
 <h5 id="_examples_of_response_type_s">Examples of `response-type`s</h5>
 <div class="paragraph"><p><em>string</em></p></div>
@@ -2162,7 +2174,7 @@ http://www.gnu.org/software/src-highlite -->
 </div>
 <div class="sect2">
 <h3 id="_enforcing_safety_with_code_panic_code">Enforcing Safety with <code>panic</code></h3>
-<div class="paragraph"><p>When processing becomes more complex you may want to implent checks on input data. The <code>panic:</code> macro
+<div class="paragraph"><p>When processing becomes more complex you may want to implement checks on input data. The <code>panic:</code> macro
 halts execution and prints a message supplied. With this combined with ==: you can code a variety
 of check macros. For example here is a macro that ends processing if two things do not match:</p></div>
 <div class="listingblock">
@@ -2293,9 +2305,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.2.4<br />
+Version 0.2.4-1-gc337a6e<br />
 Last updated
- 2020-03-07 17:30:53 AEDT
+ 2020-03-09 14:46:23 AEDT
 </div>
 </div>
 </body>

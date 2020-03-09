@@ -1076,16 +1076,14 @@ The second form allows full control over the execution:
 execute:
 	command: <path to executable>
 	args: <a sequence of strings>
-	environment: < a map of strings containing an environment for the process> 
+	environment: < a map of strings containing an environment additions for the process> 
 	directory: <a path string>
-	response-type: "string"|"lines"|"json"|"yaml"
-	request-type: "string"|"lines"|"json"|"yaml"
+	response-type: "string"|"lines"|"json"|"yaml" - default "lines"
+	request-type: "string"|"lines"|"json"|"yaml" - default "lines"
 	request: <any yaml>
 ----
 
-After execution, the stdout of the process is returned as the result without further processing. 
-
-Each argument is used as follows
+After execution, the stdout of the process is returned as the result processed according to the response-type value. Each argument is used as follows
 
 *command*
 
@@ -1097,30 +1095,15 @@ These are the command-line arguments in a seqence of strings.
 
 *environment*
 
-By default, the environment of the subprocess is inherited from the goyamp process. The environment variables for the command can be set with `environment`. 
-When provided, a new empty environment is created, overriding the parent process environment. For example
+By default, the environment of the subprocess is inherited from the goyamp process. Additional environment variables for the command can be set with `environment`. If the variable already exists the values overwrite existing ones.
 
 [source, yaml]
 ----
 execute:
     command: some-script.sh
     environment:
-        USER: fakeuser
-        PATH: /sbin
-----
-
-To _add_ to the environment use `merge:`
-
-[source, yaml]
-----
-execute:
-    command: <path to executable>
-    args: <a sequence of strings>
-    environment:
-        merge:
-            - env
-            - MYVARIABLE: 1
-              MYOTHERONE: 2
+        USER: overwrites old USER
+        X: A new variable
 ----
  
 *directory*
@@ -1156,6 +1139,32 @@ Before the process runs, goyamp serialises the `request` data ready to send on t
 
 
 ==== Examples of `execute:`
+===== An empty environment
+To build an empty environment use the Linux `env -i` command in a subshell. For example:
+
+[source, yaml]
+----
+define:
+    some_int_variable1: 2342
+    some_string_variable1: Hello World
+---
+execute:
+    command: bash
+    args: [ -c , '/usr/bin/env -i - inherit1=$some_int_variable1 inherit2="$some_string_variable1" env' ]
+    response-type: lines
+    environment:
+        some_int_variable1: 2342
+        some_string_variable1: Hello World
+----
+
+Produces
+
+[source, yaml]
+----
+- inherit1=2342
+- inherit2=Hello World
+----
+
 ===== Examples of `response-type`s 
 _string_
 
@@ -1317,7 +1326,7 @@ Produces:
 
 === Enforcing Safety with `panic`
 
-When processing becomes more complex you may want to implent checks on input data. The `panic:` macro 
+When processing becomes more complex you may want to implement checks on input data. The `panic:` macro 
 halts execution and prints a message supplied. With this combined with ==: you can code a variety
 of check macros. For example here is a macro that ends processing if two things do not match:  
 

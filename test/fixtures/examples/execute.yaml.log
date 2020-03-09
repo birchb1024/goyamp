@@ -57,9 +57,6 @@ writer:
 - Philip K. Dick
 year: 1982
 ---
-- exectest1=1
-- exectest2=2
----
 map keys:
   true: Bool
   1: Integer
@@ -154,3 +151,9 @@ sequence:
 - true
 - - 1
 - a: 1
+---
+- exectest1=1
+- exectest2=2
+---
+- inherit1=2342
+- inherit2=Hello World
