@@ -150,7 +150,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	log.Printf("execute: '%#v'", cmd)
 	if err != nil {
 		if err, ok := err.(*exec.ExitError); ok {
-			panic(fmt.Sprintf("%v %v", err.Error(), string(err.Stderr)))
+			panic(fmt.Sprintf("%v %v %v %v", err.Error(), string(err.Stderr), command, arguments))
 		}
 		panic(err)
 	}

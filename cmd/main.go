@@ -53,6 +53,7 @@ func main() {
 		description string
 		}{ "output", "yaml", "output format: json/yaml/lines"}
 
+	
 	flag.StringVar(&outputFormatVar, string(odf.switchString[0]), odf.defaul, odf.description)
 	flag.StringVar(&outputFormatVar, odf.switchString, odf.defaul, odf.description)
 
@@ -101,6 +102,6 @@ func main() {
 			format = "Error: %+v\n"
 		}
 		fmt.Fprintf(os.Stderr, format, err)
-		os.Exit(2)
+		panic(2)
 	}
 }
