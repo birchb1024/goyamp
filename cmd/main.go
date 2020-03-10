@@ -96,10 +96,11 @@ func main() {
 		err = engine.ExpandFile(flag.Arg(0))
 	}
 	if err != nil {
+		format := "Error: %v\n"
 		if debugFlag {
-			fmt.Fprintf(os.Stderr, "Error: %+v\n", err)
-			return
+			format = "Error: %+v\n"
 		}
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		fmt.Fprintf(os.Stderr, format, err)
+		os.Exit(2)
 	}
 }

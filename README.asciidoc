@@ -1060,7 +1060,8 @@ _: /usr/bin/python
 
 === Executing External Programs with `execute:`
 
-The `execute` builtin runs subprocesses and sends data to and from them. The syntax has two forms, the first takes a string argument: 
+The `execute` builtin runs subprocesses and sends data to and from them. The syntax has two forms, 
+the first takes a string argument: 
 
 [source, yaml]
 ----
@@ -1083,7 +1084,10 @@ execute:
 	request: <any yaml>
 ----
 
-After execution, the stdout of the process is returned as the result processed according to the response-type value. Each argument is used as follows
+After execution, the stdout of the process is returned as the result processed according to the response-type value. If there is
+an error during execution the goyamp process stops with status '2'.
+
+Each argument is used as follows
 
 *command*
 
