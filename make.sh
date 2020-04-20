@@ -22,6 +22,7 @@ fi
 go build -o goyamp -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 (cd test; go test -args $*)
 GOOS=windows GOARCH=amd64 go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
+GOOS=darwin GOARCH=amd64 go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 
 if [[ "${args}" == "package" ]]
 then
