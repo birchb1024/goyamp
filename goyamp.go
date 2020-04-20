@@ -18,6 +18,9 @@ import (
 //
 // Version provides the Git version tag used in the build of the binary
 var Version string
+var documentCount int
+
+
 
 //
 //
@@ -289,6 +292,7 @@ var interpolateRegex *regexp.Regexp
 func init() {
 	interpolateRegex = regexp.MustCompile(`{{[^{]*}}`)
 	log.SetFlags(log.Lshortfile)
+	documentCount = 0
 }
 
 func interpolate(tree yamly, bindings *env) yamly {
@@ -713,19 +717,37 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 		}
 		ya := classify(doc)
 		expanded := ya.expand(bindings)
+		// fmt.Println(expanded)
 		if _, eok := expanded.(empty); eok {
 			log.Printf("expandSteam: doc is empty\n")
+			if documentCount > 0 { documentCount++ }
+			continue
+		}
+		if _, eok := expanded.(nily); eok {
+			log.Printf("expandSteam: doc is nil\n")
+			if documentCount > 0 { documentCount++ }
 			continue
 		}
 		if array, ok := expanded.(seqy); ok {
 			if len(array) == 0 {
+				log.Printf("expandSteam: doc is empty list\n")
+				if documentCount > 0 { documentCount++ }
+				continue
+			}
+		}
+		if mapz, ok := expanded.(mapy); ok {
+			if len(mapz) == 0 {
+				log.Printf("expandSteam: doc is empty map\n")
+				if documentCount > 0 { documentCount++ }
 				continue
 			}
 		}
 		if bindings.engine.outFormat == YAML {
 			enc := yaml.NewEncoder(bindings.engine.output)
 			enc.SetIndent(2)
-			fmt.Fprintln(bindings.engine.output, "---")
+			if documentCount > 0 {
+				fmt.Fprintln(bindings.engine.output, "---")
+			}
 			err = enc.Encode(expanded.declassify())
 			if err != nil {
 				return err
@@ -750,5 +772,6 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 				return err
 			}
 		}
+		documentCount++
 	}
 }
