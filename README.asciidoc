@@ -1367,13 +1367,13 @@ Goyamp automatically populates some variables as it executes. These are:
 
 * `argv` - the command line arguments
 
-* `__VERSION__` - the Goyamp version number
+* ```__VERSION__``` - the Goyamp version number
 
-* `__FILE__` - the current source filename
+* ```__FILE__``` - the current source filename
 
-* `__DIR__` - the directory pathname of the current source file
+* __DIR__ - the directory pathname of the current source file
 
-* `__SOURCE__` - the expression passed into the currently executing macro - useful for debugging your macros.
+* __SOURCE__ - the expression passed into the currently executing macro - useful for debugging your macros.
 
 == Using the Goyamp Go Module
 
