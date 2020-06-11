@@ -1,0 +1,14 @@
+- defmacro:
+    name: $lowercase
+    args: $vararg
+    value:
+      gopherlua:
+        args: $vararg
+        script: result = string.lower(args)
+- defmacro:
+    name: $uppercase
+    args: $vararg
+    value:
+      gopherlua:
+        args: $vararg
+        script: result = string.upper(args)

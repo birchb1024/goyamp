@@ -3,7 +3,6 @@ package goyamp
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io"
 	"log"
 	"os"
@@ -13,6 +12,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	lua "github.com/yuin/gopher-lua"
+	"gopkg.in/yaml.v3"
 )
 
 //
@@ -20,14 +22,13 @@ import (
 var Version string
 var documentCount int
 
-
-
 //
 //
 type yamly interface {
 	expand(binding *env) yamly
 	declassify(params ...Syntax) interface{}
 	String() string
+	gopherluaify(L *lua.LState) lua.LValue
 }
 
 //
@@ -720,25 +721,33 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 		// fmt.Println(expanded)
 		if _, eok := expanded.(empty); eok {
 			log.Printf("expandSteam: doc is empty\n")
-			if documentCount > 0 { documentCount++ }
+			if documentCount > 0 {
+				documentCount++
+			}
 			continue
 		}
 		if _, eok := expanded.(nily); eok {
 			log.Printf("expandSteam: doc is nil\n")
-			if documentCount > 0 { documentCount++ }
+			if documentCount > 0 {
+				documentCount++
+			}
 			continue
 		}
 		if array, ok := expanded.(seqy); ok {
 			if len(array) == 0 {
 				log.Printf("expandSteam: doc is empty list\n")
-				if documentCount > 0 { documentCount++ }
+				if documentCount > 0 {
+					documentCount++
+				}
 				continue
 			}
 		}
 		if mapz, ok := expanded.(mapy); ok {
 			if len(mapz) == 0 {
 				log.Printf("expandSteam: doc is empty map\n")
-				if documentCount > 0 { documentCount++ }
+				if documentCount > 0 {
+					documentCount++
+				}
 				continue
 			}
 		}

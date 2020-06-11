@@ -4,18 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
-func argString(tree yamly, args mapy, name string, defaul string) string {
+func argString(tree yamly, args mapy, name string, defualt string) string {
 	a, ok := args[stringy(name)]
 	if !ok {
-		return defaul
+		return defualt
 	}
 	val, ok := a.(stringy)
 	if !ok {

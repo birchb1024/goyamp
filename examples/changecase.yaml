@@ -1,0 +1,4 @@
+include: ../lib/cases.yaml
+---
+- $lowercase: AHSGDFHFH712731723
+- $uppercase: 8234234ksdfkshf jshdk fskdjfhksjhd fkjhsd f

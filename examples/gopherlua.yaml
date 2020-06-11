@@ -1,0 +1,12 @@
+#
+# Run some Lua
+#
+gopherlua:
+    args: 
+      a:3 : 22
+      str: "a lower case string"
+      arr: { x: , y: 2 }
+      list: [1,2,3]
+    script:
+      args.date = os.capture("date")
+      result = {uppertree(args), args}
