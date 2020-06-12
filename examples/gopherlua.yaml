@@ -20,8 +20,6 @@ gopherlua: {args: , script: "result = string.reverse('doowgnilloc')"}
 ---
 gopherlua: { args: we are groot, script: "result = {string.upper(args), string.len(args)}" }
 ---
-gopherlua: {args: env , script: "result = (args.USER == os.getenv('USER'))"}
----
 gopherlua: {args: [X,K,A] , script: "table.sort(args); result = args"}
 ---
 gopherlua: {args:  , script: "result = type(loadfile('init.lua'))"}
