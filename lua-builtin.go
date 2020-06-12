@@ -47,33 +47,41 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 		allInts := true
 		keys := map[int]bool{}
 		closed := true
+		minKey := 10000000000
+		maxKey := 0
 
 		L.ForEach(x, func(k lua.LValue, v lua.LValue) {
 			if i, err := strconv.Atoi(k.String()); err == nil {
 				keys[i] = true
+				if i < minKey {
+					minKey = i
+				}
+				if i > maxKey {
+					maxKey = i
+				}
 				//				fmt.Println("key: ", k, k.Type(), i, v)
 			} else {
 				allInts = false
 			}
 		})
 		if allInts {
-			for i := 0; i < len(keys); i++ {
+			for i := minKey; i <= maxKey; i++ {
 				if _, ok := keys[i]; !ok {
 					closed = false
 					break
 				}
 			}
 		}
+		//fmt.Println("allInts closed: ", allInts, closed, minKey, maxKey, x)
+		// L.ForEach(x, func(k lua.LValue, v lua.LValue) {
+		// 	fmt.Println("                ", k.String(), v.String())
+		// })
 		if allInts && closed {
-			result := make(seqy, len(keys))
+			result := seqy{}
 			L.ForEach(x, func(k lua.LValue, v lua.LValue) {
-				if i, err := strconv.Atoi(k.String()); err == nil {
-					//					fmt.Println("key: ", k, k.Type(), i, v)
-					result[i] = classifyLua(L, v)
-				} else {
-					panic(fmt.Sprintf("gopherlua: bad index %v in '%v", k, x))
-				}
+				result = append(result, classifyLua(L, v))
 			})
+			//			fmt.Println("result", result)
 			return result
 		}
 		result := mapy{}

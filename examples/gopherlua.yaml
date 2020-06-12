@@ -1,6 +1,8 @@
 #
 # Run some Lua
 #
+- gopherlua: { args: somevariable, script: result = string.upper(args) }
+---
 gopherlua:
     args: 
       a:3 : 22
@@ -10,3 +12,10 @@ gopherlua:
     script:
       args.date = os.capture("date")
       result = {uppertree(args), args}
+---
+gopherlua: {args: , script: result = args}
+---
+gopherlua: {args: , script: result = nil}
+---
+gopherlua: {args: , script: "result = {1,2,3}"}
+---
