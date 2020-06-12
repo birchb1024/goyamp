@@ -23,6 +23,7 @@ include:
   - ../examples/foo.yaml
   - ../examples/for.yaml
   - ../examples/funny_variables.yaml
+  - ../examples/gopherlua.yaml
   - ../examples/ifs.yaml
   - ../examples/includes.yaml
   - ../examples/loader.yaml

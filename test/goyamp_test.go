@@ -71,6 +71,7 @@ func TestNormalExamples(t *testing.T) {
 		"foo.yaml",
 		"for.yaml",
 		"funny_variables.yaml",
+		"gopherlua.yaml",
 		"ifs.yaml",
 		"includes.yaml",
 		"issue06.yaml",

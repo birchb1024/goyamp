@@ -1,7 +1,38 @@
 #
 # Run some Lua
 #
-- gopherlua: { args: somevariable, script: result = string.upper(args) }
+---
+gopherlua: {args: , script: result = args}
+---
+gopherlua: {args: , script: result = nil}
+---
+gopherlua: {args: [null], script: result = args}
+---
+gopherlua: {args: , script: "result = {1,2,3}"}
+---
+gopherlua: {args: {a: , b: 2, c: 3, d: null}, script: "result = args"}
+---
+gopherlua: {args: [null, 2, 3, null], script: "result = args"}
+---
+gopherlua: {args: , script: "result = math.sqrt(math.pi)"}
+---
+gopherlua: {args: , script: "result = string.reverse('doowgnilloc')"}
+---
+gopherlua: { args: we are groot, script: "result = {string.upper(args), string.len(args)}" }
+---
+gopherlua: {args: env , script: "result = (args.USER == os.getenv('USER'))"}
+---
+gopherlua: {args: [X,K,A] , script: "table.sort(args); result = args"}
+---
+gopherlua: {args:  , script: "result = type(loadfile('init.lua'))"}
+---
+gopherlua:
+  args: 
+    a:3 : 22
+    str: "a lower case string"
+    arr: { x: , y: 2 }
+    list: [1,2,3]
+  script: result = args
 ---
 gopherlua:
     args: 
@@ -9,13 +40,28 @@ gopherlua:
       str: "a lower case string"
       arr: { x: , y: 2 }
       list: [1,2,3]
-    script:
-      args.date = os.capture("date")
+    script: |-
+      -- Uppercase all strings in a YAML tree
+      function uppertree(t)
+          local tt = type(t)
+          if tt == "string" then
+            return string.upper(t)
+          elseif tt == "table" then
+            local k, v = next(t, nil)
+            local result = {}
+            while k do
+              if type(k) == "string" then
+                result[string.upper(k)] = uppertree(v)
+              else
+                result[k] = uppertree(v)
+              end
+                k, v = next(t, k)
+            end
+            return result
+          else
+            return t
+          end
+      end
+
+      args.date = "Fri Jun 12 16:39:31 AEST 2020"
       result = {uppertree(args), args}
----
-gopherlua: {args: , script: result = args}
----
-gopherlua: {args: , script: result = nil}
----
-gopherlua: {args: , script: "result = {1,2,3}"}
----

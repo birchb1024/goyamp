@@ -3,12 +3,15 @@ package goyamp
 import (
 	"fmt"
 	"log"
-	"strconv"
+	"os"
+	"path/filepath"
 
 	lua "github.com/yuin/gopher-lua"
 )
 
-func (x nily) gopherluaify(L *lua.LState) lua.LValue     { return lua.LString(x.String()) }
+var luanily = lua.LUserData{"NILY", nil, nil}
+
+func (x nily) gopherluaify(L *lua.LState) lua.LValue     { return &luanily }
 func (e empty) gopherluaify(L *lua.LState) lua.LValue    { return lua.LString(e.String()) }
 func (x inty) gopherluaify(L *lua.LState) lua.LValue     { return lua.LNumber(x) }
 func (x float64y) gopherluaify(L *lua.LState) lua.LValue { return lua.LNumber(x) }
@@ -25,7 +28,8 @@ func (m mapy) gopherluaify(L *lua.LState) lua.LValue {
 func (s seqy) gopherluaify(L *lua.LState) lua.LValue {
 	result := L.CreateTable(len(s), len(s))
 	for i, v := range s {
-		result.RawSet(lua.LNumber(i), v.gopherluaify(L))
+		// fmt.Println("Insert", i+1, v.gopherluaify(L))
+		result.Insert(i+1, v.gopherluaify(L))
 	}
 	return result
 }
@@ -35,6 +39,13 @@ func (x unknowny) gopherluaify(L *lua.LState) lua.LValue         { return lua.LS
 
 func classifyLua(L *lua.LState, x lua.LValue) yamly {
 	switch x := x.(type) {
+	case *lua.LUserData:
+		if x == &luanily {
+			return nily{}
+		}
+		log.Printf("not classified %#v", x)
+		return unknowny{x: x}
+
 	case *lua.LNilType:
 		return nily{}
 	case lua.LNumber:
@@ -51,7 +62,8 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 		maxKey := 0
 
 		L.ForEach(x, func(k lua.LValue, v lua.LValue) {
-			if i, err := strconv.Atoi(k.String()); err == nil {
+			if ln, ok := k.(lua.LNumber); ok {
+				i := int(ln)
 				keys[i] = true
 				if i < minKey {
 					minKey = i
@@ -72,16 +84,18 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 				}
 			}
 		}
-		//fmt.Println("allInts closed: ", allInts, closed, minKey, maxKey, x)
+		// fmt.Println("allInts closed: ", allInts, closed, minKey, maxKey, x)
 		// L.ForEach(x, func(k lua.LValue, v lua.LValue) {
 		// 	fmt.Println("                ", k.String(), v.String())
 		// })
 		if allInts && closed {
-			result := seqy{}
-			L.ForEach(x, func(k lua.LValue, v lua.LValue) {
-				result = append(result, classifyLua(L, v))
-			})
-			//			fmt.Println("result", result)
+			result := make(seqy, maxKey-minKey+1)
+			for i := minKey; i <= maxKey; i++ {
+				// fmt.Println("resultB", i, result)
+				v := x.RawGetInt(i)
+				result[i-1] = classifyLua(L, v)
+				// fmt.Println("resultA", result)
+			}
 			return result
 		}
 		result := mapy{}
@@ -116,8 +130,14 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	tb := a.gopherluaify(L)
 	// Invoke Lua
 	//
-	if err := L.DoFile("init.lua"); err != nil {
-		panic(fmt.Sprintf("gopherlua eror in init.lua: %s", err))
+	// Find out where the excutbales are
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exePath := filepath.Dir(ex)
+	if err := L.DoFile(exePath + "/init.lua"); err != nil {
+		log.Printf("Warning: gopherlua error in init.lua, continuing: %s\n", err)
 	}
 
 	L.SetGlobal("args", tb)

@@ -1328,6 +1328,86 @@ Produces:
   name: Bill Birch
 ----
 
+=== Executing Lua Scripts with the Embedded Interpreter
+
+You can make complex or fiddly manipulations on the YAML data since Goyamp incorporates a Lua 5.1 interpreter, 'Gopher Lua'. This is written in 100% Go language and is embedded in Goyamp. You can read about https://github.com/yuin/gopher-lua:[gopherlua here], And https://www.lua.org/manual/5.1/:[Lua 5.1]
+
+To use Lua you invoke the interpreter with the 'gopherlua:' key and pass it a YAML structure. The YAML structure is converted into Lua tables and is passed to your script in the 'args' global variable. At the end of execution you pass data back to Goyamp in the 'results' global variable. This becomes the value of the gopherlua map which is substituted in the output.
+
+Each time you invoke 'gopherlua:', a new interpreter is created, and destroyed at the end.  The Lua interpreter attempts to load 'init.lua' from the directory containing the goyamp binary. This allows one to load libraries of Lua functions. 
+
+The syntax is as follows:
+
+[source, YAML]
+----
+gopherlua:
+  args: # this is where you pass a YAML structure to Lua
+  script: # This a Lua script which is executed.
+----
+
+Here are some examples:
+
+To return an uppercase version of a string we use the Lua string.upper() function.
+
+[source, YAML]
+----
+gopherlua:
+  args: we are groot
+  script: "result = string.upper(args)"
+----
+
+To sort a list we can use the Lua table.sort() function.
+
+[source, YAML]
+----
+gopherlua:
+  args: [X,K,A]
+  script: "table.sort(args); result = args"
+----
+
+Here is a more complex example.  We want to turn all the elements in a YAML structure
+to uppercase. Granted this could be done with shell tools, but this example shows are recursive
+tree walk function. YAML allows multi-line strings which are convenient for medium length
+scripts. Longer scripts can be put into source files and loaded by Lua with `loadfile()` or similar.
+
+[source, YAML]
+----
+gopherlua:
+    args: 
+      a:3 : 22
+      str: "a lower case string"
+      arr: { x: , y: 2 }
+      list: [1,2,3]
+    script: |-
+
+      -- Uppercase all strings in a YAML tree
+      function uppertree(t)
+          local tt = type(t)
+          if tt == "string" then
+            return string.upper(t)
+          elseif tt == "table" then
+            local k, v = next(t, nil)
+            local result = {}
+            while k do
+              if type(k) == "string" then
+                result[string.upper(k)] = uppertree(v)
+              else
+                result[k] = uppertree(v)
+              end
+                k, v = next(t, k)
+            end
+            return result
+          else
+            return t
+          end
+      end
+      result = uppertree(args)
+----
+
+
+
+
+
 === Enforcing Safety with `panic`
 
 When processing becomes more complex you may want to implement checks on input data. The `panic:` macro 
