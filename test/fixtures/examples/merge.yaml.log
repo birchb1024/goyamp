@@ -1,0 +1,19 @@
+---
+file_header: null
+---
+a: -1
+b: 2
+c: 3
+---
+- app: tetris
+  hostname: tetris.games.org
+  ip: 1.1.1.1
+  site: Kansas
+---
+Y:
+  A:
+    J: 888
+  Z:
+    I: 999
+a: -1
+c: 3

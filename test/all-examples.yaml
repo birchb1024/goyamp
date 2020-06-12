@@ -18,6 +18,7 @@ include:
   - ../examples/arguments.yaml
   - ../examples/config.yaml
   - ../examples/flatten.yaml
+  - ../examples/merge.yaml
   - ../examples/flatten-repeat.yaml
   - ../examples/foo.yaml
   - ../examples/for.yaml

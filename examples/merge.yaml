@@ -1,0 +1,30 @@
+file_header:
+---
+merge:
+    - { a : 1 }
+    - { b : 2 }
+    - { c : 3 , a : -1}
+---
+- define: 
+    network-data: 
+      hostname: tetris.games.org
+- defmacro:
+    name: mymacro
+    args: [arg1]
+    value:
+      hostname: arg1
+      ip: 1.1.1.1
+      app: tetris
+- merge:
+  - { hostname: tetris.home.org }
+  - { site: Kansas }
+  - mymacro:
+      arg1: tetris
+  - network-data
+---
+merge:
+    - { a : { X: 90 }, Y: { Z: { I: 123}, A: { J: 111}}}
+    - { a : { X: 28 }, Y: { Z: { I: 999}, A: { J: 888}}}
+    - { c : 3 , a : -1}
+
+

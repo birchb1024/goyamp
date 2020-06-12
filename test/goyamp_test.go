@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/birchb1024/goyamp"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/birchb1024/goyamp"
 )
 
 func fileRunner(output io.Writer, filename string, format goyamp.Syntax) error {
@@ -77,6 +78,7 @@ func TestNormalExamples(t *testing.T) {
 		"loader.yaml",
 		"macros.yaml",
 		"macro-argless.yaml",
+		"merge.yaml",
 		"multi_define.yaml",
 		"quote.yaml",
 		"range.yaml",
