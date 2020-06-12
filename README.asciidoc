@@ -914,7 +914,7 @@ Produces:
 
 === Combining Maps with `merge`
 
-The `merge` macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Syntax:
+The `merge` macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Merge is recursive, it merges all levels of the maps provided. Syntax:
 
 [source,YAML]
 ----
