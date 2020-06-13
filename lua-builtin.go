@@ -76,6 +76,9 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 				allInts = false
 			}
 		})
+		if maxKey == 0 { // Empty table!
+			allInts = false
+		}
 		if allInts {
 			for i := minKey; i <= maxKey; i++ {
 				if _, ok := keys[i]; !ok {
@@ -89,6 +92,7 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 		// 	fmt.Println("                ", k.String(), v.String())
 		// })
 		if allInts && closed {
+			log.Printf("makeseqy %d %d %d", minKey, maxKey, maxKey-minKey+1)
 			result := make(seqy, maxKey-minKey+1)
 			for i := minKey; i <= maxKey; i++ {
 				// fmt.Println("resultB", i, result)
@@ -145,7 +149,12 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 		panic(fmt.Sprintf("gopherlua eror: %s", err))
 	}
 
-	// Process the response from the sub-process
+	// Process the response from the other interpreter
 	//
-	return classifyLua(L, L.GetGlobal("result"))
+	r := L.GetGlobal("result")
+	log.Printf("r: %v", r)
+	cr := classifyLua(L, r)
+	log.Printf("cr: %v", cr)
+
+	return cr
 }

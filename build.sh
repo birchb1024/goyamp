@@ -2,7 +2,10 @@
 set -e
 set -u
 set -x
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 version=$(git describe --abbrev)
+
+export LUA_PATH="$script_dir"/lib/?.lua;
 
 function buildDocs {
 	cp README.asciidoc /tmp/README.asciidoc

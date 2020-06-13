@@ -1,0 +1,76 @@
+#
+# Run some complex Lua
+#
+define:
+  $deepmerge: |-
+    dm = require('deepmerge')
+    result = dm.deep_merge(args[1], args[2])
+---
+gopherlua:
+  script: $deepmerge
+  args: 
+    - set1: [1,2,3, a, b, c, nil]
+      set2: [[1],[2]]
+      set3: [{a: 1},{b: 2}]
+      bag1: [1,1,2]
+      bag2: [a,a,s]
+    - set1: [77,88,99, x, y, z, nil, 1, a]
+      set2: [[77],[88], [1], [2]]
+      set3: [{a: 1},{b: 2}, {c: 3}]
+      bag1: [3,3,4]
+      bag2: [z,z,x]
+---
+gopherlua:
+  script: $deepmerge
+  args: 
+    - map1:
+        A: 1
+        B: 2
+      map2:
+        A:
+          K: 99
+          L: 2
+      map3:
+        A:
+          B:
+            C:
+              D:
+                K: 1
+                L: zzzzz
+                M: [1,2,3]
+                Parray: [1,2,3]
+    - map1:
+        A: 77
+        B: 88
+        C: 
+      map2:
+        A:
+          K: 1
+          L: 2
+      map3:
+        A:
+          B:
+            C:
+              D:
+                K: 1
+                L: 2
+                M: [1,2,a,b,c]
+                N: 42
+                Parray: [e,e,r,t] 
+---
+gopherlua:
+  script: $deepmerge
+  args: 
+    - array1: [1,2,3, a, b, c, nil]
+    - array1: [1,1,2,77,88,99, x, y, z, nil, 1, a]
+---
+gopherlua:
+  script: $deepmerge
+  args:
+    - maps: {a: 1, c: 4, d: {y: 10} }
+      bags: [1, 1, 2, 3]
+      sets: [ 1, 2, 3 ]
+    - maps: {a: 2, b: 3, d: {y: 99, u: 100 } }
+      bags: [3, 4, 5, 1]
+      sets: [3, 4, 5, 1]
+

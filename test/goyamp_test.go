@@ -77,6 +77,7 @@ func TestNormalExamples(t *testing.T) {
 		"issue06.yaml",
 		"load_data.yaml",
 		"loader.yaml",
+		"luadeepmerge-tests.yaml",
 		"macros.yaml",
 		"macro-argless.yaml",
 		"merge.yaml",
