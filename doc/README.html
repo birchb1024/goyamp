@@ -735,8 +735,8 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.3.0,</span>
-<span id="revdate">12.06.2020</span>
+<span id="revnumber">version 0.3.1,</span>
+<span id="revdate">13.06.2020</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -785,7 +785,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.3</span><span style="color: #990000">.</span><span style="color: #993399">0</span>/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.3</span><span style="color: #990000">.</span><span style="color: #993399">1</span>/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -1714,7 +1714,7 @@ http://www.gnu.org/software/src-highlite -->
 </div>
 <div class="sect2">
 <h3 id="_combining_maps_with_code_merge_code">Combining Maps with <code>merge</code></h3>
-<div class="paragraph"><p>The <code>merge</code> macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Merge is recursive, it merges all levels of the maps provided. Syntax:</p></div>
+<div class="paragraph"><p>The <code>merge</code> macro takes a list of maps and merges them togther to make a single map. When there are keys shared between the supplied maps, the program uses the last one seen, it over-writes the earlier value. Hence the order in the list dictates the priority. Merge is NOT recursive, it merges one level of the maps provided. Syntax:</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
@@ -2381,9 +2381,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.3.0<br />
+Version 0.3.1<br />
 Last updated
- 2020-06-12 20:55:08 AEST
+ 2020-06-13 18:58:57 AEST
 </div>
 </div>
 </body>
