@@ -47,6 +47,7 @@ Sets (where both A and B have unique elements)
 -- --Debug functions, uncomment when needed
 -- local inspect = require('inspect')
 -- ix = function (x) print(inspect.inspect(x)) end
+-- ix(args)
 
 function classify(t)
     if type(t) ~= "table" then return type(t) end  

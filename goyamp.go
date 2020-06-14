@@ -289,11 +289,18 @@ func (r compiledFunction) String() string {
 }
 
 var interpolateRegex *regexp.Regexp
+var goyampExecutablePath string
 
 func init() {
 	interpolateRegex = regexp.MustCompile(`{{[^{]*}}`)
 	log.SetFlags(log.Lshortfile)
 	documentCount = 0
+	// Locate current running goyamp process file
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	goyampExecutablePath = filepath.Dir(ex)
 }
 
 func interpolate(tree yamly, bindings *env) yamly {

@@ -3,8 +3,6 @@ package goyamp
 import (
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -133,17 +131,26 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	//
 	tb := a.gopherluaify(L)
 	// Invoke Lua
-	//
-	// Find out where the excutbales are
-	ex, err := os.Executable()
+	//    	First set the package.path to avoid disappointment.
+	// 		The default gopher-lua loads from /usr/local and we dont want random effects,
+	//		so we limit loading to the goyamp context.
+	//		LUA_PATH is always there if needed
+	defaultLoaderPath := "./?.lua;./?.lc;" + goyampExecutablePath + "/lib/?.lua;" + goyampExecutablePath + "/lib/?.lc"
+	err := L.DoString(`
+		executable_directory = "` + goyampExecutablePath + `"
+		if os.getenv("LUA_PATH") ~= nil then
+			package.path = os.getenv("LUA_PATH")
+		else
+			package.path = "` + defaultLoaderPath + `"
+		end`)
 	if err != nil {
 		panic(err)
 	}
-	exePath := filepath.Dir(ex)
-	if err := L.DoFile(exePath + "/init.lua"); err != nil {
+	// Run init if it exists - fail silently
+	if err := L.DoString(`require('init')`); err != nil {
 		log.Printf("Warning: gopherlua error in init.lua, continuing: %s\n", err)
 	}
-
+	// Now actually run the script string
 	L.SetGlobal("args", tb)
 	if err := L.DoString(s); err != nil {
 		panic(fmt.Sprintf("gopherlua eror: %s", err))
