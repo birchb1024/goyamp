@@ -63,3 +63,15 @@ gopherlua:
 
       args.date = "Fri Jun 12 16:39:31 AEST 2020"
       result = {uppertree(args), args}
+---
+# Load local file
+gopherlua:
+    args: 
+      a:3 : 22
+      str: "a lower case string"
+      arr: { x: , y: 2 }
+      list: [1,2,3]
+    script: |-
+      require('uppertree')
+      args.date = "Fri Jun 12 16:39:31 AEST 2020"
+      result = {uppertree(args)}

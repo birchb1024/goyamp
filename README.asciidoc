@@ -1332,24 +1332,25 @@ Produces:
 
 You can make complex manipulations of the YAML data with the Lua 5.1 interpreter embedded in Goyamp. 'Gopher Lua' is written in 100% Go language. You can read about https://github.com/yuin/gopher-lua:[gopherlua here], and https://www.lua.org/manual/5.1/:[Lua 5.1 here].
 
-To use Lua you invoke the interpreter with the 'gopherlua:' key and pass it a YAML structure. The YAML structure is converted into Lua tables and set in the 'args' global variable where your script can access it. At the end of execution you pass data back to Goyamp in the 'results' global variable. This becomes the value of the gopherlua map which is substituted in the output.
+To use Lua you invoke the interpreter with the `gopherlua:` key and pass it a YAML structure. The YAML structure is converted into Lua tables and set in the `args` global variable where your script can access it. At the end of execution you pass data back to Goyamp in the `results` Lua global variable. This becomes the value of the gopherlua map which is substituted in the output.
 
-Each time you invoke 'gopherlua:', a new interpreter is created, and destroyed at the end. The Lua initialisation process is:
+Each time you invoke `gopherlua:`, a new interpreter is created, and destroyed at the end. The Lua initialisation process is:
 
-1. The location of the goyamp binary file is determined and saved to the global variable "executable_directory"
+1. The location of the goyamp binary file is determined and saved to the global variable `executable_directory`
 
-2. The package.path variable is set to the value of environment variable LUA_PATH if present, 
-otherwise the package.path variable is set to the default `./?.lua;./?.lc;<executable_directory>/lib/?.lua;<executable_directory>/lib/?.lc`. This means Lua will pick up files in `require()` calls from the `lib/` wherever goyamp is installed.   
+2. The package.path variable is set to the value of environment variable `+__DIR__/?.lua;LUA_PATH+` if `LUA_PATH` is present, 
+otherwise the package.path variable is set to the default `+__DIR__/?.lua;./?.lua;./?.lc;<executable_directory>/lib/?.lua;<executable_directory>/lib/?.lc+`. This means Lua will pick up files in `require()` calls from the `lib/` directory wherever goyamp is installed. It will also pick up scripts relative to the current YAML file.    
 
-3. The Lua interpreter attempts to require 'init.lua' from the package.path. If it isn't present there is no error or warning message unless you run with `-d`. 
+3. The Lua interpreter attempts to require `init.lua` from the package.path. If it isn't present there is no error or warning message unless you run with `-d`. 
 
 4. Then the global variable `args` is set to the value of the YAML args: element. The string in script: is executed, and the value of `result` is returned to Goyamp.
 
 Goyamp uses these global variables in the Lua interpreter:
 
-* args - Holds the input args: argument
-* executable_directory - Directory holding the gymap binary, useful for path manipulations,
-* result - where the result of the Lua execution is placed for return to Goyamp
+* `+__DIR__+` - Directory containing the current enclosing YAML script
+* `args` - Holds the input args: argument
+* `executable_directory` - Directory holding the gymap binary, useful for path manipulations,
+* `result` - where the result of the Lua execution is placed for return to Goyamp
 
 The gopherlua: syntax is as follows:
 
@@ -1477,13 +1478,13 @@ Goyamp automatically populates some variables as it executes. These are:
 
 * `argv` - the command line arguments
 
-* ```__VERSION__``` - the Goyamp version number
+* `+__VERSION__+` - the Goyamp version number
 
-* ```__FILE__``` - the current source filename
+* `+__FILE__+` - the current source filename
 
-* __DIR__ - the directory pathname of the current source file
+* `+__DIR__+` - the directory pathname of the current source file
 
-* __SOURCE__ - the expression passed into the currently executing macro - useful for debugging your macros.
+* `+__SOURCE__+` - the expression passed into the currently executing macro - useful for debugging your macros.
 
 == Using the Goyamp Go Module
 

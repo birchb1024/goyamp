@@ -58,3 +58,14 @@ str: a lower case string
   - 2
   - 3
   str: a lower case string
+---
+- A:3: 22
+  ARR:
+    X: null
+    Y: 2
+  DATE: FRI JUN 12 16:39:31 AEST 2020
+  LIST:
+  - 1
+  - 2
+  - 3
+  STR: A LOWER CASE STRING

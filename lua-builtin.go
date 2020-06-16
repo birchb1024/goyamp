@@ -125,6 +125,8 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	a := argsmap[stringy("args")]
 	s := argString(tree, argsmap, "script", "")
 
+
+
 	L := lua.NewState()
 	defer L.Close()
 	// // Convert argument to Lua format
@@ -135,16 +137,29 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	// 		The default gopher-lua loads from /usr/local and we dont want random effects,
 	//		so we limit loading to the goyamp context.
 	//		LUA_PATH is always there if needed
-	defaultLoaderPath := "./?.lua;./?.lc;" + goyampExecutablePath + "/lib/?.lua;" + goyampExecutablePath + "/lib/?.lc"
-	err := L.DoString(`
+	// 		Always Add the directory holding this script to the Lua search path
+	script_dir := ""
+	if sy, ok := bindings.lookup(stringy("__DIR__")); ok {
+		sd, ok := sy.(stringy)
+		script_dir = string(sd)
+		if !ok {
+			panic(fmt.Sprintf("Was expecting __DIR__ to be a string, but got %v", script_dir))
+		}
+	}
+
+	lua_path_setup := `
 		executable_directory = "` + goyampExecutablePath + `"
+		__DIR__ = "` + script_dir + `"
 		if os.getenv("LUA_PATH") ~= nil then
 			package.path = os.getenv("LUA_PATH")
 		else
-			package.path = "` + defaultLoaderPath + `"
-		end`)
-	if err != nil {
-		panic(err)
+			package.path = "./?.lua;./?.lc;"..executable_directory.."/lib/?.lua;"..executable_directory.."/lib/?.lc"
+		end
+		if __DIR__ ~= "" then
+			package.path = __DIR__.."/?.lua;"..package.path
+		end`
+	if err := L.DoString(lua_path_setup); err != nil {
+		panic(fmt.Sprintf("gopherlua:  %s", err))
 	}
 	// Run init if it exists - fail silently
 	if err := L.DoString(`require('init')`); err != nil {
