@@ -5,7 +5,7 @@ set -x
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 version=$(git describe --abbrev)
 
-export LUA_PATH="./?.lua;./?.lc;$script_dir"/lib/?.lua;
+export LUA_PATH='./?.lua;./?.lc;'"$script_dir"'/lib/?.lua;'
 
 function buildDocs {
 	cp README.asciidoc /tmp/README.asciidoc
@@ -24,7 +24,7 @@ fi
 #go build -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
 go build -o goyamp -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 strip ./goyamp
-(cd test; go test -args $*)
+(cd test; go test -args "$*")
 GOOS=windows GOARCH=amd64 go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 GOOS=darwin GOARCH=amd64 go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 
@@ -32,6 +32,6 @@ if [[ "${args}" == "package" ]]
 then
     mkdir -p pkg
     buildDocs
-    tar zcvf pkg/goyamp-${version}.tgz ./goyamp ./goyamp_mac ./goyamp.exe doc/README.html examples lib
+    tar zcvf pkg/goyamp-"${version}".tgz ./goyamp ./goyamp_mac ./goyamp.exe doc/README.html examples lib
 	exit
 fi
