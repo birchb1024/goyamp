@@ -1,7 +1,6 @@
 #!/bin/bash
-set -e
-set -u
-set -x
+set -euo pipefail
+#set -x
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 version=$(git describe --abbrev)
 
@@ -21,10 +20,14 @@ then
 	exit
 fi
 
-#go build -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
 go build -o goyamp -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 strip ./goyamp
-(cd test; go test -args "$*")
+(cd test; go test -coverprofile=../coverage.out -coverpkg ./.. ./ -args "$*"; )
+if [[ "${args}" == "coverage" ]]
+then
+	go tool cover -html=coverage.out
+fi
+
 GOOS=windows GOARCH=amd64 go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 GOOS=darwin GOARCH=amd64 go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 

@@ -4,3 +4,5 @@ file_header:
 ---
 include:
   - AVARIABLE
+---
+include: "../lib/cases.yaml"

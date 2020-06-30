@@ -80,6 +80,7 @@ func TestNormalExamples(t *testing.T) {
 		"luadeepmerge-tests.yaml",
 		"macros.yaml",
 		"macro-argless.yaml",
+		"math.yaml",
 		"merge.yaml",
 		"multi_define.yaml",
 		"quote.yaml",

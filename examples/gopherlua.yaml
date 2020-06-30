@@ -71,7 +71,31 @@ gopherlua:
       str: "a lower case string"
       arr: { x: , yy: 2 }
       list: [1,2,3]
+      float: 12.34
+      empty: {define: {x: 2}}
     script: |-
       require('uppertree')
       args.date = "Fri Jun 12 16:39:31 AEST 2020"
       result = {uppertree(args)}
+---
+# Booleans
+gopherlua:
+    args: 
+      a: {==: [1,2]}
+      b: {==: [1,1]}
+    script: result = {args.a, args.b, args.a and args.b}
+---
+# Builtin and macro, Unknown
+---
+defmacro: {name: foobar, args: x, value: x}
+---
+gopherlua:
+    args: 
+      builtin: define
+      macro: foobar
+      unknown: !quux
+    script: result = args
+---
+gopherlua:
+    args: nil
+    script: result = {false, true}
