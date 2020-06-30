@@ -4,7 +4,7 @@
 		"null" : "Null",
 		"1" : "Integer",
 		"12.34" :  "Float",
-		"true" : "Bool",
+		"true" : "Bool"
 	},
 	"sequence": [
 		null, 
@@ -12,7 +12,6 @@
 		12.34,
 		true,
 		[1],
-		{ "a": 1 },
+		{ "a": 1 }
 	]
-}		
-		
+}

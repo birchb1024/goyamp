@@ -33,17 +33,17 @@ pipelines:
 - web01
 ---
 - Database upgrade for Netflix:
-  - stop application Netflix
-  - backup app database db8812
-  - upgrade the database db8812
-  - restart the application Netflix
-  - smoke test Netflix
+    - stop application Netflix
+    - backup app database db8812
+    - upgrade the database db8812
+    - restart the application Netflix
+    - smoke test Netflix
 - Database upgrade for Stan:
-  - stop application Stan
-  - backup app database postgres123123
-  - upgrade the database postgres123123
-  - restart the application Stan
-  - smoke test Stan
+    - stop application Stan
+    - backup app database postgres123123
+    - upgrade the database postgres123123
+    - restart the application Stan
+    - smoke test Stan
 ---
 name: Install apache
 yum:

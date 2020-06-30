@@ -2,8 +2,8 @@
 file_header: null
 ---
 Deploy_PREIMP:
-- steps: Do PREIMP 1
-- steps: Do PREIMP 2
+  - steps: Do PREIMP 1
+  - steps: Do PREIMP 2
 Deploy_PROD:
-- steps: Do PROD 1
-- steps: Do PROD 2
+  - steps: Do PROD 1
+  - steps: Do PROD 2

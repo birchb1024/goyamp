@@ -5,9 +5,9 @@ map keys:
   12.34: Float
   null: "Null"
 sequence:
-- null
-- 1
-- 12.34
-- true
-- - 1
-- a: 1
+  - null
+  - 1
+  - 12.34
+  - true
+  - - 1
+  - a: 1

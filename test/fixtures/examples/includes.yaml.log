@@ -4,20 +4,20 @@ file_header: null
 file_header: null
 ---
 - deploy:
-  - boilerplate
-  - shutdown_server: 20 seconds
-  - deploy:
-      facts:
-        hostname: lll123
-        password: 1231231
-        ports:
-        - 21
-        - 22
-        username: jill
-      something: 34
-      timeout: 3 h
-  - intermediate
-  - start server
+    - boilerplate
+    - shutdown_server: 20 seconds
+    - deploy:
+        facts:
+          hostname: lll123
+          password: 1231231
+          ports:
+            - 21
+            - 22
+          username: jill
+        something: 34
+        timeout: 3 h
+    - intermediate
+    - start server
 - first_port: 21
 - second_port: 22
 ---

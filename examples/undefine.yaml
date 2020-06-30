@@ -6,11 +6,11 @@ file_header:
 # Simple example in the top level
 - define:
     x: 2
-    y: 3
+    k: 3
     z: 4
-- [x, y, z]
-- undefine: y
-- [x, y, z]
+- [x, k, z]
+- undefine: k
+- [x, k, z]
 ---
 # redefine a macro to a name we want
 - define: 

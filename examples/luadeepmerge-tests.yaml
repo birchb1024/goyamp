@@ -14,7 +14,7 @@ gopherlua:
       set3: [{a: 1},{b: 2}]
       bag1: [1,1,2]
       bag2: [a,a,s]
-    - set1: [77,88,99, x, y, z, nil, 1, a]
+    - set1: [77,88,99, x, yy, z, nil, 1, a]
       set2: [[77],[88], [1], [2]]
       set3: [{a: 1},{b: 2}, {c: 3}]
       bag1: [3,3,4]
@@ -62,15 +62,15 @@ gopherlua:
   script: $deepmerge
   args: 
     - array1: [1,2,3, a, b, c, nil]
-    - array1: [1,1,2,77,88,99, x, y, z, nil, 1, a]
+    - array1: [1,1,2,77,88,99, x, yy, z, nil, 1, a]
 ---
 gopherlua:
   script: $deepmerge
   args:
-    - maps: {a: 1, c: 4, d: {y: 10} }
+    - maps: {a: 1, c: 4, d: {yy: 10} }
       bags: [1, 1, 2, 3]
       sets: [ 1, 2, 3 ]
-    - maps: {a: 2, b: 3, d: {y: 99, u: 100 } }
+    - maps: {a: 2, b: 3, d: {yy: 99, u: 100 } }
       bags: [3, 4, 5, 1]
       sets: [3, 4, 5, 1]
 

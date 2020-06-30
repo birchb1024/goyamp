@@ -39,22 +39,21 @@
   Hello Universe
 ---
 actors:
-- Harrison Ford
-- Sean Young
-- Roy Batty
+  - Harrison Ford
+  - Sean Young
+  - Roy Batty
 categories:
-- sci-fi
-- thriller
+  - sci-fi
+  - thriller
 director: ' Ridley Scott'
 name: Blade Runner
 release-date: "1982-09-09"
 runtime: 117
-storyline: A blade runner must pursue and try to terminate four replicants who stole
-  a ship in space and have returned to Earth to find their creator.
+storyline: A blade runner must pursue and try to terminate four replicants who stole a ship in space and have returned to Earth to find their creator.
 writer:
-- Hampton Fancher
-- David Peoples
-- Philip K. Dick
+  - Hampton Fancher
+  - David Peoples
+  - Philip K. Dick
 year: 1982
 ---
 map keys:
@@ -63,12 +62,12 @@ map keys:
   12.34: Float
   null: "Null"
 sequence:
-- null
-- 1
-- 12.34
-- true
-- - 1
-- a: 1
+  - null
+  - 1
+  - 12.34
+  - true
+  - - 1
+  - a: 1
 ---
 map keys:
   "1": Integer
@@ -76,12 +75,12 @@ map keys:
   "null": "Null"
   "true": Bool
 sequence:
-- null
-- 1
-- 12.34
-- true
-- - 1
-- a: 1
+  - null
+  - 1
+  - 12.34
+  - true
+  - - 1
+  - a: 1
 ---
 Hello World
 ---
@@ -132,12 +131,12 @@ Hello World: 1
     12.34: Float
     null: "Null"
   sequence:
-  - null
-  - 1
-  - 12.34
-  - true
-  - - 1
-  - a: 1
+    - null
+    - 1
+    - 12.34
+    - true
+    - - 1
+    - a: 1
 ---
 map keys:
   true: Bool
@@ -145,12 +144,12 @@ map keys:
   12.34: Float
   null: "Null"
 sequence:
-- null
-- 1
-- 12.34
-- true
-- - 1
-- a: 1
+  - null
+  - 1
+  - 12.34
+  - true
+  - - 1
+  - a: 1
 ---
 - exectest1=1
 - exectest2=2

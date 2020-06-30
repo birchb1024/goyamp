@@ -9,29 +9,29 @@ pipelines:
       shared:
         git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
     stages:
-    - Hello:
-        approval: success
-        jobs:
-          World1:
-            resources:
-            - linux
-            tasks:
-            - exec:
-                arguments:
-                - -c
-                - date
-                command: /bin/bash
-                run_if: passed
-          World2:
-            resources:
-            - linux
-            tasks:
-            - exec:
-                arguments:
-                - -c
-                - date
-                command: /bin/bash
-                run_if: passed
+      - Hello:
+          approval: success
+          jobs:
+            World1:
+              resources:
+                - linux
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - date
+                    command: /bin/bash
+                    run_if: passed
+            World2:
+              resources:
+                - linux
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - date
+                    command: /bin/bash
+                    run_if: passed
   Hello_World_2:
     group: Group_1
     label_template: ${COUNT}
@@ -39,29 +39,29 @@ pipelines:
       shared:
         git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
     stages:
-    - Hello:
-        approval: success
-        jobs:
-          World1:
-            resources:
-            - linux
-            tasks:
-            - exec:
-                arguments:
-                - -c
-                - date
-                command: /bin/bash
-                run_if: passed
-          World2:
-            resources:
-            - linux
-            tasks:
-            - exec:
-                arguments:
-                - -c
-                - date
-                command: /bin/bash
-                run_if: passed
+      - Hello:
+          approval: success
+          jobs:
+            World1:
+              resources:
+                - linux
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - date
+                    command: /bin/bash
+                    run_if: passed
+            World2:
+              resources:
+                - linux
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - date
+                    command: /bin/bash
+                    run_if: passed
   Hello_World_3:
     group: Group_1
     label_template: ${COUNT}
@@ -69,26 +69,26 @@ pipelines:
       shared:
         git: ssh://git@bitbucket/~geoff/gocdpocpipelines.git
     stages:
-    - Hello:
-        approval: success
-        jobs:
-          World1:
-            resources:
-            - linux
-            tasks:
-            - exec:
-                arguments:
-                - -c
-                - date
-                command: /bin/bash
-                run_if: passed
-          World2:
-            resources:
-            - linux
-            tasks:
-            - exec:
-                arguments:
-                - -c
-                - date
-                command: /bin/bash
-                run_if: passed
+      - Hello:
+          approval: success
+          jobs:
+            World1:
+              resources:
+                - linux
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - date
+                    command: /bin/bash
+                    run_if: passed
+            World2:
+              resources:
+                - linux
+              tasks:
+                - exec:
+                    arguments:
+                      - -c
+                      - date
+                    command: /bin/bash
+                    run_if: passed

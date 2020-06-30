@@ -2,18 +2,18 @@
 file_header: null
 ---
 - one:
-  - a
-  - b
-  - c
+    - a
+    - b
+    - c
 - two: 77
 ---
 - hosts: webservers
   remote_user: root
   tasks:
-  - name: Install apache
-    yum:
-      name: apache
-      state: latest
+    - name: Install apache
+      yum:
+        name: apache
+        state: latest
   vars:
     http_port: 80
     max_clients: 200

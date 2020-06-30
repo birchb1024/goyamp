@@ -16,11 +16,11 @@ OK
     Job_hi:
       tasks:
         resources:
-        - linux
+          - linux
         tasks:
-        - exec:
-            arguments:
-            - -c
-            - date
-            command: /bin/bash
-            run_if: passed
+          - exec:
+              arguments:
+                - -c
+                - date
+              command: /bin/bash
+              run_if: passed
