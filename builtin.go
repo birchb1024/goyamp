@@ -241,6 +241,14 @@ func quoteBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	return args
 }
 
+func emptyBuiltin(tree mapy, args yamly, bindings *env) yamly {
+	//    """
+	//    :return: empty
+	//    """
+	assertSingleKey(tree)
+	return empty{}
+}
+
 func addBuiltinsToEnv(env *env) {
 	//    """
 	//    Utility function to add all the builtins to an environment
@@ -277,4 +285,5 @@ func addBuiltinsToEnv(env *env) {
 	addNewBuiltin("execute", executeBuiltin, true, true)
 	addNewBuiltin("panic", panicBuiltin, true, false)
 	addNewBuiltin("gopherlua", gopherluaBuiltin, true, true)
+	addNewBuiltin("vanish", emptyBuiltin, true, true)
 }
