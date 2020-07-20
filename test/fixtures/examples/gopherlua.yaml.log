@@ -64,7 +64,6 @@ str: a lower case string
     X: null
     YY: 2
   DATE: FRI JUN 12 16:39:31 AEST 2020
-  EMPTY: GOYAMP.EMPTY
   FLOAT: 12.34
   LIST:
     - 1

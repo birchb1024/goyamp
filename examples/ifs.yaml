@@ -3,6 +3,14 @@ file_header:
 if: true
 then: OK
 ---
+this_map_disappears:
+  if: false
+  then: OK
+---
+this_map_disappears:
+  if: true
+  else: false
+---
 if: false
 else: OK
 ---

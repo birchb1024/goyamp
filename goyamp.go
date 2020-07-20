@@ -650,7 +650,10 @@ func (m mapy) expand(bindings *env) yamly {
 		if _, ok := newdict[k]; ok {
 			panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interpKey, m))
 		}
-		newdict[k] = v.expand(bindings)
+		expanded := v.expand(bindings)
+		if _, ok := expanded.(empty); !ok { // Skip golang.EMPTY values
+			newdict[k] = expanded
+		}
 	}
 	return newdict
 }

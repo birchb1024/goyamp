@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/pkg/errors v0.9.1
+	github.com/stamblerre/gocode v1.0.0 // indirect
 	github.com/yuin/goldmark v1.1.32 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20200603152657-dc2b0ca8b37e
 	golang.org/x/mod v0.3.0 // indirect
