@@ -303,7 +303,7 @@ When all the objects in the data have been scanned and in some cases, substitute
 in YAML or JSON format. Because YAML maps are unordered, the order of the keys and their corresponding values on output maybe be different from 
 the input footnote:[Order-preservation may happen in a future version, but it's complicated].
 
-When the processor sees a null item in an input sequence, these are preserved, however if the empty value is the result of a `define:`, `defmacro:` or other expansion which produces null, the null value is stripped from the output. 
+When the processor sees a null item in an input sequence, these are preserved, however if the empty value is the result of a `define:`, `defmacro:` or other expansion which produces empty values, the value is stripped from the output. 
 
 === Variables
 
@@ -333,11 +333,13 @@ Produces:
 - - 99
 ----
 
-The result of expanding a `define`, `undefine` and `include` is a 'magic' value `goyamp.EMPTY`. This value is removed automatically from sequences, but may appear in map items if a `define` has been used there. So it's better to use `define` etc in sequences. When placed in their own document, they disappear completely:
+The result of expanding a `define`, `undefine`, `if` and `include` is a 'magic' value `goyamp.EMPTY`. This value is removed automatically from sequences, and maps if a `define` or `if` has been used there. So it's better to use `define` etc in sequences. When placed in their own document, they disappear completely:
 
 [source, YAML]
 ----
 - define: {name: age, value: 32}
+- if: true
+  else: 23
 ---
 - age
 ----
@@ -347,7 +349,19 @@ Produces:
 [source, YAML]
 ----
 - 32
-----  
+---- 
+
+This provides a simple way to have conditional map keys, or list items. For example, if we only want a key to appear sometimes, we can use:
+
+[source, YAML]
+----
+some_map:
+  this_key_is_always_here: 42
+  this_key_only_appears_if_$var_is_true:
+    if: $var
+    then: 23
+----
+
 
 ==== Scalars
 
