@@ -17,7 +17,7 @@ import (
 func fileRunner(output io.Writer, filename string, format goyamp.Syntax) error {
 	engine := goyamp.NewExpander(
 		[]string{"A", "B", "C", "D"},
-		[]string{"USERNAME=birchb", "USER=birchb"},
+		[]string{"USERNAME=birchb", "USER=birchb", "TEST_EMBEDDED=x=y,y=5"},
 		output,
 		format)
 	return engine.ExpandFile(filename)

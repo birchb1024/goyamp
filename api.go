@@ -2,10 +2,11 @@ package goyamp
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 func (engine *Expander) init(environment []string, argv []string) {
@@ -15,7 +16,7 @@ func (engine *Expander) init(environment []string, argv []string) {
 	//    """
 	envMap := mapy{}
 	for _, pair := range environment {
-		kv := strings.Split(pair, "=")
+		kv := strings.SplitN(pair, "=", 2)
 		envMap[stringy(kv[0])] = stringy(kv[1])
 	}
 	pwd, err := os.Getwd()

@@ -8,6 +8,9 @@ file_header:
 - My username is {{env.USER}}
 ---
 #- This variable is {{ MISSING }}
+---
+# Check embedded '='
+env.TEST_EMBEDDED   # ='x=y,z=5'
 
 
 
