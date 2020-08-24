@@ -3,6 +3,7 @@ package goyamp
 import (
 	"fmt"
 	"log"
+	"math"
 
 	lua "github.com/yuin/gopher-lua"
 )
@@ -47,7 +48,12 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 	case *lua.LNilType:
 		return nily{}
 	case lua.LNumber:
-		return float64y(x)
+
+		if float64(x) == float64(math.Trunc(float64(x))) {
+			return inty(x)
+		} else {
+			return float64y(x)
+		}
 	case lua.LBool:
 		return booly(x)
 	case lua.LString:
@@ -124,8 +130,6 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	assertKeys(map[string]bool{"args": true, "script": true}, argsmap)
 	a := argsmap[stringy("args")]
 	s := argString(tree, argsmap, "script", "")
-
-
 
 	L := lua.NewState()
 	defer L.Close()

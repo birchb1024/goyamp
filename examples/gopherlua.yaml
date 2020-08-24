@@ -99,3 +99,9 @@ gopherlua:
 gopherlua:
     args: nil
     script: result = {false, true}
+---
+==:
+  - 2
+  - gopherlua:
+      args: nil
+      script: result = 2
