@@ -156,3 +156,7 @@ sequence:
 ---
 - inherit1=2342
 - inherit2=Hello World
+---
+- null
+---
+- null

@@ -155,3 +155,18 @@ execute:
     environment:
         some_int_variable1: 2342
         some_string_variable1: Hello World
+---
+# Empty YAML
+- execute:
+    command: cat
+    request-type: string
+    response-type: yaml
+    request: ""
+---
+# Empty JSON
+- execute:
+    command: cat
+    request-type: string
+    response-type: json
+    request: ""
+---

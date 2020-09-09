@@ -176,9 +176,12 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 		return result
 	case "json":
 		var doc interface{}
+		if len(response) == 0 {
+			return nily{} // JSON parser can't deal with ""
+		}
 		err := json.Unmarshal(response, &doc)
 		if err != nil {
-			panic(fmt.Sprintf("execute response was not JSON '%v'", err))
+			panic(fmt.Sprintf("execute response, '%s', was not JSON '%v'", response, err))
 		}
 		return classify(doc)
 	case "yaml":
@@ -186,7 +189,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 		var doc interface{}
 		err = decoder.Decode(&doc)
 		if err != nil && err != io.EOF {
-			panic(fmt.Sprintf("execute response was not YAML '%v'", err))
+			panic(fmt.Sprintf("execute response '%s', was not YAML '%v'", response, err))
 		}
 		return classify(doc)
 	default:
