@@ -276,5 +276,6 @@ func addBuiltinsToEnv(env *env) {
 	addNewBuiltin("load", loadBuiltin, true, false)
 	addNewBuiltin("execute", executeBuiltin, true, true)
 	addNewBuiltin("panic", panicBuiltin, true, false)
+	addNewBuiltin("exit", exitBuiltin, true, false)
 	addNewBuiltin("gopherlua", gopherluaBuiltin, true, true)
 }

@@ -1,0 +1,18 @@
+file_header:
+---
+Line number 3 - the last line to appear.
+---
+define:
+  ava:
+    exit:
+---
+This will never appear
+---
+or this
+---
+A pity Coorvid-19 doesn't vanish.
+
+# TODO Automate test exit, if added now, it kills everything.
+
+
+

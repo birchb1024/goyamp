@@ -1452,6 +1452,21 @@ gopherlua:
 
 In Lua you can add more to the path with `package.path = package.path ... ";my/directory/?.lua"`.
 
+=== Quitting Early with `exit`
+
+Sometimes you will want the script simply stop processing.  The `exit:` builtin halts execution by calling the operating system exit() function. You can provide the status for the process as an argument. If the argument is empty, null or 0 or the string `"0"`, the process status is zero. If an integer or a string containing an integer is provided this becomes the status of the process termination.    
+
+Example:
+
+[source, YAML]
+----
+if:
+  ==: [p1, p2]
+else:
+  exit: 3
+----
+
+This quietly exits with code 3. 
 
 === Enforcing Safety with `panic`
 
@@ -1546,7 +1561,7 @@ Run the unit tests with `cd test; go test`
 
 === Updating This Document
 
-This document is in http://www.methods.co.nz/asciidoc/:[AsciiDoc] format. Use the Linux `asciidoc` packages. To Highlight the YAML syntax also install `source-highlight` and the https://gist.github.com/zeroyonichihachi/c4952b355bb7a27552a5f23e0c53b65f#file-yaml-lang:[YAML syntax module]. Save the HTML version in `doc/README.html`.
+This document is in http://www.methods.co.nz/asciidoc/:[AsciiDoc] format. Use the Linux `asciidoc` packages. To Highlight the YAML syntax also install `source-highlight` and the https://gist.github.com/AlexZeitler/48813447f253360ccc431ae22d6939fd[YAML syntax module]. Save the HTML version in `doc/README.html`.
 
 === Known Issues
 
