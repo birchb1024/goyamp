@@ -1,6 +1,7 @@
 # Binaries for programs and plugins
 *.exe
 *_mac
+*_rpi
 *.exe~
 *.dll
 *.so

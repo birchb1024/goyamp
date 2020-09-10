@@ -32,13 +32,14 @@ then
 	go tool cover -html=coverage.out
 fi
 
-GOOS=windows GOARCH=amd64 go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
-GOOS=darwin GOARCH=amd64 go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
+GOOS=windows GOARCH=amd64         go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
+GOOS=darwin  GOARCH=amd64         go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
+GOOS=linux   GOARCH=arm   GOARM=7 go build -o goyamp_rpi -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 
 if [[ "${args}" == "package" ]]
 then
     mkdir -p pkg
     buildDocs
-    tar zcvf pkg/goyamp-"${version}".tgz ./goyamp ./goyamp_mac ./goyamp.exe doc/README.html examples lib
+    tar zcvf pkg/goyamp-"${version}".tgz ./goyamp ./goyamp_mac ./goyamp.exe ./goyamp_rpi doc/README.html examples lib
 	exit
 fi

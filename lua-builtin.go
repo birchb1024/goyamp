@@ -62,7 +62,9 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 		allInts := true
 		keys := map[int]bool{}
 		closed := true
-		minKey := 10000000000
+		const MaxUint = ^uint(0)
+		const MaxInt = int(MaxUint >> 1)
+		minKey := MaxInt
 		maxKey := 0
 
 		L.ForEach(x, func(k lua.LValue, v lua.LValue) {
