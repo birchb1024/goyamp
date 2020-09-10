@@ -34,7 +34,8 @@ fi
 
 GOOS=windows GOARCH=amd64         go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 GOOS=darwin  GOARCH=amd64         go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
-GOOS=linux   GOARCH=arm   GOARM=7 go build -o goyamp_rpi -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
+GOOS=linux   GOARCH=arm   GOARM=7 go build -o goyamp_arm7 -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
+GOOS=linux   GOARCH=arm   GOARM=6 go build -o goyamp_arm6 -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" cmd/main.go
 
 if [[ "${args}" == "package" ]]
 then
