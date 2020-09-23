@@ -35,6 +35,19 @@ func subvarLookup(original string, varsList []string, majorVariable yamly, bindi
 	}
 	firststr, sok := first.(stringy)
 	firstint, iok := first.(inty)
+	if sok && !iok {
+		// Look for a string containg an int
+		i, err := strconv.Atoi(firststr.String())
+		if err == nil {
+			iok = true
+			firstint = inty(i)
+		}
+	}
+	if iok && !sok {
+		// got an int make a string as well
+		sok = true
+		firststr = stringy(strconv.Itoa(int(firstint)))
+	}
 	if !sok && !iok {
 		panic(fmt.Sprintf("Subvariable value %v for not string or int in %v", first, original))
 	}
@@ -42,9 +55,12 @@ func subvarLookup(original string, varsList []string, majorVariable yamly, bindi
 	switch majorVariableTyped := majorVariable.(type) {
 	case mapy:
 		// A map of values
-		result, ok := majorVariableTyped[firststr]
+		result, ok := majorVariableTyped[firststr] // Usually map keys are strings
 		if !ok {
-			panic(fmt.Sprintf("Subvariable '%v' not found in %v and %v", first, original, majorVariableTyped))
+			result, ok = majorVariableTyped[firstint] // but majorVariable may have an integer key
+			if !ok {
+				panic(fmt.Sprintf("Subvariable '%#v' not found in %v and %v", firstint, original, majorVariableTyped))
+			}
 		}
 		if len(varsList) == 1 {
 			return result

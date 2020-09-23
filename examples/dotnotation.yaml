@@ -1,0 +1,15 @@
+- define:
+    intkeysmap:
+      1: a
+      2: b
+      "3": d
+---
+- intkeysmap.2
+- intkeysmap.3
+---
+- define:
+    v: 2
+    w: 3
+---
+- intkeysmap.v
+- intkeysmap.w
