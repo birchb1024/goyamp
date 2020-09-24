@@ -192,7 +192,7 @@ func assertKeys(validKeys map[string]bool, tmap mapy) {
 	for k, mandatory := range validKeys {
 		if mandatory {
 			if _, ok := tmap[stringy(k)]; !ok {
-				panic(fmt.Sprintf("missing key '%v' in %v", mandatory, tmap))
+				panic(fmt.Sprintf("missing key '%v' in %v", k, tmap))
 			}
 		}
 	}
