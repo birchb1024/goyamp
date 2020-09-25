@@ -2,12 +2,13 @@ package goyamp
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 func includeBuiltin(tree mapy, args yamly, bindings *env) yamly {
@@ -21,12 +22,15 @@ func includeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	}
 	switch arg := args.(type) {
 	case seqy:
+		if len(arg) == 0 {
+			panic(fmt.Sprintf("ERROR: include was expecting list of filenames, got %#v", args))
+		}
 		for _, x := range arg {
 			maybefile := x.expand(bindings)
 			if filename, ok := maybefile.(stringy); ok {
 				err := expandFile(string(filename), bindings)
 				if err != nil {
-					log.Fatalf("%v", err)
+					panic(fmt.Sprintf("%v", err))
 				}
 			} else {
 				panic(fmt.Sprintf("ERROR: include was expecting string filename, got %v for %v in %v", maybefile, x, tree))
@@ -35,7 +39,7 @@ func includeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	case stringy:
 		err := expandFile(string(arg), bindings)
 		if err != nil {
-			log.Fatalf("%v", err)
+			panic(fmt.Sprintf("%v", err))
 		}
 	default:
 		panic(fmt.Sprintf("ERROR: include was expecting list of filenames, got %#v", args))
