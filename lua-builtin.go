@@ -8,7 +8,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
-var luanily = lua.LUserData{"NILY", nil, nil}
+var luanily = lua.LUserData{Value: "NILY", Env: nil, Metatable: nil}
 
 func (x nily) gopherluaify(L *lua.LState) lua.LValue     { return &luanily }
 func (e empty) gopherluaify(L *lua.LState) lua.LValue    { return lua.LString(e.String()) }

@@ -143,16 +143,17 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 	cmd := exec.Command(command, arguments...)
 	cmd.Dir = directory
 	cmd.Env = environment
+	cmd.Stderr = os.Stderr // process stderr goes direct to user stderr
+	var responseBuffer bytes.Buffer
+	cmd.Stdout = &responseBuffer
 	if request != nil {
 		cmd.Stdin = bytes.NewReader(request)
 	}
-	log.Printf("execute: '%#v'", cmd)
-	response, err := cmd.Output()
-	log.Printf("execute: '%#v'", cmd)
+	log.Printf("execute: start: '%#v'", cmd)
+	err := cmd.Run()
+	response := responseBuffer.Bytes()
+	log.Printf("execute: done.")
 	if err != nil {
-		if err, ok := err.(*exec.ExitError); ok {
-			panic(fmt.Sprintf("%v %v %v %v", err.Error(), string(err.Stderr), command, arguments))
-		}
 		panic(err)
 	}
 
