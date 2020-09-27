@@ -1550,9 +1550,12 @@ The goymap Go module can be used as a component to other programs. The 'main' of
 
 === Build from Source
 
+Source code is in GitHub https://github.com/:birchb1024/goyamp:[here].
+
 [source, Shell]
 ----
-$ make.sh
+$ git clone https://github.com/birchb1024/goyamp
+$ build.sh
 ----
 
 === Code
@@ -1565,4 +1568,4 @@ This document is in http://www.methods.co.nz/asciidoc/:[AsciiDoc] format. Use th
 
 === Known Issues
 
-TODO
+See the `Issues` in the https://github.com/birchb1024/goyamp:[Goyamp GitHub project]
