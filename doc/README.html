@@ -736,8 +736,8 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.4.2,</span>
-<span id="revdate">09.09.2020</span>
+<span id="revnumber">version 0.4.2-8-gcb443b3,</span>
+<span id="revdate">28.09.2020</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -786,7 +786,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.4</span><span style="color: #990000">.</span><span style="color: #993399">2</span>/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.4</span><span style="color: #990000">.</span><span style="color: #993399">2</span>-<span style="color: #993399">8</span>-gcb443b3/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -2447,12 +2447,40 @@ http://www.gnu.org/software/src-highlite -->
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_build_from_source">Build from Source</h3>
+<div class="paragraph"><p>Source code is in GitHub <a href="https://github.com/:birchb1024/goyamp:">here</a>.</p></div>
+<div class="paragraph"><p>First install dependencies (Ubuntu)</p></div>
 <div class="listingblock">
 <div class="content"><!-- Generator: GNU source-highlight
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ make<span style="color: #990000">.</span>sh</tt></pre></div></div>
+<pre><tt>
+$ sudo apt install asciidoctor
+$ sudo apt install source-highlight
+<span style="color: #990000">:</span> Install the source-highlighter <span style="font-weight: bold"><span style="color: #0000FF">for</span></span> YAML - Following these instructions https<span style="color: #990000">:</span>//gist<span style="color: #990000">.</span>github<span style="color: #990000">.</span>com/AlexZeitler<span style="color: #990000">/</span>48813447f253360ccc431ae22d6939fd
+
+$ sudo -H bash
+$ curl https<span style="color: #990000">:</span>//gist<span style="color: #990000">.</span>githubusercontent<span style="color: #990000">.</span>com/AlexZeitler<span style="color: #990000">/</span>48813447f253360ccc431ae22d6939fd/raw<span style="color: #990000">/</span>1c1d9372cce5fb2b568b2dd953d334ef8fe3f33d/yaml<span style="color: #990000">.</span>lang <span style="color: #990000">&gt;</span> /usr/share/source-highlight/yaml<span style="color: #990000">.</span>lang
+$ <span style="font-weight: bold"><span style="color: #0000FF">for</span></span> X <span style="font-weight: bold"><span style="color: #0000FF">in</span></span> yml yaml
+<span style="font-weight: bold"><span style="color: #0000FF">do</span></span>
+  echo <span style="color: #FF0000">"$X = yaml.lang"</span> <span style="color: #990000">&gt;&gt;</span> /usr/share/source-highlight/lang<span style="color: #990000">.</span>map
+<span style="font-weight: bold"><span style="color: #0000FF">done</span></span></tt></pre></div></div>
+<div class="paragraph"><p>Build</p></div>
+<div class="listingblock">
+<div class="content"><!-- Generator: GNU source-highlight
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #990000">:</span> First install dependencies <span style="color: #990000">(</span>Ubuntu<span style="color: #990000">)</span>
+$ git clone https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp
+$ cd goyamp
+$ build<span style="color: #990000">.</span>sh                        <span style="font-style: italic"><span style="color: #9A1900"># For executables</span></span>
+
+$ build<span style="color: #990000">.</span>sh coverage               <span style="font-style: italic"><span style="color: #9A1900"># Test coverage detailed report</span></span>
+
+$ build<span style="color: #990000">.</span>sh doc                    <span style="font-style: italic"><span style="color: #9A1900"># For Asciidoc to HTML</span></span>
+
+$ build<span style="color: #990000">.</span>sh package                <span style="font-style: italic"><span style="color: #9A1900"># To make a releasable tar file with document, examples and executables.</span></span></tt></pre></div></div>
 </div>
 <div class="sect2">
 <h3 id="_code">Code</h3>
@@ -2464,7 +2492,7 @@ http://www.gnu.org/software/src-highlite -->
 </div>
 <div class="sect2">
 <h3 id="_known_issues">Known Issues</h3>
-<div class="paragraph"><p>TODO</p></div>
+<div class="paragraph"><p>See the <code>Issues</code> in the <a href="https://github.com/birchb1024/goyamp:">Goyamp GitHub project</a></p></div>
 </div>
 </div>
 </div>
@@ -2472,9 +2500,9 @@ http://www.gnu.org/software/src-highlite -->
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.4.2<br />
+Version 0.4.2-8-gcb443b3<br />
 Last updated
- 2020-09-09 20:30:28 AEST
+ 2020-09-28 08:42:05 AEST
 </div>
 </div>
 </body>

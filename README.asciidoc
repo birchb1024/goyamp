@@ -1552,10 +1552,36 @@ The goymap Go module can be used as a component to other programs. The 'main' of
 
 Source code is in GitHub https://github.com/:birchb1024/goyamp:[here].
 
+First install dependencies (Ubuntu)
+
+[source, Shell]
+----
+
+$ sudo apt install asciidoctor
+$ sudo apt install source-highlight
+: Install the source-highlighter for YAML - Following these instructions https://gist.github.com/AlexZeitler/48813447f253360ccc431ae22d6939fd
+
+$ sudo -H bash
+$ curl https://gist.githubusercontent.com/AlexZeitler/48813447f253360ccc431ae22d6939fd/raw/1c1d9372cce5fb2b568b2dd953d334ef8fe3f33d/yaml.lang > /usr/share/source-highlight/yaml.lang
+$ for X in yml yaml
+do
+  echo "$X = yaml.lang" >> /usr/share/source-highlight/lang.map
+done
+----
+
+Build
+
 [source, Shell]
 ----
 $ git clone https://github.com/birchb1024/goyamp
-$ build.sh
+$ cd goyamp
+$ build.sh                        # For executables
+
+$ build.sh coverage               # Test coverage detailed report
+
+$ build.sh doc                    # For Asciidoc to HTML
+
+$ build.sh package                # To make a releasable tar file with document, examples and executables.
 ----
 
 === Code
