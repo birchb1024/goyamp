@@ -41,6 +41,6 @@ if [[ "${args}" == "package" ]]
 then
     mkdir -p pkg
     buildDocs
-    tar zcvf pkg/goyamp-"${version}".tgz ./goyamp ./goyamp_mac ./goyamp.exe ./goyamp_rpi doc/README.html examples lib
+    tar zcf pkg/goyamp-"${version}".tgz ./goyamp ./goyamp_mac ./goyamp.exe ./goyamp_arm6 ./goyamp_arm7 doc/README.html examples lib
 	exit
 fi
