@@ -11,12 +11,12 @@ import (
 // Cannot us Lua nil because that implies empty in tables. So use this singleton object instead
 var luanily = lua.LUserData{Value: "NILY", Env: nil, Metatable: nil}
 
-func (x nily) gopherluaify(L *lua.LState) lua.LValue     { return &luanily }
-func (e empty) gopherluaify(L *lua.LState) lua.LValue    { return lua.LString(e.String()) }
-func (x inty) gopherluaify(L *lua.LState) lua.LValue     { return lua.LNumber(x) }
-func (x float64y) gopherluaify(L *lua.LState) lua.LValue { return lua.LNumber(x) }
-func (x booly) gopherluaify(L *lua.LState) lua.LValue    { return lua.LBool(x) }
-func (x stringy) gopherluaify(L *lua.LState) lua.LValue  { return lua.LString(x) }
+func (x nily) gopherluaify(*lua.LState) lua.LValue     { return &luanily }
+func (e empty) gopherluaify(*lua.LState) lua.LValue    { return lua.LString(e.String()) }
+func (x inty) gopherluaify(*lua.LState) lua.LValue     { return lua.LNumber(x) }
+func (x float64y) gopherluaify(*lua.LState) lua.LValue { return lua.LNumber(x) }
+func (x booly) gopherluaify(*lua.LState) lua.LValue    { return lua.LBool(x) }
+func (x stringy) gopherluaify(*lua.LState) lua.LValue  { return lua.LString(x) }
 func (m mapy) gopherluaify(L *lua.LState) lua.LValue {
 	result := L.CreateTable(len(m), len(m))
 	result.Metatable = L.GetGlobal("mapy")
@@ -34,9 +34,9 @@ func (s seqy) gopherluaify(L *lua.LState) lua.LValue {
 	}
 	return result
 }
-func (r macroFunction) gopherluaify(L *lua.LState) lua.LValue    { return lua.LString(r.String()) }
-func (r compiledFunction) gopherluaify(L *lua.LState) lua.LValue { return lua.LString(r.String()) }
-func (x unknowny) gopherluaify(L *lua.LState) lua.LValue         { return lua.LString(x.String()) }
+func (r macroFunction) gopherluaify(*lua.LState) lua.LValue    { return lua.LString(r.String()) }
+func (r compiledFunction) gopherluaify(*lua.LState) lua.LValue { return lua.LString(r.String()) }
+func (x unknowny) gopherluaify(*lua.LState) lua.LValue         { return lua.LString(x.String()) }
 
 func classifyLua(L *lua.LState, x lua.LValue) yamly {
 	switch x := x.(type) {
