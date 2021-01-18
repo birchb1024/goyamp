@@ -6,6 +6,12 @@ define:
     dm = require('deepmerge')
     result = dm.deep_merge(args[1], args[2])
 ---
+define:
+  classify(): |-
+    dm = require('deepmerge')
+    ac = dm.classify(args)
+    result = ac
+---
 gopherlua:
   script: $deepmerge
   args: 
@@ -73,4 +79,41 @@ gopherlua:
     - maps: {a: 2, b: 3, d: {yy: 99, u: 100 } }
       bags: [3, 4, 5, 1]
       sets: [3, 4, 5, 1]
+---
+gopherlua:
+  script: $deepmerge
+  args:
+    - empty_list: []
+      empty_map: {}
+      map_like_array: {1: , 2: , 3: }
+    - empty_map: {}
+      empty_list: []
+      map_like_array: {1: , 2: , 3: }
+---
+flatten:
+  repeat:
+    for: $x
+    in:
+      -
+      - ~
+      - null
+      - []
+      - {}
+      - [1]
+      - [1,2,3]
+      - [1,2,4]
+      - [1,2,2]
+      - ["1"]
+      - {1: a, 3: b}
+      - {1:, 2:}
+      - {a: , b:}
+      - {a: 1, b: 2}
+      - [ { a: 2} , 2, W, "x"]
+    body:
+      - define:
+          $type:
+            gopherlua:
+              script: classify()
+              args: $x
+      - "{{$x}} {{$type}}"
 

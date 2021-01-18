@@ -8,6 +8,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+// Cannot us Lua nil because that implies empty in tables. So use this singleton object instead
 var luanily = lua.LUserData{Value: "NILY", Env: nil, Metatable: nil}
 
 func (x nily) gopherluaify(L *lua.LState) lua.LValue     { return &luanily }
@@ -18,6 +19,7 @@ func (x booly) gopherluaify(L *lua.LState) lua.LValue    { return lua.LBool(x) }
 func (x stringy) gopherluaify(L *lua.LState) lua.LValue  { return lua.LString(x) }
 func (m mapy) gopherluaify(L *lua.LState) lua.LValue {
 	result := L.CreateTable(len(m), len(m))
+	result.Metatable = L.GetGlobal("mapy")
 	for k, v := range m {
 		result.RawSet(lua.LString(k.String()), v.gopherluaify(L))
 	}
@@ -26,8 +28,8 @@ func (m mapy) gopherluaify(L *lua.LState) lua.LValue {
 
 func (s seqy) gopherluaify(L *lua.LState) lua.LValue {
 	result := L.CreateTable(len(s), len(s))
+	result.Metatable = L.GetGlobal("seqy")
 	for i, v := range s {
-		// fmt.Println("Insert", i+1, v.gopherluaify(L))
 		result.Insert(i+1, v.gopherluaify(L))
 	}
 	return result
@@ -66,8 +68,11 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 		const MaxInt = int(MaxUint >> 1)
 		minKey := MaxInt
 		maxKey := 0
+		length := 0
 
+		// Scan the table
 		L.ForEach(x, func(k lua.LValue, v lua.LValue) {
+			length += 1
 			if ln, ok := k.(lua.LNumber); ok {
 				i := int(ln)
 				keys[i] = true
@@ -77,15 +82,18 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 				if i > maxKey {
 					maxKey = i
 				}
-				//				fmt.Println("key: ", k, k.Type(), i, v)
 			} else {
 				allInts = false
 			}
 		})
-		if maxKey == 0 { // Empty table!
-			allInts = false
+		if length == 0 { // Empty
+			if x.Metatable == L.GetGlobal("mapy") {
+				return mapy{}
+			} else {
+				return seqy{}
+			}
 		}
-		if allInts {
+		if allInts { // Look for gaps in the key sequence
 			for i := minKey; i <= maxKey; i++ {
 				if _, ok := keys[i]; !ok {
 					closed = false
@@ -93,18 +101,12 @@ func classifyLua(L *lua.LState, x lua.LValue) yamly {
 				}
 			}
 		}
-		// fmt.Println("allInts closed: ", allInts, closed, minKey, maxKey, x)
-		// L.ForEach(x, func(k lua.LValue, v lua.LValue) {
-		// 	fmt.Println("                ", k.String(), v.String())
-		// })
 		if allInts && closed {
 			log.Printf("makeseqy %d %d %d", minKey, maxKey, maxKey-minKey+1)
 			result := make(seqy, maxKey-minKey+1)
 			for i := minKey; i <= maxKey; i++ {
-				// fmt.Println("resultB", i, result)
 				v := x.RawGetInt(i)
 				result[i-1] = classifyLua(L, v)
-				// fmt.Println("resultA", result)
 			}
 			return result
 		}
@@ -135,6 +137,16 @@ func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly {
 
 	L := lua.NewState()
 	defer L.Close()
+
+	// Add additional types
+	L.SetGlobal("nily", &luanily)
+	for _, mtn := range []string{"seqy", "mapy"} {
+		mt := L.NewTypeMetatable(mtn)
+		L.SetGlobal(mtn, mt)
+		if err := L.DoString(fmt.Sprintf("%[1]s['name']='%[1]s'; ", mtn)); err != nil {
+			panic(fmt.Sprintf("gopherlua:  %s", err))
+		}
+	}
 	// // Convert argument to Lua format
 	//
 	tb := a.gopherluaify(L)

@@ -105,3 +105,12 @@ gopherlua:
   - gopherlua:
       args: nil
       script: result = 2
+---
+gopherlua:
+  args: [[1], {"x": 3}]
+  script: |
+    result = {
+      getmetatable(args[1]) == seqy,
+      getmetatable(args[2]) == mapy
+    }
+---

@@ -26,21 +26,21 @@ Maps with keys
 
 Arrays (sequential integer keys with no gaps):
 
-Bags (where there are duplicate items)
+	Lists (where there are duplicate items)
 
-    One list is added to the end of the other.
+		One list is added to the end of the other.
 
-    { 1, 1, 2, 3 }, {3, 4, 5, 1}
+		{ 1, 1, 2, 3 }, {3, 4, 5, 1}
 
-    { 1, 1, 2, 3, 3, 4, 5, 1}
+		{ 1, 1, 2, 3, 3, 4, 5, 1}
 
-Sets (where both A and B have unique elements) 
+	Sets (where both A and B have unique elements)
 
-    A set union is returned
+		A set union is returned
 
-    { 1, 2, 3 }, {3, 4, 5, 1}
+		{ 1, 2, 3 }, {3, 4, 5, 1}
 
-    { 1, 2, 3, 4, 5}
+		{ 1, 2, 3, 4, 5}
 
 ]]
 
@@ -49,77 +49,97 @@ Sets (where both A and B have unique elements)
 -- ix = function (x) print(inspect.inspect(x)) end
 -- ix(args)
 
+-- classify - Return 'set', 'list' or 'map' for table types else the Lua type name
 function classify(t)
-    if type(t) ~= "table" then return type(t) end  
-    -- Determine if a Lua table is an array. https://ericjmritz.wordpress.com/2014/02/26/lua-is_array/
+    if type(t) ~= "table" then return type(t) end
+    -- Are all the keys integer?
+    for k,_ in pairs(t) do
+        if type(k) ~= "number" then
+            return "map"
+        end
+    end
+    -- Determine if a Lua table is a sequence of keys with nil holes. https://ericjmritz.wordpress.com/2014/02/26/lua-is_array/
     local i = 0
     for _,_ in pairs(t) do
         i = i + 1
         if t[i] == nil then return "map" end
     end
-    -- it's an array
+    if i == 0 then -- empty list or map?
+        if getmetatable(t) == mapy then
+            return "map"
+        end
+        if getmetatable(t) == seqy then
+            return "list"
+        end
+    end
+
+    -- See if the vlaues are unique, if not it's a list
     local set = {}
     for _, v in ipairs(t) do
-		if set[v] ~= nil then return "array" end
-		set[v] = true
-		end
+        if set[v] ~= nil then return "list" end
+        set[v] = true
+    end
+
     return "set"
 end
 
 function set_merge(a, b)
-	-- Treat arrays as sets. 
-	-- result randomly ordered
-	local elements = {}
-	for i, v in ipairs(a) do
-		elements[v] = true
-	end
-	for i, v in ipairs(b) do
-		elements[v] = true
-	end
-	local results = {}
-	for k, _ in pairs(elements) do
-		table.insert(results, k)
-	end
-	return results
+    -- Treat tables as sets.
+    -- result randomly ordered
+    local elements = {}
+    for i, v in ipairs(a) do
+        elements[v] = true
+    end
+    for i, v in ipairs(b) do
+        elements[v] = true
+    end
+    local results = {}
+    setmetatable(results, seqy)
+    for k, _ in pairs(elements) do
+        table.insert(results, k)
+    end
+    return results
 end
 
-function array_merge(a, b)
-	-- Treat arrays as a bag, ie possibly with duplicates and ordered.
-	-- result ordered a first, then b
-	local result = {}
-	for i, v in ipairs(a) do
-		result[i] = v
-	end
-	for i, v in ipairs(b) do
-		table.insert(result, v)
-	end
-	return result
+function list_merge(a, b)
+    -- Treat tables as a list, i.e. possibly with duplicates and ordered.
+    -- result ordered a first, then b
+    local result = {}
+    setmetatable(result, seqy)
+    for i, v in ipairs(a) do
+        result[i] = v
+    end
+    for i, v in ipairs(b) do
+        table.insert(result, v)
+    end
+    return result
 end
 
 function map_merge(a, b)
-	-- map elements with same keys to be merged, otherwies just added
-	local result = {}
-	for ka, va in pairs(a) do
-		if b[ka] ~= nil then -- both maps have this key 
-			result[ka] = deep_merge(va, b[ka])
-		else
-			result[ka] = va
-		end
-	end
+    -- map elements with same keys to be merged, otherwise just added
+    local result = {}
+    setmetatable(result, mapy)
+    for ka, va in pairs(a) do
+        if b[ka] ~= nil then -- both maps have this key
+            result[ka] = deep_merge(va, b[ka])
+        else
+            result[ka] = va
+        end
+    end
 
-	for kb, vb in pairs(b) do
-		if a[kb] == nil then    -- A does not have this key
-			result[kb] = vb       -- For a hard earned thirst.
-		else
-		-- A already has this key and it trumps B
-		end
-	end
-	return result
+    for kb, vb in pairs(b) do
+        if a[kb] == nil then    -- A does not have this key
+            result[kb] = vb       -- For a hard earned thirst.
+        else
+            -- A already has this key and it trumps B
+        end
+    end
+    return result
 end
 
 function isarray(typ)
-	arraytypes = {set = true, array = true}
-	return arraytypes[typ] ~= nil
+    arraytypes = {set = true, list = true}
+    return arraytypes[typ] ~= nil
 end
 --
 -- Deep merge two trees 
@@ -128,28 +148,28 @@ function dm.deep_merge(a, b)
     --ix({"deep_merge: ", a, b})
     local at = classify(a)
     local bt = classify(b)
-    
+
     if at == "number" or at == "string" then
-    	return a
+        return a
     end
-   
-	if at == bt then
-		if at == "set" then
-	        return set_merge(a, b)
-    	elseif at == "array" then
-        	return array_merge(a, b)
-    	elseif at == "map" then
-        	return map_merge(a, b)
-		else
-			return a
-		end
-	else
-	    if isarray(at) and isarray(bt) then	
-			return array_merge(a, b)
-		else
-			return a
-		end
-	end
+
+    if at == bt then
+        if at == "set" then
+            return set_merge(a, b)
+        elseif at == "list" then
+            return list_merge(a, b)
+        elseif at == "map" then
+            return map_merge(a, b)
+        else
+            return a
+        end
+    else
+        if isarray(at) and isarray(bt) then
+            return list_merge(a, b)
+        else
+            return a
+        end
+    end
 end
 
 return dm
