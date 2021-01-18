@@ -736,8 +736,8 @@ asciidoc.install(4);
 <div id="header">
 <h1>Goyamp - The Go Macro Processor for YAML and JSON</h1>
 <span id="author">Peter Birch &lt;birchb1024 at gmail.com&gt;</span><br />
-<span id="revnumber">version 0.4.3,</span>
-<span id="revdate">03.10.2020</span>
+<span id="revnumber">version 0.4.3-7-gc0bbe28,</span>
+<span id="revdate">18.01.2021</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -786,7 +786,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.4</span><span style="color: #990000">.</span><span style="color: #993399">3</span>/goyamp
+<pre><tt>$ curl -L -o goyamp https<span style="color: #990000">:</span>//github<span style="color: #990000">.</span>com/birchb<span style="color: #993399">1024</span>/goyamp/releases/download<span style="color: #990000">/</span><span style="color: #993399">0.4</span><span style="color: #990000">.</span><span style="color: #993399">3</span>-<span style="color: #993399">7</span>-gc0bbe28/goyamp
 $ chmod a<span style="color: #990000">+</span>x goyamp</tt></pre></div></div>
 </div>
 <div class="sect2">
@@ -2217,7 +2217,7 @@ Then the global variable <code>args</code> is set to the value of the YAML args:
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Goyamp uses these global variables in the Lua interpreter:</p></div>
+<div class="paragraph"><p>Goyamp uses these global variables inside the Lua interpreter:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -2237,6 +2237,21 @@ Then the global variable <code>args</code> is set to the value of the YAML args:
 <li>
 <p>
 <code>result</code> - where the result of the Lua execution is placed for return to Goyamp
+</p>
+</li>
+<li>
+<p>
+<code>seqy</code> - the metatable attached to YAML sequence (list) tables
+</p>
+</li>
+<li>
+<p>
+<code>mapy</code> - the metatable for YAML map tables
+</p>
+</li>
+<li>
+<p>
+<code>nily</code> - variable contains the userdata object used for YAML null values
 </p>
 </li>
 </ul></div>
@@ -2323,6 +2338,11 @@ http://www.gnu.org/software/src-highlite -->
 <span style="color: #990000">  </span><span style="color: #009900">script</span><span style="color: #990000">:</span> $deepmerge
 <span style="color: #990000">  </span><span style="color: #009900">args</span><span style="color: #990000">:</span> etc, etc</tt></pre></div></div>
 <div class="paragraph"><p>In Lua you can add more to the path with <code>package.path = package.path ... ";my/directory/?.lua"</code>.</p></div>
+<div class="sect3">
+<h4 id="_lua_conversion">Lua Conversion</h4>
+<div class="paragraph"><p>Lua tables use <code>nil</code> to signal absence of an entry rather than holding the value <code>nil</code>. To work around this, Goyamp converts YAML <code>null</code> to a <code>userdata</code> object which is stored in the global Lua variable <code>nily</code>.</p></div>
+<div class="paragraph"><p>Lua does not have a separate data types for arrays and maps, it uses the <code>table</code> type for both of these. Hence issues arise when working with YAML data which <em>does</em> differentiate. This is handled by the custom metatables <code>mapy</code> and <code>seqy</code>. When collections are transfered to Gopher Lua their metatables are set to either <code>mapy</code> or <code>seqy</code>. Likewise when a Lua table is ambiguous in a result you can clarify this with <code>setmetatable</code>. For example <code>setmetatable(x, mapy)</code> ensures that Goymap sees this result item as a map.</p></div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_quitting_early_with_code_exit_code">Quitting Early with <code>exit</code></h3>
@@ -2499,9 +2519,9 @@ $ build<span style="color: #990000">.</span>sh package                <span styl
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 0.4.3<br />
+Version 0.4.3-7-gc0bbe28<br />
 Last updated
- 2020-10-03 05:07:42 AEST
+ 2021-01-18 17:15:38 AEDT
 </div>
 </div>
 </body>

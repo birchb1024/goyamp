@@ -269,8 +269,8 @@ Goyamp is looking for macro calls with this structure:
 [source,YAML]
 ----
 <Macro>:
-   <Argument>: <value>
-   <Argument>: <value>
+   <Argument1>: <value>
+   <Argument2>: <value>
     . . .
 ----
 
@@ -1359,12 +1359,15 @@ otherwise the package.path variable is set to the default `+__DIR__/?.lua;./?.lu
 
 4. Then the global variable `args` is set to the value of the YAML args: element. The string in script: is executed, and the value of `result` is returned to Goyamp.
 
-Goyamp uses these global variables in the Lua interpreter:
+Goyamp uses these global variables inside the Lua interpreter:
 
 * `+__DIR__+` - Directory containing the current enclosing YAML script
 * `args` - Holds the input args: argument
 * `executable_directory` - Directory holding the gymap binary, useful for path manipulations,
 * `result` - where the result of the Lua execution is placed for return to Goyamp
+* `seqy` - the metatable attached to YAML sequence (list) tables
+* `mapy` - the metatable for YAML map tables
+* `nily` - variable contains the userdata object used for YAML null values
 
 The gopherlua: syntax is as follows:
 
@@ -1451,6 +1454,13 @@ gopherlua:
 ----
 
 In Lua you can add more to the path with `package.path = package.path ... ";my/directory/?.lua"`.
+
+==== Lua Conversion
+
+Lua tables use `nil` to signal absence of an entry rather than holding the value `nil`. To work around this, Goyamp converts YAML `null` to a `userdata` object which is stored in the global Lua variable `nily`.
+
+Lua does not have a separate data types for arrays and maps, it uses the `table` type for both of these. Hence issues arise when working with YAML data which _does_ differentiate. This is handled by the custom metatables `mapy` and `seqy`. When collections are transfered to Gopher Lua their metatables are set to either `mapy` or `seqy`. Likewise when a Lua table is ambiguous in a result you can clarify this with `setmetatable`. For example `setmetatable(x, mapy)` ensures that Goymap sees this result item as a map.
+
 
 === Quitting Early with `exit`
 
