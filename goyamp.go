@@ -46,19 +46,19 @@ type unknowny struct {
 	x interface{}
 }
 
-func (x nily) expand(binding *env) yamly { return x }
-func (x nily) String() string            { return "null" }
+func (x nily) expand(*env) yamly { return x }
+func (x nily) String() string    { return "null" }
 
-func (e empty) expand(binding *env) yamly { return e }
-func (e empty) String() string            { return "goyamp.EMPTY" }
+func (e empty) expand(*env) yamly { return e }
+func (e empty) String() string    { return "goyamp.EMPTY" }
 
-func (x inty) expand(binding *env) yamly { return x }
-func (x inty) String() string            { return strconv.Itoa(int(x)) }
+func (x inty) expand(*env) yamly { return x }
+func (x inty) String() string    { return strconv.Itoa(int(x)) }
 
-func (x float64y) expand(binding *env) yamly { return x }
-func (x float64y) String() string            { return strconv.FormatFloat(float64(x), 'G', -1, 32) }
+func (x float64y) expand(*env) yamly { return x }
+func (x float64y) String() string    { return strconv.FormatFloat(float64(x), 'G', -1, 32) }
 
-func (x booly) expand(binding *env) yamly { return x }
+func (x booly) expand(*env) yamly { return x }
 func (x booly) String() string {
 	if x {
 		return "true"
@@ -66,8 +66,8 @@ func (x booly) String() string {
 	return "false"
 }
 
-func (x unknowny) expand(binding *env) yamly { return x }
-func (x unknowny) String() string            { return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }
+func (x unknowny) expand(*env) yamly { return x }
+func (x unknowny) String() string    { return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }
 
 func (x stringy) String() string { return string(x) }
 
@@ -104,14 +104,14 @@ type macroFunction struct {
 	body yamly
 }
 
-func (r macroFunction) expand(binding *env) yamly { return r }
+func (r macroFunction) expand(*env) yamly { return r }
 
 type compiledFunction struct {
 	fun      functionDef
 	compiled builtin
 }
 
-func (r compiledFunction) expand(binding *env) yamly { return r }
+func (r compiledFunction) expand(*env) yamly { return r }
 
 type runnable interface {
 	isEager() bool
@@ -716,7 +716,7 @@ func expandFile(filename string, bindings *env) error {
 	return nil
 }
 
-func expandStream(input io.Reader, filename string, bindings *env) (err error) {
+func expandStream(input io.Reader, _ string, bindings *env) (err error) {
 	decoder := yaml.NewDecoder(input)
 	for {
 		var doc interface{}
@@ -765,7 +765,7 @@ func expandStream(input io.Reader, filename string, bindings *env) (err error) {
 			enc := yaml.NewEncoder(bindings.engine.output)
 			enc.SetIndent(2)
 			if documentCount > 0 {
-				fmt.Fprintln(bindings.engine.output, "---")
+				_, _ = fmt.Fprintln(bindings.engine.output, "---")
 			}
 			err = enc.Encode(expanded.declassify())
 			if err != nil {
