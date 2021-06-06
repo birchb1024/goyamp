@@ -15,3 +15,5 @@ somedata.1.qa1
 - Movie Name = {{movie1.name}}
 - Movie Director = {{movie1.director}}
 - Movie Cast = {{movie1.actors}}
+---
+somedata.2.floats_and_ints

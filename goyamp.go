@@ -227,6 +227,59 @@ func classify(x interface{}) yamly {
 }
 
 //
+// intify - Scan some tree and convert any floats to ints if possible,
+// return the tree with ints in it.
+//
+func intify(x interface{}) interface{} {
+	switch x := x.(type) {
+	case float64:
+		possibleInt := int(x)
+		if float64(possibleInt) == x {
+			return possibleInt
+		}
+		return x
+	case map[interface{}]interface{}:
+		result := map[interface{}]interface{}{}
+		for k, v := range x {
+			result[intify(k)] = intify(v)
+		}
+		return result
+	case map[interface{}]float64:
+		result := map[interface{}]interface{}{}
+		for k, v := range x {
+			result[intify(k)] = intify(v)
+		}
+		return result
+	case map[string]float64:
+		result := map[string]interface{}{}
+		for k, v := range x {
+			result[k] = intify(v)
+		}
+		return result
+	case map[string]interface{}:
+		result := map[string]interface{}{}
+		for k, v := range x {
+			result[k] = intify(v)
+		}
+		return result
+	case []interface{}:
+		result := []interface{}{}
+		for _, v := range x {
+			result = append(result, intify(v))
+		}
+		return result
+	case []float64:
+		result := []interface{}{}
+		for _, v := range x {
+			result = append(result, intify(v))
+		}
+		return result
+	default:
+		return x
+	}
+}
+
+//
 //
 func (x nily) declassify(...Syntax) interface{}     { return nil }
 func (e empty) declassify(...Syntax) interface{}    { return "goyamp.EMPTY" }

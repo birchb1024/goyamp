@@ -25,7 +25,7 @@ func argString(tree yamly, args mapy, name string, defualt string) string {
 	return string(val)
 }
 
-func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
+func executeBuiltin(tree mapy, args yamly, _ *env) yamly {
 	log.Printf("exec: %v", args)
 
 	validResponseType := map[string]bool{"lines": true, "yaml": true, "json": true, "string": true}
@@ -184,7 +184,7 @@ func executeBuiltin(tree mapy, args yamly, bindings *env) yamly {
 		if err != nil {
 			panic(fmt.Sprintf("execute response, '%s', was not JSON '%v'", response, err))
 		}
-		return classify(doc)
+		return classify(intify(doc)) // convert floats to ints where possible, because JSON uses only float64 :-(
 	case "yaml":
 		decoder := yaml.NewDecoder(bytes.NewReader(response))
 		var doc interface{}

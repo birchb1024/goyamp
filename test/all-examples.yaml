@@ -43,3 +43,5 @@ include:
   - ../examples/varargs.yaml
   - ../examples/caret.yaml
   - ../examples/issue06.yaml
+  - ../examples/json_numbers.yaml
+  
