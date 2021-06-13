@@ -1,6 +1,6 @@
 module github.com/birchb1024/goyamp
 
-go 1.12
+go 1.16
 
 require (
 	github.com/pkg/errors v0.9.1
