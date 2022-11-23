@@ -1,0 +1,28 @@
+defmacro:
+  name: isDefined
+  args: $varname
+  value:
+    gopherlua:
+      args: {^$varname : $varname}
+      script: |
+        result = true
+        for k,v in pairs(args) do
+           if k==v then
+              result = result and false
+           else
+              result = result and true
+           end
+        end
+---
+- define: {$PKI: true}
+- define: {$PKI2: 34}
+- isDefined: {quote: $PKI}
+- isDefined: {quote: $PKI2}
+- isDefined: {quote: $NotDefined}
+- if: {isDefined: {quote: $PKI}}
+  then:
+    pki:
+      Root-CA: yada yada
+      CA: blah blah
+      Cert_Finger_Print: 12.34.56.78
+      
