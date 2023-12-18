@@ -19,6 +19,14 @@ function buildDocs {
 }
 
 args=${1:-bin}
+
+if [[ "${args}" == "depends" ]]
+then
+  setupWorkspaceForBuild
+	exit
+fi
+
+
 if [[ "${args}" == "doc" ]]
 then
     buildDocs
@@ -49,11 +57,5 @@ then
     buildDocs
     tar zcf pkg/goyamp-"${version}".tgz ./goyamp ./goyamp_mac ./goyamp.exe ./goyamp_arm6 ./goyamp_arm7 doc/README.html examples lib
 	  exit
-fi
-
-if [[ "${args}" == "depends" ]]
-then
-  setupWorkspaceForBuild
-	exit
 fi
 
