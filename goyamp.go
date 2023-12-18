@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"github.com/birchb1024/goyamp/internal"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
+	"runtime/debug"
+	"strings"
 )
 
 func helpText(out io.Writer, doOrNotDo bool) {
@@ -42,7 +43,12 @@ func makeBooleanFlag(flagVar *bool, switchName string, desc string) {
 	flag.BoolVar(flagVar, string(switchName[0]), false, desc)
 }
 
+// Version provides the Git version tag used in the build of the binary
+var Version string
+
 func main() {
+
+	version :=  getBuildInfoVersion(Version)
 
 	var help, debugFlag bool
 	var outputFormatVar string
@@ -75,7 +81,7 @@ func main() {
 	}
 
 	if !debugFlag {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 	log.Printf("output = %#v", outputFormatVar)
 
@@ -83,7 +89,7 @@ func main() {
 	if len(flag.Args()) > 0 {
 		commandArgs = flag.Args()[1:]
 	}
-	engine := internal.NewExpander(commandArgs, os.Environ(), os.Stdout, outFormat)
+	engine := internal.NewExpander(commandArgs, os.Environ(), os.Stdout, outFormat, version)
 
 	var err error
 	if len(flag.Args()) == 0 {
@@ -103,4 +109,25 @@ func main() {
 		fmt.Fprintf(os.Stderr, format, err)
 		panic(2)
 	}
+}
+
+func getBuildInfoVersion(ldflagVersion string) string {
+	parts := []string{}
+	if ldflagVersion != "" {
+		parts = append(parts, ldflagVersion)
+	}
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return strings.Join(parts, "-")
+	}
+	for _, kv := range info.Settings {
+		switch kv.Key {
+		case "vcs.revision":
+			parts = append(parts, kv.Value[:9])
+		//case "vcs.time":LastCommit, _ = time.Parse(time.RFC3339, kv.Value)
+		case "vcs.modified":
+			parts = append(parts, "dirty")
+		}
+	}
+	return strings.Join(parts, "-")
 }

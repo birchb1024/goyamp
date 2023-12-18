@@ -25,7 +25,7 @@ then
 	exit
 fi
 
-go build -o goyamp -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" goyamp.go
+go build -o goyamp -ldflags "-X main.Version=${version}"
 
 (
 	cd test
@@ -37,10 +37,11 @@ then
 	go tool cover -html=coverage.out
 fi
 
-GOOS=windows GOARCH=amd64         go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" goyamp.go
-GOOS=darwin  GOARCH=amd64         go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" goyamp.go
-GOOS=linux   GOARCH=arm   GOARM=7 go build -o goyamp_arm7 -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" goyamp.go
-GOOS=linux   GOARCH=arm   GOARM=6 go build -o goyamp_arm6 -ldflags "-X github.com/birchb1024/goyamp.Version=${version}" goyamp.go
+GOOS=windows GOARCH=amd64         go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
+GOOS=darwin  GOARCH=amd64         go build -o goyamp_mac -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
+GOOS=linux   GOARCH=arm   GOARM=7 go build -o goyamp_arm7 -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
+GOOS=linux   GOARCH=arm   GOARM=6 go build -o goyamp_arm6 -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"
+
 
 if [[ "${args}" == "package" ]]
 then

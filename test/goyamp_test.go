@@ -18,7 +18,8 @@ func fileRunner(output io.Writer, filename string, format internal.Syntax) error
 		[]string{"A", "B", "C", "D"},
 		[]string{"USERNAME=birchb", "USER=birchb", "TEST_EMBEDDED=x=y,y=5"},
 		output,
-		format)
+		format,
+		"9.9.9")
 	return engine.ExpandFile(filename)
 }
 

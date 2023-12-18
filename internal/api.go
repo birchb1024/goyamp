@@ -22,7 +22,7 @@ func (engine *Expander) init(environment []string, argv []string) {
 	pwd, err := os.Getwd()
 	if err != nil {
 		pwd = "."
-		fmt.Fprintf(os.Stderr, "%v", err)
+		_, _ = fmt.Fprintf(os.Stderr, "%v", err)
 	}
 	engine.globals = &env{
 		engine: engine,
@@ -30,7 +30,7 @@ func (engine *Expander) init(environment []string, argv []string) {
 		bind: map[string]yamly{
 			"argv":        classify(argv),
 			"env":         envMap,
-			"__VERSION__": stringy(Version),
+			"__VERSION__": stringy(engine.version),
 			"__DIR__":     stringy(pwd),
 		},
 	}
@@ -47,14 +47,14 @@ const (
 	LINES
 )
 
-//
 // NewExpander creates a Goyamp macro expansion engine.
-func NewExpander(commandArgs []string, environment []string, ow io.Writer, format Syntax) Expander {
+func NewExpander(commandArgs []string, environment []string, ow io.Writer, format Syntax, version string) Expander {
 
 	ex := Expander{
 		globals:   nil,
 		output:    ow,
 		outFormat: format,
+		version:   version,
 	}
 
 	ex.init(environment, commandArgs)

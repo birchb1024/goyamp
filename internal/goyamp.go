@@ -11,42 +11,13 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
-	"runtime/debug"
 	"sort"
 	"strconv"
 	"strings"
 )
 
-// Version provides the Git version tag used in the build of the binary
-var Version string
 var documentCount int
 
-func init() {
-	if Version != "" {
-		return
-	}
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return
-	}
-	parts := make([]string, 0, 3)
-	parts = append(parts, info.Main.Version)
-	for _, kv := range info.Settings {
-		if kv.Value == "" {
-			continue
-		}
-		switch kv.Key {
-		case "vcs.revision":
-
-			parts = append(parts, kv.Value[:7])
-		case "vcs.time":
-			//LastCommit, _ = time.Parse(time.RFC3339, kv.Value)
-		case "vcs.modified":
-			parts = append(parts, "dirty")
-		}
-	}
-	Version = strings.Join(parts, "-")
-}
 
 type yamly interface {
 	expand(binding *env) yamly
@@ -107,6 +78,7 @@ type Expander struct {
 	globals   *env
 	output    io.Writer
 	outFormat Syntax
+	version   string
 }
 
 func (e env) String() string { return fmt.Sprintf("an environment...") }
