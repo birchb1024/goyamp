@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/birchb1024/goyamp/internal"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -40,13 +39,13 @@ func runTestFiles(name string, fileList []string, format internal.Syntax, t *tes
 				t.Error(path, err)
 				return
 			}
-			expected, err := ioutil.ReadFile(logFile)
+			expected, err := os.ReadFile(logFile)
 			if err != nil {
 				t.Error(path, err)
 				return
 			}
 			if result.String() != string(expected) {
-				err := ioutil.WriteFile("/tmp/"+filename+".logFile", result.Bytes(), 0644)
+				err := os.WriteFile("/tmp/"+filename+".logFile", result.Bytes(), 0644)
 				if err != nil {
 					panic(err)
 				}
@@ -136,7 +135,7 @@ func TestMain(m *testing.M) {
 	flag.BoolVar(&debugFlag, "d", false, "output debug strings")
 	flag.Parse()
 	if !debugFlag {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 
 	os.Exit(m.Run())
