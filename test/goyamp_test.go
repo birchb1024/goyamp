@@ -4,18 +4,17 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/birchb1024/goyamp/internal"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"testing"
-
-	"github.com/birchb1024/goyamp"
 )
 
-func fileRunner(output io.Writer, filename string, format goyamp.Syntax) error {
-	engine := goyamp.NewExpander(
+func fileRunner(output io.Writer, filename string, format internal.Syntax) error {
+	engine := internal.NewExpander(
 		[]string{"A", "B", "C", "D"},
 		[]string{"USERNAME=birchb", "USER=birchb", "TEST_EMBEDDED=x=y,y=5"},
 		output,
@@ -23,10 +22,10 @@ func fileRunner(output io.Writer, filename string, format goyamp.Syntax) error {
 	return engine.ExpandFile(filename)
 }
 
-func runTestFiles(name string, fileList []string, format goyamp.Syntax, t *testing.T) {
+func runTestFiles(name string, fileList []string, format internal.Syntax, t *testing.T) {
 
 	typeFlag := ""
-	if format == goyamp.JSON {
+	if format == internal.JSON {
 		typeFlag = "json."
 	}
 	for _, filename := range fileList {
@@ -98,7 +97,7 @@ func TestNormalExamples(t *testing.T) {
 		"varargs.yaml",
 		"variety.yaml",
 	}
-	runTestFiles("Normal examples", normalExampleFiles, goyamp.YAML, t)
+	runTestFiles("Normal examples", normalExampleFiles, internal.YAML, t)
 }
 
 func TestNormalJSONExamples(t *testing.T) {
@@ -112,7 +111,7 @@ func TestNormalJSONExamples(t *testing.T) {
 		"multi_define.yaml",
 		"flatten-repeat.yaml",
 	}
-	runTestFiles("Normal JSON examples", normalExampleFiles, goyamp.JSON, t)
+	runTestFiles("Normal JSON examples", normalExampleFiles, internal.JSON, t)
 }
 
 //func TODOTestPanicExamples(t *testing.T) {

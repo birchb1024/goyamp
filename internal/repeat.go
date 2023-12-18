@@ -1,4 +1,4 @@
-package goyamp
+package internal
 
 import (
 	"fmt"
