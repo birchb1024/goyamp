@@ -42,7 +42,8 @@ go build -o goyamp -ldflags "-X main.Version=${version}"
 
 if [[ "${args}" == "coverage" ]]
 then
-	go tool cover -html=coverage.out
+  go tool cover -func=coverage.out | awk '/^total/' > coverage-total.txt
+	go tool cover -html=coverage.out -o=coverage.html
 fi
 
 GOOS=windows GOARCH=amd64         go build -o goyamp.exe -ldflags "-X github.com/birchb1024/goyamp.Version=${version}"

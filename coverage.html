@@ -1,0 +1,2203 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>internal: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/birchb1024/goyamp/internal/api.go (65.2%)</option>
+				
+				<option value="file1">github.com/birchb1024/goyamp/internal/builtin.go (84.4%)</option>
+				
+				<option value="file2">github.com/birchb1024/goyamp/internal/define.go (81.0%)</option>
+				
+				<option value="file3">github.com/birchb1024/goyamp/internal/dotnotation.go (70.2%)</option>
+				
+				<option value="file4">github.com/birchb1024/goyamp/internal/execute.go (87.1%)</option>
+				
+				<option value="file5">github.com/birchb1024/goyamp/internal/exit.go (0.0%)</option>
+				
+				<option value="file6">github.com/birchb1024/goyamp/internal/goyamp.go (81.9%)</option>
+				
+				<option value="file7">github.com/birchb1024/goyamp/internal/include.go (72.1%)</option>
+				
+				<option value="file8">github.com/birchb1024/goyamp/internal/lua-builtin.go (86.8%)</option>
+				
+				<option value="file9">github.com/birchb1024/goyamp/internal/panic.go (0.0%)</option>
+				
+				<option value="file10">github.com/birchb1024/goyamp/internal/repeat.go (88.2%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package internal
+
+import (
+        "fmt"
+        "io"
+        "os"
+        "strings"
+
+        "github.com/pkg/errors"
+)
+
+func (engine *Expander) init(environment []string, argv []string) <span class="cov8" title="1">{
+        //    """
+        //    Construct a new  environment of globals.
+        //    :return: New global dict
+        //    """
+        envMap := mapy{}
+        for _, pair := range environment </span><span class="cov8" title="1">{
+                kv := strings.SplitN(pair, "=", 2)
+                envMap[stringy(kv[0])] = stringy(kv[1])
+        }</span>
+        <span class="cov8" title="1">pwd, err := os.Getwd()
+        if err != nil </span><span class="cov0" title="0">{
+                pwd = "."
+                _, _ = fmt.Fprintf(os.Stderr, "%v", err)
+        }</span>
+        <span class="cov8" title="1">engine.globals = &amp;env{
+                engine: engine,
+                parent: nil,
+                bind: map[string]yamly{
+                        "argv":        classify(argv),
+                        "env":         envMap,
+                        "__VERSION__": stringy(engine.version),
+                        "__DIR__":     stringy(pwd),
+                },
+        }
+        addBuiltinsToEnv(engine.globals)</span>
+}
+
+// Syntax holds different output format syntaxes
+type Syntax int
+
+// Constants for YAML and JSON syntax
+const (
+        YAML Syntax = iota + 0
+        JSON
+        LINES
+)
+
+// NewExpander creates a Goyamp macro expansion engine.
+func NewExpander(commandArgs []string, environment []string, ow io.Writer, format Syntax, version string) Expander <span class="cov8" title="1">{
+
+        ex := Expander{
+                globals:   nil,
+                output:    ow,
+                outFormat: format,
+                version:   version,
+        }
+
+        ex.init(environment, commandArgs)
+        return ex
+}</span>
+
+// ExpandStream reads a stream of YAML and expands it.
+func (engine *Expander) ExpandStream(input io.Reader, filename string) (err error) <span class="cov0" title="0">{
+        defer func() </span><span class="cov0" title="0">{
+                if r := recover(); r != nil </span><span class="cov0" title="0">{
+                        err = errors.New(fmt.Sprintf("%+v", r))
+                }</span>
+        }()
+        <span class="cov0" title="0">engine.globals.bind["__FILE__"] = stringy(filename)
+        return expandStream(input, filename, engine.globals)</span>
+}
+
+// ExpandFile reads a file of YAML given a path
+func (engine *Expander) ExpandFile(filename string) (err error) <span class="cov8" title="1">{
+        defer func() </span><span class="cov8" title="1">{
+                if r := recover(); r != nil </span><span class="cov0" title="0">{
+                        err = errors.New(fmt.Sprintf("%+v", r))
+                }</span>
+        }()
+        <span class="cov8" title="1">engine.globals.bind["__FILE__"] = stringy(filename)
+        return expandFile(filename, engine.globals)</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package internal
+
+import (
+        "fmt"
+        "log"
+        "math"
+        "reflect"
+        "sort"
+        "strconv"
+)
+
+//    """
+//    :return: True or False depending if args are the same.
+//    """
+func equalsBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("== %v %v\n", tree, args)
+        argarray, ok := args.(seqy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("== builtin expected sequence, got %v", args))</span>
+        }
+        <span class="cov8" title="1">if len(argarray) &lt; 2 </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("== builtin expected more than two in sequence, got %v", args))</span>
+        }
+        <span class="cov8" title="1">expected := argarray[0]
+        for _, item := range argarray </span><span class="cov8" title="1">{
+                if !reflect.DeepEqual(item, expected) </span><span class="cov8" title="1">{
+                        return booly(false)
+                }</span>
+        }
+        <span class="cov8" title="1">return booly(true)</span>
+}
+
+//    """
+//    :return: the sum of the arguments.
+//    """
+func plusBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        argarray, ok := args.(seqy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("+ builtin exepected sequence, got %v", args))</span>
+        }
+        <span class="cov8" title="1">if len(argarray) &lt; 2 </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("+ builtin exepected more than two in sequence, got %v", args))</span>
+        }
+        <span class="cov8" title="1">var sum float64
+        for _, item := range argarray </span><span class="cov8" title="1">{
+                switch toadd := item.(type) </span>{
+                case stringy:<span class="cov8" title="1">
+                        ind, err := strconv.Atoi(string(toadd))
+                        if err != nil </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("+ builtin cannot add with %v", toadd))</span>
+                        }
+                        <span class="cov8" title="1">sum += float64(ind)</span>
+                case inty:<span class="cov8" title="1">
+                        sum += float64(int(inty(toadd)))</span>
+                case float64y:<span class="cov8" title="1">
+                        sum += float64(float64y(toadd))</span>
+                default:<span class="cov0" title="0">
+                        panic(fmt.Sprintf("+ builtin cannot add with %v", toadd))</span>
+                }
+        }
+        <span class="cov8" title="1">if math.Round(sum) == sum </span><span class="cov8" title="1">{
+                return inty(int(sum))
+        }</span>
+        <span class="cov0" title="0">return float64y(sum)</span>
+}
+
+//    """
+//    :return: a list from  statement[0] to statement[1]
+//    """
+func rangeBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        switch args := args.(type) </span>{
+        case seqy:<span class="cov8" title="1">
+                if len(args) != 2 </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("range builtin needs sequence of 2, got %v", args))</span>
+                }
+                <span class="cov8" title="1">start := any2int(args[0], "range builtin needs integers, got %v")
+                end := any2int(args[1], "range builtin needs integers, got %v")
+                result := seqy{}
+                if start &lt; end </span><span class="cov8" title="1">{
+                        for i := start; i &lt; end+1; i++ </span><span class="cov8" title="1">{
+                                result = append(result, inty(i))
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        for i := start; i &gt;= end; i-- </span><span class="cov8" title="1">{
+                                result = append(result, inty(i))
+                        }</span>
+                }
+                <span class="cov8" title="1">if len(result) == 0 </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("range empty range in %v ", tree))</span>
+                }
+                <span class="cov8" title="1">return result</span>
+        case mapy:<span class="cov8" title="1">
+                result := seqy{}
+                for key := range args </span><span class="cov8" title="1">{
+                        result = append(result, key)
+                }</span>
+                <span class="cov8" title="1">sort.Sort(result)
+                return result</span>
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("range builtin needs sequence or map, got %v", args))</span>
+        }
+}
+
+//    """
+//    expand and flatten a list.
+//    :param bindings:
+//    :return:
+//    """
+func flattenList(any yamly, depth int) yamly <span class="cov8" title="1">{
+        log.Printf("flattenList: %v", any)
+
+        if depth == 0 </span><span class="cov8" title="1">{
+                return any
+        }</span>
+        <span class="cov8" title="1">switch listy := any.(type) </span>{
+        case seqy:<span class="cov8" title="1">
+                result := seqy{}
+                for _, item := range listy </span><span class="cov8" title="1">{
+                        switch item := item.(type) </span>{
+                        case seqy:<span class="cov8" title="1">
+                                sub := flattenList(item, depth-1)
+                                if sublist, ok := sub.(seqy); ok </span><span class="cov8" title="1">{
+                                        for _, v := range sublist </span><span class="cov8" title="1">{
+                                                result = append(result, v)
+                                        }</span>
+                                } else<span class="cov0" title="0"> {
+                                        result = append(result, item)
+                                }</span>
+                        default:<span class="cov8" title="1">
+                                result = append(result, item)</span>
+                        }
+                }
+                <span class="cov8" title="1">return result</span>
+        default:<span class="cov0" title="0">
+                return any</span>
+        }
+}
+
+func flattenBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        //    """
+        //    See flattenList
+        //    """
+        return flattenList(args, math.MaxInt32)
+}</span>
+
+func flatoneBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        //    """
+        //    See flatList
+        //    """
+        return flattenList(args, 1)
+}</span>
+
+func mergeBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        //    """
+        //    See mergeMaps
+        //    """
+        //    """
+        //    Expand and combine multiple maps into one map. Not recursive. Later maps overwrite earlier.
+        //    :param mappy: list of maps to be merged.
+        //    :param bindings:
+        //    :return: new map with merged content
+        //    """
+        result := make(mapy)
+        switch args := args.(type) </span>{
+        case seqy:<span class="cov8" title="1">
+                for _, item := range args </span><span class="cov8" title="1">{
+                        switch item := item.(type) </span>{
+                        case mapy:<span class="cov8" title="1">
+                                for k, v := range item </span><span class="cov8" title="1">{
+                                        result[k] = v // later overwrites earlier
+                                }</span>
+                        default:<span class="cov0" title="0">
+                                panic(fmt.Sprintf("Error: non-map passed to merge '%v' from %v", item, tree))</span>
+                        }
+                }
+                <span class="cov8" title="1">return result</span>
+        default:<span class="cov0" title="0">
+                return args</span>
+        }
+}
+
+func assertKeys(validKeys map[string]bool, tmap mapy) <span class="cov8" title="1">{
+        for x := range tmap </span><span class="cov8" title="1">{
+                x, ok := x.(stringy)
+                if !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("'%v' is not a valid key in %v", x, tmap))</span>
+                }
+                <span class="cov8" title="1">if _, ok := validKeys[string(x)]; !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("'%v' is not a valid key in %v", x, tmap))</span>
+                }
+        }
+        <span class="cov8" title="1">for k, mandatory := range validKeys </span><span class="cov8" title="1">{
+                if mandatory </span><span class="cov8" title="1">{
+                        if _, ok := tmap[stringy(k)]; !ok </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("missing key '%v' in %v", k, tmap))</span>
+                        }
+                }
+        }
+}
+
+func ifBuiltin(tmap mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("ifBuiltin %v\n", tmap)
+        //    """
+        //    Conditional expression
+        //    :return: either the expansion of the 'then' or 'else' elements.
+        //    """
+        assertKeys(map[string]bool{"if": true, "then": false, "else": false}, tmap)
+        thenClause, thok := tmap[stringy("then")]
+        elseClause, elok := tmap[stringy("else")]
+        if !thok &amp;&amp; !elok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error 'then' or 'else' missing in %v", tmap))</span>
+        }
+        <span class="cov8" title="1">condition := tmap[stringy("if")].expand(bindings)
+        var condBool bool
+        switch condition := condition.(type) </span>{
+        case empty:<span class="cov0" title="0">
+                condBool = false</span>
+        case nily:<span class="cov8" title="1">
+                condBool = false</span>
+        case booly:<span class="cov8" title="1">
+                condBool = bool(condition)</span>
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("If condition not 'true', 'false' or 'null'. Got: '%v' in %v", condition, tmap))</span>
+        }
+        <span class="cov8" title="1">log.Printf("ifBuiltin: condBool %v thok %v elok %v\n", condBool, thok, elok)
+        if condBool &amp;&amp; thok </span><span class="cov8" title="1">{
+                expanded := thenClause.expand(bindings)
+                return expanded.expand(bindings)
+        }</span> else<span class="cov8" title="1"> if !condBool &amp;&amp; elok </span><span class="cov8" title="1">{
+                expanded := elseClause.expand(bindings)
+                return expanded.expand(bindings)
+        }</span>
+        <span class="cov8" title="1">return empty{}</span>
+}
+
+func quoteBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        //    """
+        //    :return: the args without expansion
+        //    """
+        assertSingleKey(tree)
+        return args
+}</span>
+
+func addBuiltinsToEnv(env *env) <span class="cov8" title="1">{
+        //    """
+        //    Utility function to add all the builtins to an environment
+        //    :env: environment to add to
+        //    :return: The environment
+        //    """
+        addNewBuiltin := func(name stringy, fn builtin, eager bool, quote bool) </span><span class="cov8" title="1">{
+                env.bind[string(name)] = compiledFunction{
+                        fun: functionDef{
+                                eager:      eager,
+                                quote:      quote,
+                                name:       name,
+                                parameters: seqy{stringy("varargs")},
+                                varargs:    true,
+                                bindings:   env,
+                        },
+                        compiled: fn,
+                }
+        }</span>
+        <span class="cov8" title="1">addNewBuiltin("define", defineBuiltin, false, false)
+        addNewBuiltin("include", includeBuiltin, true, false)
+        addNewBuiltin("defmacro", defmacroBuiltin, false, false)
+        addNewBuiltin("==", equalsBuiltin, true, false)
+        addNewBuiltin("+", plusBuiltin, true, false)
+        addNewBuiltin("if", ifBuiltin, false, false)
+        addNewBuiltin("range", rangeBuiltin, true, false)
+        addNewBuiltin("repeat", repeatBuiltin, false, false)
+        addNewBuiltin("quote", quoteBuiltin, false, true)
+        addNewBuiltin("undefine", undefineBuiltin, false, false)
+        addNewBuiltin("flatten", flattenBuiltin, true, false)
+        addNewBuiltin("flatone", flatoneBuiltin, true, false)
+        addNewBuiltin("merge", mergeBuiltin, true, false)
+        addNewBuiltin("load", loadBuiltin, true, false)
+        addNewBuiltin("execute", executeBuiltin, true, true)
+        addNewBuiltin("panic", panicBuiltin, true, false)
+        addNewBuiltin("exit", exitBuiltin, true, false)
+        addNewBuiltin("gopherlua", gopherluaBuiltin, true, true)</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package internal
+
+import (
+        "fmt"
+        "log"
+)
+
+func mapDefine(defs mapy, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("mapDefine: %v\n", defs)
+        definitions := defs.expand(bindings)
+        defmap, ok := definitions.(mapy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error '%v' not a map from %v", definitions, defs))</span>
+        }
+        <span class="cov8" title="1">for k, v := range defmap </span><span class="cov8" title="1">{
+                varname, ok := k.(stringy)
+                if !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("define variable name %v must be string in %v", k, defs))</span>
+                }
+                <span class="cov8" title="1">bindings.bind[string(varname)] = v</span>
+        }
+        <span class="cov8" title="1">return empty{}</span>
+}
+
+func defineBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("defineBuiltin:\n   %#v\n   %#v\n", tree, args)
+        //    """
+        //    Define one or more variables in the current scope.
+        //    :return: None
+        //    """
+        assertSingleKey(tree)
+        todefine, aok := args.(mapy)
+        if !aok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("define expects a map in %v got %T", tree, args))</span>
+        }
+        <span class="cov8" title="1">name, nok := todefine[stringy("name")]
+        value, vok := todefine[stringy("value")]
+        log.Printf("defineBuiltin: nok vok %v %v\n", nok, vok)
+        if !nok &amp;&amp; !vok </span><span class="cov8" title="1">{
+                return mapDefine(todefine, bindings)
+        }</span>
+        <span class="cov8" title="1">if !(nok &amp;&amp; vok) </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error '%v' missing keyword in %v", args, tree))</span>
+        }
+        <span class="cov8" title="1">namestr, ok := name.(stringy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error '%v' not a string in %v", name, tree))</span>
+        }
+        <span class="cov8" title="1">newvalue := value.expand(bindings)
+        bindings.bind[string(namestr)] = newvalue
+        log.Printf("\ndefineBuiltin:\n new value for :  %#v\n value:  %#v\n", namestr, newvalue)
+        return empty{}</span>
+}
+
+func undefineBuiltin(tree mapy, args yamly, bindin *env) yamly <span class="cov8" title="1">{
+        log.Printf("undefineBuiltin:\n   %#v\n   %#v\n", tree, args)
+        //    """
+        //    Remove binding in the current environment only.
+        //    :return: None
+        //    """
+        assertSingleKey(tree)
+        if variable, ok := args.(stringy); ok </span><span class="cov8" title="1">{
+                delete(bindin.bind, string(variable))
+                return empty{}
+        }</span>
+        <span class="cov0" title="0">panic(fmt.Sprintf("Syntax error was expecting string in %v got %v", tree, args))</span>
+}
+
+func defmacroBuiltin(tree mapy, args yamly, bindin *env) yamly <span class="cov8" title="1">{
+        //    """
+        //    Define a new macro.
+        //    :return: None
+        //    """
+        if args == nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error empty defmacro %v", tree))</span>
+        }
+        <span class="cov8" title="1">argst, ok := args.(mapy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error defmacro expected a map, got %v", args))</span>
+        }
+        <span class="cov8" title="1">macroName, ok := argst[stringy("name")]
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("missing names in %v", tree))</span>
+        }
+        <span class="cov8" title="1">macroNameStr, ok := macroName.(stringy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("in macro %v is not a string", macroName))</span>
+        }
+
+        // Collate arguments
+        <span class="cov8" title="1">var macroParams = seqy{} // default is list if no args
+        varargs := false
+        macrop, ok := argst[stringy("args")]
+        if ok </span><span class="cov8" title="1">{
+                switch theparams := macrop.(type) </span>{
+                case nily:<span class="cov8" title="1"></span>
+                case stringy:<span class="cov8" title="1"> //varargs
+                        macroParams = append(macroParams, theparams)
+                        varargs = true</span>
+                case seqy:<span class="cov8" title="1">
+                        for _, k := range theparams </span><span class="cov8" title="1">{
+                                if paramName, ok := k.(stringy); ok </span><span class="cov8" title="1">{
+                                        macroParams = append(macroParams, paramName)
+                                }</span> else<span class="cov0" title="0"> {
+                                        panic(fmt.Sprintf("in defmacro args '%#v' is not a string", k))</span>
+                                }
+                        }
+                default:<span class="cov0" title="0">
+                        panic(fmt.Sprintf("in defmacro args '%#v' is not a string", macrop))</span>
+                }
+        }
+        <span class="cov8" title="1">macroBody, ok := argst[stringy("value")]
+        newMacro := macroFunction{
+                fun: functionDef{
+                        name:       macroNameStr,
+                        eager:      true,
+                        quote:      false,
+                        parameters: macroParams,
+                        varargs:    varargs,
+                        bindings:   bindin,
+                },
+                body: macroBody,
+        }
+        bindin.bind[string(macroNameStr)] = newMacro
+        return empty{}</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package internal
+
+import (
+        "fmt"
+        "log"
+        "strconv"
+)
+
+func subvarLookup(original string, varsList []string, majorVariable yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("subvarLookup: %v %v %#v %v\n", original, varsList, majorVariable, bindings)
+        //    """
+        //    Parse and expand a 'dot notation' variable string. Recursively walk the tree of the main variable value,
+        //    as given by the subvariable list. Return the last value if possible.
+        //
+        //    :param original: The dot notation string - ie. 'b.1' - used for debug
+        //    :param varsList: a list of 'sub' variables - ie ['1']
+        //    :param majorVariable: the value of the major variable - ie. value of 'b' =&gt; ['x', 'y']
+        //    :param bindings: the current environment
+        //    :return: Example - Given 'b.1', ['b', '1' ] , {'b': ['x', 'y']} =&gt; returns 'y'
+        //    """
+        if len(varsList) == 0 </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Subvariable not found in %v %v", original, majorVariable))</span>
+        }
+        <span class="cov8" title="1">if majorVariable == nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Subvariable %v not found in %v and %v", varsList, original, majorVariable))</span>
+        }
+        // If the subvar is a variable binding, use it
+        <span class="cov8" title="1">var first yamly
+        ftv, ok := bindings.lookup(stringy(varsList[0]))
+        log.Printf("subvarLookup ftv ok: %v %v", ftv, ok)
+        if ok </span><span class="cov8" title="1">{
+                first = ftv
+        }</span> else<span class="cov8" title="1"> {
+                first = stringy(varsList[0])
+        }</span>
+        <span class="cov8" title="1">firststr, sok := first.(stringy)
+        firstint, iok := first.(inty)
+        if sok &amp;&amp; !iok </span><span class="cov8" title="1">{
+                // Look for a string containg an int
+                i, err := strconv.Atoi(firststr.String())
+                if err == nil </span><span class="cov8" title="1">{
+                        iok = true
+                        firstint = inty(i)
+                }</span>
+        }
+        <span class="cov8" title="1">if iok &amp;&amp; !sok </span><span class="cov8" title="1">{
+                // got an int make a string as well
+                sok = true
+                firststr = stringy(strconv.Itoa(int(firstint)))
+        }</span>
+        <span class="cov8" title="1">if !sok &amp;&amp; !iok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Subvariable value %v for not string or int in %v", first, original))</span>
+        }
+        // What kind of variable data do we have?
+        <span class="cov8" title="1">switch majorVariableTyped := majorVariable.(type) </span>{
+        case mapy:<span class="cov8" title="1">
+                // A map of values
+                result, ok := majorVariableTyped[firststr] // Usually map keys are strings
+                if !ok </span><span class="cov0" title="0">{
+                        result, ok = majorVariableTyped[firstint] // but majorVariable may have an integer key
+                        if !ok </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("Subvariable '%#v' not found in %v and %v", firstint, original, majorVariableTyped))</span>
+                        }
+                }
+                <span class="cov8" title="1">if len(varsList) == 1 </span><span class="cov8" title="1">{
+                        return result
+                }</span>
+                <span class="cov8" title="1">return subvarLookup(original, varsList[1:], result, bindings)</span>
+
+        case seqy:<span class="cov8" title="1">
+                // A Sequence needing an integer index
+                var index int
+                if iok </span><span class="cov8" title="1">{
+                        index = int(firstint)
+                }</span> else<span class="cov0" title="0"> if sok </span><span class="cov0" title="0">{
+                        ind, err := strconv.Atoi(string(firststr))
+                        if err != nil </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("Subvariable List index not numeric: '%v' for %v %v", first, original, majorVariable))</span>
+                        }
+                        <span class="cov0" title="0">index = ind</span>
+                } else<span class="cov0" title="0"> {
+                        panic(fmt.Sprintf("Subvariable List index not numeric: '%v' for %v %v", first, original, majorVariable))</span>
+                }
+
+                <span class="cov8" title="1">if len(majorVariableTyped) &lt;= index || index &lt; 0 </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("Subvariable List index out of bounds: %v for %v %v", index, original, majorVariableTyped))</span>
+                }
+                <span class="cov8" title="1">if len(varsList) == 1 </span><span class="cov8" title="1">{ // Last one
+                        return majorVariableTyped[index]
+                }</span>
+                <span class="cov8" title="1">return subvarLookup(original, varsList[1:], majorVariableTyped[index], bindings)</span>
+
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("Subvariable data not indexable %#v in %v", majorVariable, original))</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package internal
+
+import (
+        "bytes"
+        "encoding/json"
+        "fmt"
+        "io"
+        "log"
+        "os"
+        "os/exec"
+        "strings"
+
+        "gopkg.in/yaml.v3"
+)
+
+func argString(tree yamly, args mapy, name string, defualt string) string <span class="cov8" title="1">{
+        a, ok := args[stringy(name)]
+        if !ok </span><span class="cov8" title="1">{
+                return defualt
+        }</span>
+        <span class="cov8" title="1">val, ok := a.(stringy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("'%#v' %v is not a string in '%v'", a, name, tree))</span>
+        }
+        <span class="cov8" title="1">return string(val)</span>
+}
+
+func executeBuiltin(tree mapy, args yamly, _ *env) yamly <span class="cov8" title="1">{
+        log.Printf("exec: %v", args)
+
+        validResponseType := map[string]bool{"lines": true, "yaml": true, "json": true, "string": true}
+        validRequestType := map[string]bool{"lines": true, "yaml": true, "json": true, "string": true}
+        assertSingleKey(tree)
+
+        var command, directory string
+        responseType := "lines"
+        requestType := "lines"
+        request := []byte{}
+        environment := os.Environ()
+        arguments := []string{}
+
+        switch args := args.(type) </span>{
+        case stringy:<span class="cov8" title="1">
+                str := string(args)
+                command = strings.Split(str, " ")[0]
+                arguments = strings.Split(str, " ")[1:]
+                responseType = "string"</span>
+        case mapy:<span class="cov8" title="1">
+                assertKeys(map[string]bool{"command": true, "args": false, "environment": false, "directory": false, "request": false, "request-type": false, "response-type": false}, args)
+                command = argString(tree, args, "command", "")
+
+                a, aok := args[stringy("args")]
+                if aok </span><span class="cov8" title="1">{
+                        clst, ok := a.(seqy)
+                        if !ok </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("execute: '%v' is not a valid args sequence", a))</span>
+                        } else<span class="cov8" title="1"> {
+                                for _, v := range clst </span><span class="cov8" title="1">{
+                                        arguments = append(arguments, v.String())
+                                        log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
+                                }</span>
+                        }
+                }
+                <span class="cov8" title="1">log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
+
+                directory = argString(tree, args, "directory", "")
+                requestType = argString(tree, args, "request-type", "lines")
+                if _, ok := validRequestType[responseType]; !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("'%v' is not a valid request-type", requestType))</span>
+                }
+                <span class="cov8" title="1">responseType = argString(tree, args, "response-type", "lines")
+                if _, ok := validResponseType[responseType]; !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("'%v' is not a valid response-type", responseType))</span>
+                }
+
+                <span class="cov8" title="1">if envi, eok := args[stringy("environment")]; eok </span><span class="cov8" title="1">{
+                        switch envi.(type) </span>{
+                        case mapy:<span class="cov8" title="1">
+                                for k, v := range envi.(mapy) </span><span class="cov8" title="1">{
+                                        environment = append(environment, k.String()+"="+v.String())
+                                }</span>
+                        default:<span class="cov0" title="0">
+                                panic(fmt.Sprintf("'%#v' is not a environment map", envi))</span>
+                        }
+                }
+
+                <span class="cov8" title="1">log.Printf("execute: '%v' '%v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
+                if req, eok := args[stringy("request")]; eok </span><span class="cov8" title="1">{
+                        switch requestType </span>{
+                        case "string":<span class="cov8" title="1">
+                                request = []byte(req.String())</span>
+                        case "lines":<span class="cov8" title="1">
+                                switch req.(type) </span>{
+                                case stringy:<span class="cov8" title="1">
+                                        request = []byte(req.String())</span>
+                                case seqy:<span class="cov8" title="1">
+                                        var buf bytes.Buffer
+                                        for _, line := range req.(seqy) </span><span class="cov8" title="1">{
+                                                buf.WriteString(line.String())
+                                                buf.WriteString("\n")
+                                        }</span>
+                                        <span class="cov8" title="1">request = buf.Bytes()</span>
+                                default:<span class="cov0" title="0">
+                                        panic(fmt.Sprintf("execute: '%v' is not a string or sequence for lines", req))</span>
+                                }
+
+                        case "json":<span class="cov8" title="1">
+                                var buf bytes.Buffer
+                                j := req.declassify(JSON)
+                                jenc := json.NewEncoder(&amp;buf)
+                                jenc.SetIndent("", "  ")
+                                err := jenc.Encode(j)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        panic(fmt.Sprintf("execute: '%v' could not be encoded as JSON", req))</span>
+                                }
+                                <span class="cov8" title="1">request = buf.Bytes()</span>
+
+                        case "yaml":<span class="cov8" title="1">
+                                var buf bytes.Buffer
+                                y := req.declassify()
+                                enc := yaml.NewEncoder(&amp;buf)
+                                enc.SetIndent(2)
+                                err := enc.Encode(y)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        panic(fmt.Sprintf("execute: '%v' could not be encoded as YAML!", req))</span>
+                                }
+                                <span class="cov8" title="1">request = buf.Bytes()</span>
+
+                        default:<span class="cov0" title="0">
+                                panic(fmt.Sprintf("'%v' is not a valid request-type", requestType))</span>
+                        }
+                }
+
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("execute args are not string or map %v", args))</span>
+        }
+
+        <span class="cov8" title="1">log.Printf("execute: '%v' '%#v' '%v' '%v' '%v' '%v' '%v'", command, arguments, directory, environment, requestType, responseType, string(request))
+        if command == "" </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("execute has no string command %v", args))</span>
+        }
+
+        <span class="cov8" title="1">cmd := exec.Command(command, arguments...)
+        cmd.Dir = directory
+        cmd.Env = environment
+        cmd.Stderr = os.Stderr // process stderr goes direct to user stderr
+        var responseBuffer bytes.Buffer
+        cmd.Stdout = &amp;responseBuffer
+        if request != nil </span><span class="cov8" title="1">{
+                cmd.Stdin = bytes.NewReader(request)
+        }</span>
+        <span class="cov8" title="1">log.Printf("execute: start: '%#v'", cmd)
+        err := cmd.Run()
+        response := responseBuffer.Bytes()
+        log.Printf("execute: done.")
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+
+        // Process the response from the sub-process
+        //
+        <span class="cov8" title="1">responsestr := string(response)
+        log.Printf("exec: response %#v", responsestr)
+        switch responseType </span>{
+        case "string":<span class="cov8" title="1">
+                return stringy(strings.TrimSpace(responsestr))</span>
+        case "lines":<span class="cov8" title="1">
+                lineslice := strings.Split(responsestr, "\n")
+                result := seqy{}
+                for i, l := range lineslice </span><span class="cov8" title="1">{
+                        if i == len(lineslice)-1 &amp;&amp; l == "" </span>{<span class="cov8" title="1">
+
+                        }</span> else<span class="cov8" title="1"> {
+                                result = append(result, stringy(l))
+                        }</span>
+                }
+                <span class="cov8" title="1">return result</span>
+        case "json":<span class="cov8" title="1">
+                var doc interface{}
+                if len(response) == 0 </span><span class="cov8" title="1">{
+                        return nily{} // JSON parser can't deal with ""
+                }</span>
+                <span class="cov8" title="1">err := json.Unmarshal(response, &amp;doc)
+                if err != nil </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("execute response, '%s', was not JSON '%v'", response, err))</span>
+                }
+                <span class="cov8" title="1">return classify(intify(doc))</span> // convert floats to ints where possible, because JSON uses only float64 :-(
+        case "yaml":<span class="cov8" title="1">
+                decoder := yaml.NewDecoder(bytes.NewReader(response))
+                var doc interface{}
+                err = decoder.Decode(&amp;doc)
+                if err != nil &amp;&amp; err != io.EOF </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("execute response '%s', was not YAML '%v'", response, err))</span>
+                }
+                <span class="cov8" title="1">return classify(doc)</span>
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("execute unknown response type '%v'", responseType))</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package internal
+
+import (
+        "os"
+        "strconv"
+)
+
+//
+// Exit the current processing and exit the process cleanly.
+//
+func exitBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov0" title="0">{
+        result := 1
+        switch a := args.(type) </span>{
+        case empty:<span class="cov0" title="0">
+                result = 0</span>
+        case nily:<span class="cov0" title="0">
+                result = 0</span>
+        case inty:<span class="cov0" title="0">
+                result = int(a)</span>
+        case stringy:<span class="cov0" title="0">
+                if i, err := strconv.Atoi(string(a)); err == nil </span><span class="cov0" title="0">{
+                        result = i
+                }</span>
+        }
+
+        <span class="cov0" title="0">os.Exit(result)
+        return nily{}</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package internal
+
+import (
+        "encoding/json"
+        "fmt"
+        lua "github.com/yuin/gopher-lua"
+        "gopkg.in/yaml.v3"
+        "io"
+        "log"
+        "os"
+        "path/filepath"
+        "reflect"
+        "regexp"
+        "sort"
+        "strconv"
+        "strings"
+)
+
+var documentCount int
+
+
+type yamly interface {
+        expand(binding *env) yamly
+        declassify(params ...Syntax) interface{}
+        String() string
+        gopherluaify(L *lua.LState) lua.LValue
+}
+
+// Type nily stands instead of nil
+// to avoid nil.expand()
+type nily struct{}
+type empty struct{}
+type booly bool
+type inty int
+type stringy string
+type float64y float64
+type mapy map[yamly]yamly
+type seqy []yamly
+type unknowny struct {
+        x interface{}
+}
+
+func (x nily) expand(*env) yamly <span class="cov8" title="1">{ return x }</span>
+func (x nily) String() string    <span class="cov8" title="1">{ return "null" }</span>
+
+func (e empty) expand(*env) yamly <span class="cov8" title="1">{ return e }</span>
+func (e empty) String() string    <span class="cov0" title="0">{ return "goyamp.EMPTY" }</span>
+
+func (x inty) expand(*env) yamly <span class="cov8" title="1">{ return x }</span>
+func (x inty) String() string    <span class="cov8" title="1">{ return strconv.Itoa(int(x)) }</span>
+
+func (x float64y) expand(*env) yamly <span class="cov8" title="1">{ return x }</span>
+func (x float64y) String() string    <span class="cov0" title="0">{ return strconv.FormatFloat(float64(x), 'G', -1, 32) }</span>
+
+func (x booly) expand(*env) yamly <span class="cov8" title="1">{ return x }</span>
+func (x booly) String() string <span class="cov0" title="0">{
+        if x </span><span class="cov0" title="0">{
+                return "true"
+        }</span>
+        <span class="cov0" title="0">return "false"</span>
+}
+
+func (x unknowny) expand(*env) yamly <span class="cov0" title="0">{ return x }</span>
+func (x unknowny) String() string    <span class="cov0" title="0">{ return fmt.Sprintf("unknown: %T %#v", x.x, x.x) }</span>
+
+func (x stringy) String() string <span class="cov8" title="1">{ return string(x) }</span>
+
+// - Engine internals...
+type env struct {
+        bind   map[string]yamly
+        parent *env
+        engine *Expander
+}
+
+// Expander holds the state of the goyamp engine.
+// It is not a singleton type, have as many as you want.
+type Expander struct {
+        globals   *env
+        output    io.Writer
+        outFormat Syntax
+        version   string
+}
+
+func (e env) String() string <span class="cov0" title="0">{ return fmt.Sprintf("an environment...") }</span>
+
+type builtin func(mapy, yamly, *env) yamly
+
+type functionDef struct {
+        name       stringy
+        eager      bool
+        quote      bool
+        parameters seqy
+        varargs    bool
+        bindings   *env // Closure
+}
+
+type macroFunction struct {
+        fun  functionDef
+        body yamly
+}
+
+func (r macroFunction) expand(*env) yamly <span class="cov8" title="1">{ return r }</span>
+
+type compiledFunction struct {
+        fun      functionDef
+        compiled builtin
+}
+
+func (r compiledFunction) expand(*env) yamly <span class="cov8" title="1">{ return r }</span>
+
+type runnable interface {
+        isEager() bool
+        isQuote() bool
+
+        apply(mapy, yamly, *env) yamly
+}
+
+func (s seqy) Len() int <span class="cov8" title="1">{
+        return len(s)
+}</span>
+
+// Less reports whether the element with
+// index i should sort before the element with index j.
+func (s seqy) Less(i, j int) bool <span class="cov8" title="1">{
+        si := s[i].String()
+        sj := s[j].String()
+        return si &lt; sj
+}</span>
+
+// Swap swaps the elements with indexes i and j.
+func (s seqy) Swap(i, j int) <span class="cov8" title="1">{
+        tmp := s[i]
+        s[i] = s[j]
+        s[j] = tmp
+}</span>
+
+// Stringer for maps, print in order for reliable testing
+func (m mapy) String() string <span class="cov8" title="1">{
+        // store the keys in slice in sorted order
+        keystr := []string{}
+        keystr2key := map[string]yamly{}
+        for k := range m </span><span class="cov8" title="1">{
+                keyAsString := k.String()
+                keystr = append(keystr, keyAsString)
+                keystr2key[keyAsString] = k
+        }</span>
+        <span class="cov8" title="1">sort.Strings(keystr)
+
+        result := "{"
+        counter := 0
+        for _, ks := range keystr </span><span class="cov8" title="1">{
+                k := keystr2key[ks]
+                v := m[k]
+                counter++
+                result = fmt.Sprintf("%v %v : %v ", result, k, v)
+                if !(counter == len(m)) </span><span class="cov8" title="1">{
+                        result = fmt.Sprintf("%v,", result)
+                }</span>
+        }
+        <span class="cov8" title="1">result = fmt.Sprintf("%v }", result)
+        return result</span>
+}
+
+func (s seqy) String() string <span class="cov8" title="1">{
+        result := "["
+        for i, v := range s </span><span class="cov8" title="1">{
+                result = fmt.Sprintf("%v %v", result, v)
+                if i != len(s)-1 </span><span class="cov8" title="1">{
+                        result = fmt.Sprintf("%v,", result)
+                }</span>
+        }
+        <span class="cov8" title="1">result = fmt.Sprintf("%v ]", result)
+        return result</span>
+}
+
+// Convert something from the YAML parser into known
+// types controlled in the goyamp packages.
+func classify(x interface{}) yamly <span class="cov8" title="1">{
+        switch x := x.(type) </span>{
+        case nil:<span class="cov8" title="1">
+                return nily{}</span>
+        case int:<span class="cov8" title="1">
+                return inty(x)</span>
+        case float64:<span class="cov8" title="1">
+                return float64y(x)</span>
+        case bool:<span class="cov8" title="1">
+                return booly(x)</span>
+        case string:<span class="cov8" title="1">
+                return stringy(x)</span>
+        case map[interface{}]interface{}:<span class="cov8" title="1">
+                result := mapy{}
+                for k, v := range x </span><span class="cov8" title="1">{
+                        result[classify(k)] = classify(v)
+                }</span>
+                <span class="cov8" title="1">return result</span>
+        case map[string]interface{}:<span class="cov8" title="1">
+                result := mapy{}
+                for k, v := range x </span><span class="cov8" title="1">{
+                        result[classify(k)] = classify(v)
+                }</span>
+                <span class="cov8" title="1">return result</span>
+        case []interface{}:<span class="cov8" title="1">
+                result := seqy{}
+                for _, v := range x </span><span class="cov8" title="1">{
+                        result = append(result, classify(v))
+                }</span>
+                <span class="cov8" title="1">return result</span>
+        case []string:<span class="cov8" title="1">
+                result := seqy{}
+                for _, v := range x </span><span class="cov8" title="1">{
+                        result = append(result, classify(v))
+                }</span>
+                <span class="cov8" title="1">return result</span>
+        default:<span class="cov0" title="0">
+                log.Printf("not classified %#v", x)
+                return unknowny{x: x}</span>
+        }
+}
+
+// intify - Scan some tree and convert any floats to ints if possible,
+// return the tree with ints in it.
+func intify(x interface{}) interface{} <span class="cov8" title="1">{
+        switch x := x.(type) </span>{
+        case float64:<span class="cov8" title="1">
+                possibleInt := int(x)
+                if float64(possibleInt) == x </span><span class="cov8" title="1">{
+                        return possibleInt
+                }</span>
+                <span class="cov8" title="1">return x</span>
+        case map[interface{}]interface{}:<span class="cov0" title="0">
+                result := map[interface{}]interface{}{}
+                for k, v := range x </span><span class="cov0" title="0">{
+                        result[intify(k)] = intify(v)
+                }</span>
+                <span class="cov0" title="0">return result</span>
+        case map[interface{}]float64:<span class="cov0" title="0">
+                result := map[interface{}]interface{}{}
+                for k, v := range x </span><span class="cov0" title="0">{
+                        result[intify(k)] = intify(v)
+                }</span>
+                <span class="cov0" title="0">return result</span>
+        case map[string]float64:<span class="cov0" title="0">
+                result := map[string]interface{}{}
+                for k, v := range x </span><span class="cov0" title="0">{
+                        result[k] = intify(v)
+                }</span>
+                <span class="cov0" title="0">return result</span>
+        case map[string]interface{}:<span class="cov8" title="1">
+                result := map[string]interface{}{}
+                for k, v := range x </span><span class="cov8" title="1">{
+                        result[k] = intify(v)
+                }</span>
+                <span class="cov8" title="1">return result</span>
+        case []interface{}:<span class="cov8" title="1">
+                result := []interface{}{}
+                for _, v := range x </span><span class="cov8" title="1">{
+                        result = append(result, intify(v))
+                }</span>
+                <span class="cov8" title="1">return result</span>
+        case []float64:<span class="cov0" title="0">
+                result := []interface{}{}
+                for _, v := range x </span><span class="cov0" title="0">{
+                        result = append(result, intify(v))
+                }</span>
+                <span class="cov0" title="0">return result</span>
+        default:<span class="cov8" title="1">
+                return x</span>
+        }
+}
+
+func (x nily) declassify(...Syntax) interface{}     <span class="cov8" title="1">{ return nil }</span>
+func (e empty) declassify(...Syntax) interface{}    <span class="cov0" title="0">{ return "goyamp.EMPTY" }</span>
+func (x inty) declassify(...Syntax) interface{}     <span class="cov8" title="1">{ return int(x) }</span>
+func (x float64y) declassify(...Syntax) interface{} <span class="cov8" title="1">{ return float64(x) }</span>
+func (x booly) declassify(...Syntax) interface{}    <span class="cov8" title="1">{ return bool(x) }</span>
+func (x stringy) declassify(...Syntax) interface{}  <span class="cov8" title="1">{ return string(x) }</span>
+func (m mapy) declassify(syntax ...Syntax) interface{} <span class="cov8" title="1">{
+        if len(syntax) &gt; 0 &amp;&amp; syntax[0] == JSON </span><span class="cov8" title="1">{
+                result := map[string]interface{}{}
+                for k, v := range m </span><span class="cov8" title="1">{
+                        switch k := k.(type) </span>{
+                        case nily:<span class="cov8" title="1">
+                                result["null"] = v.declassify(syntax...)</span>
+                        default:<span class="cov8" title="1">
+                                result[fmt.Sprintf("%v", k.declassify(syntax...))] = v.declassify(syntax...)</span>
+                        }
+                }
+                <span class="cov8" title="1">return result</span>
+        }
+        <span class="cov8" title="1">result := map[interface{}]interface{}{}
+        for k, v := range m </span><span class="cov8" title="1">{
+                result[k.declassify()] = v.declassify(syntax...)
+        }</span>
+        <span class="cov8" title="1">return result</span>
+}
+
+func (s seqy) declassify(syntax ...Syntax) interface{} <span class="cov8" title="1">{
+        result := []interface{}{}
+        for _, v := range s </span><span class="cov8" title="1">{
+                result = append(result, v.declassify(syntax...))
+        }</span>
+        <span class="cov8" title="1">return result</span>
+}
+func (r macroFunction) declassify(...Syntax) interface{}    <span class="cov0" title="0">{ return r }</span>
+func (r compiledFunction) declassify(...Syntax) interface{} <span class="cov0" title="0">{ return r }</span>
+func (x unknowny) declassify(...Syntax) interface{}         <span class="cov0" title="0">{ return x.x }</span>
+
+func (r macroFunction) isEager() bool <span class="cov8" title="1">{
+        log.Printf("isEager: %v", r)
+        return r.fun.eager
+}</span>
+func (r macroFunction) isQuote() bool <span class="cov8" title="1">{
+        log.Printf("isQuote: %v", r)
+        return r.fun.quote
+}</span>
+func (r compiledFunction) isEager() bool <span class="cov8" title="1">{
+        log.Printf("isEager: %v", r)
+        return r.fun.eager
+}</span>
+func (r compiledFunction) isQuote() bool <span class="cov8" title="1">{
+        log.Printf("isQuote: %v", r)
+        return r.fun.quote
+}</span>
+func (r macroFunction) String() string <span class="cov8" title="1">{
+        return fmt.Sprintf("macro: name: %v, eager: %v", r.fun.name, r.fun.eager)
+}</span>
+func (r compiledFunction) String() string <span class="cov8" title="1">{
+        return fmt.Sprintf("builtin: name: %v, eager: %v", r.fun.name, r.fun.eager)
+}</span>
+
+var interpolateRegex *regexp.Regexp
+var goyampExecutablePath string
+
+func init() <span class="cov8" title="1">{
+        interpolateRegex = regexp.MustCompile(`{{[^{]*}}`)
+        log.SetFlags(log.Lshortfile)
+        documentCount = 0
+        // Locate current running goyamp process file
+        ex, err := os.Executable()
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">goyampExecutablePath = filepath.Dir(ex)</span>
+}
+
+func interpolate(tree yamly, bindings *env) yamly <span class="cov8" title="1">{
+
+        //    """
+        //    Parse a string which may contain embedded variables denoted by curlies {{ }}.
+        //    When these are found expand the variables and return the expanded string.
+        //    If the variables are called up but not defined throw an error.
+        //    :param astring:
+        //    :param bindings:
+        //    :return: astring with added values
+        //    """
+        //
+        s, ok := tree.(stringy)
+        if !ok </span><span class="cov8" title="1">{
+                log.Printf("interpolate not string %#v", tree)
+                return tree
+        }</span>
+        <span class="cov8" title="1">astring := string(s)
+        log.Printf("interpolate: astring %#v", astring)
+        result := interpolateRegex.ReplaceAllStringFunc(astring,
+                func(tok string) string </span><span class="cov8" title="1">{
+                        variableName := strings.TrimSpace(tok[2 : len(tok)-2])
+                        log.Printf("interpolate: variablename %#v", variableName)
+                        // value, ok := bindings.lookup(stringy(variableName))
+                        value, ok := expandStr(variableName, bindings)
+                        if !ok </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("'%v' is not a bound variable in '%v'", variableName, tree))</span>
+                        }
+                        <span class="cov8" title="1">log.Printf("interpolate: value, ok %#v %#v", value, ok)
+                        return value.String()</span>
+                })
+        <span class="cov8" title="1">return stringy(result)</span>
+}
+
+func (e *env) lookup(any yamly) (yamly, bool) <span class="cov8" title="1">{
+        log.Printf("lookup: %#v\n", any)
+        //    """
+        //    Search an environment stack for a binding of key to a value,
+        //    following __parent__ links to higher environment.
+        //    :param env: Start seaching from this env
+        //    :param key: variable name to look for.
+        //    :return: value, ok - if key is found ok is True and value has the value, otherwise ok is False and value is undefined.
+        //    """
+        keyy, ok := any.(stringy)
+        if !ok </span><span class="cov8" title="1">{
+                return nil, false
+        }</span>
+        <span class="cov8" title="1">key := string(keyy)
+        for </span><span class="cov8" title="1">{
+                val, ok := e.bind[key]
+                if ok </span><span class="cov8" title="1">{
+                        return val, true
+                }</span>
+                <span class="cov8" title="1">if e.parent != nil </span><span class="cov8" title="1">{
+                        e = e.parent
+                        continue</span>
+                }
+                <span class="cov8" title="1">return nil, false</span>
+        }
+}
+
+func (f functionDef) checkArgumentsOrDie(actuals yamly) <span class="cov8" title="1">{
+        log.Printf("checkArgumentsOrDie:\n   %#v\n   %#v\n", f, actuals)
+        if f.varargs </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">switch args := actuals.(type) </span>{
+        case nily:<span class="cov8" title="1">
+                return</span>
+        case mapy:<span class="cov8" title="1">
+
+                if f.parameters == nil </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("function parameters are nil!!"))</span>
+                }
+                // Check all params are present
+                <span class="cov8" title="1">missing := seqy{}
+                for _, k := range f.parameters </span><span class="cov8" title="1">{
+                        _, ok := args[k]
+                        if !ok </span><span class="cov0" title="0">{
+                                missing = append(missing, k)
+                        }</span>
+                }
+                <span class="cov8" title="1">if len(missing) &gt; 0 </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("Argument mismatch in %v expected %v got %v", f.name, f.parameters, args))</span>
+                }
+                <span class="cov8" title="1">if len(args) &gt; len(f.parameters) </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("To many arguments in %v expected %v got %v", f.name, f.parameters, args))</span>
+                }
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("Expecting argument map for %v, got: %#v", f.name, actuals))</span>
+        }
+}
+
+func (r compiledFunction) apply(seenTree mapy, actuals yamly, dynamicBindings *env) yamly <span class="cov8" title="1">{
+        return r.compiled(seenTree, actuals, dynamicBindings)
+}</span>
+
+func (r macroFunction) apply(seenTree mapy, anyargs yamly, dynamicBindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("apply:\n   %#v\n   %#v\n   %#v\n", seenTree, anyargs, r)
+        //        """
+        //        Given a map of arguments, create a new local environment for this macro expansion, bind the args to the new
+        //        enviroment, then expand the captured body and return the result. If the captured parameters variable is a string, it is
+        //        used for variable arguments which are all bound to it.
+        //        :param seenTree: Tree as parsed
+        //        :param args:
+        //        :param dynamicBindings: bindings for builtins
+        //        :return:
+        //        """
+        if len(seenTree) != 1 </span><span class="cov0" title="0">{ // Macros always have a single key
+                panic(fmt.Sprintf("ERROR: too many keys in macro call '%v'", seenTree))</span>
+        }
+        <span class="cov8" title="1">r.fun.checkArgumentsOrDie(anyargs)
+
+        macroEnv := env{
+                engine: dynamicBindings.engine,
+                parent: r.fun.bindings,
+                bind:   map[string]yamly{"__SOURCE__": seenTree},
+        }
+        if r.fun.varargs </span><span class="cov8" title="1">{
+                log.Printf("varags: %v %v\n", anyargs, r.fun.parameters)
+                varg := r.fun.parameters[0].(stringy)
+                macroEnv.bind[string(varg)] = anyargs
+        }</span> else<span class="cov8" title="1"> {
+                switch args := anyargs.(type) </span>{
+                case mapy:<span class="cov8" title="1">
+                        for k, v := range args </span><span class="cov8" title="1">{
+                                argname, ok := k.(stringy)
+                                if !ok </span><span class="cov0" title="0">{
+                                        panic(fmt.Sprintf("arg name %v must be string in %v", k, seenTree))</span>
+                                }
+                                <span class="cov8" title="1">macroEnv.bind[string(argname)] = v</span>
+                        }
+                case nily:<span class="cov8" title="1"></span>
+
+                default:<span class="cov0" title="0">
+                        panic(fmt.Sprintf("Expecting argument map or null for %v, got: %#v", r.fun.name, anyargs))</span>
+                }
+        }
+        <span class="cov8" title="1">return r.body.expand(&amp;macroEnv)</span>
+
+}
+
+func expandStr(varName string, bindings *env) (yamly, bool) <span class="cov8" title="1">{
+        //    """
+        //    Given a simple string variable get its value from the binding, it has dot notation look in the
+        //    variable value for the selection.
+        //    :param tree: - the variable name in a simple case, or the dotnotation variable.
+        //    :param bindings: - current environment
+        //    :return:
+        //    """
+        variableName := stringy(varName)
+        value, ok := bindings.lookup(variableName)
+        if ok </span><span class="cov8" title="1">{
+                return value, true // a simple variable like 'host' or a variable like 'a.c.e' matches first
+        }</span>
+        //  simple, look for subvariables.
+        <span class="cov8" title="1">subvar := strings.Split(varName, ".")
+        if len(subvar) &gt; 1 </span><span class="cov8" title="1">{
+                // It's a dot notation variable like 'host.name'
+                topvalue, ok := bindings.lookup(stringy(subvar[0]))
+                if !ok </span><span class="cov8" title="1">{
+                        return nil, false // No variable found
+                }</span>
+                <span class="cov8" title="1">return subvarLookup(varName, subvar[1:], topvalue, bindings), true</span>
+        }
+        <span class="cov8" title="1">return nil, false</span>
+}
+
+func assertSingleKey(tree yamly) <span class="cov8" title="1">{
+        //    """
+        //    Raise an exception if there are not a single key in map in tree.
+        //    :return: None
+        //    """
+        amap, ok := tree.(mapy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error: aruments not a map."))</span>
+        }
+        <span class="cov8" title="1">if len(amap) != 1 </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error too many keys in %v", amap))</span>
+        }
+}
+
+func any2int(item yamly, errorMessage string) int <span class="cov8" title="1">{
+        switch item := item.(type) </span>{
+        case inty:<span class="cov8" title="1">
+                return int(item)</span>
+        case stringy:<span class="cov8" title="1">
+                ind, err := strconv.Atoi(string(item))
+                if err != nil </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf(errorMessage, item))</span>
+                }
+                <span class="cov8" title="1">return ind</span>
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf(errorMessage, item))</span>
+        }
+}
+
+func lookupCaret(key yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("lookupCaret %#v\n", key)
+        keysty, ok := key.(stringy)
+        if !ok </span><span class="cov8" title="1">{
+                return key
+        }</span>
+        <span class="cov8" title="1">keyst := string(keysty)
+        if !strings.HasPrefix(keyst, "^") </span><span class="cov8" title="1">{
+                return key
+        }</span>
+        <span class="cov8" title="1">variableName := keyst[1:]
+        if value, ok := bindings.lookup(stringy(variableName)); ok </span><span class="cov8" title="1">{
+                return value
+        }</span>
+        <span class="cov0" title="0">panic(fmt.Sprintf("caret variable %v not defined in %v", variableName, key))</span>
+}
+
+func isFunction(tree mapy, bindings *env) (bool, runnable, yamly) <span class="cov8" title="1">{
+        log.Printf("isFunction %v\n", tree)
+
+        // Return function tuple and rhs if this is a function call, else False
+
+        lookupFunction := func(k yamly) (runnable, bool) </span><span class="cov8" title="1">{
+                // Return the function def from its binding, or not
+                log.Printf("lookupFunction %#v\n", k)
+
+                functionName := lookupCaret(k, bindings)
+                log.Printf("lookupCaret =&gt; %v\n", functionName)
+                value, ok := bindings.lookup(functionName)
+                log.Printf("lookupFunction. value, ok  = %v, %v\n", value, ok)
+                if !ok </span><span class="cov8" title="1">{
+                        return nil, false
+                }</span>
+                <span class="cov8" title="1">if result, ok := value.(runnable); ok </span><span class="cov8" title="1">{
+                        log.Printf("lookupFunction. result, ok  = %v, %v\n", result, ok)
+                        return result, true
+                }</span>
+                <span class="cov8" title="1">return nil, false</span>
+
+        }
+        <span class="cov8" title="1">var k yamly
+        if len(tree) == 1 </span><span class="cov8" title="1">{
+                for key := range tree </span><span class="cov8" title="1">{
+                        k = key // executes once only
+                }</span>
+        } else<span class="cov8" title="1"> if _, ok := tree[stringy("if")]; ok </span><span class="cov8" title="1">{ // Special case :-(
+                k = stringy("if")
+        }</span>
+        <span class="cov8" title="1">log.Printf("isFunction k = %v\n", k)
+
+        fun, ok := lookupFunction(k)
+        log.Printf("isFunction fun = %#v %#v\n", fun, ok)
+        if ok </span><span class="cov8" title="1">{
+                log.Printf("isFunction fun ok =&gt; %v\n", fun)
+                return true, fun, tree[k]
+        }</span>
+        <span class="cov8" title="1">log.Printf("isFunction fun not ok =&gt; %v\n", fun)
+        // At this point we have len(keys()) &gt; 1 and its not an "if"
+        // so we cannot have a function under any key...
+        for k := range tree </span><span class="cov8" title="1">{
+                if _, ok := lookupFunction(k); ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("ERROR: too many keys in macro %v", tree))</span>
+                }
+        }
+        <span class="cov8" title="1">return false, nil, nil</span>
+}
+
+func (s seqy) expand(bindings *env) yamly <span class="cov8" title="1">{
+        newlist := seqy{}
+        for _, item := range s </span><span class="cov8" title="1">{
+                expanded := item.expand(bindings)
+                if _, ok := expanded.(empty); !ok </span><span class="cov8" title="1">{
+                        newlist = append(newlist, expanded)
+                }</span>
+        }
+        <span class="cov8" title="1">return newlist</span>
+}
+
+func (x stringy) expand(bindings *env) yamly <span class="cov8" title="1">{
+        result, ok := expandStr(string(x), bindings)
+        if !ok </span><span class="cov8" title="1">{
+                return interpolate(x, bindings)
+        }</span>
+        <span class="cov8" title="1">if resultStr, ok := result.(stringy); ok </span><span class="cov8" title="1">{
+                return interpolate(resultStr.expand(bindings), bindings)
+        }</span>
+        <span class="cov8" title="1">return result.expand(bindings)</span>
+}
+
+func expandMapKey(kstr stringy, bindings *env) (yamly, bool) <span class="cov8" title="1">{
+        if strings.HasPrefix(string(kstr), "^") </span><span class="cov8" title="1">{
+                variableName := kstr[1:]
+                value, ok := bindings.lookup(variableName)
+                if !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("ERROR: Variable ^%v is not defined", variableName))</span>
+                }
+                <span class="cov8" title="1">if !reflect.ValueOf(value).Type().Comparable() </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("Unable to use %v as map key, '%v' is not comparable.", variableName, value))</span>
+                }
+                <span class="cov8" title="1">return value, true</span>
+        }
+        <span class="cov8" title="1">return nil, false</span>
+}
+
+func (m mapy) expand(bindings *env) yamly <span class="cov8" title="1">{
+
+        newdict := mapy{}
+
+        // Lookahead for functions. Some have Lazy maps we dont want to expand yet...
+        if ok, function, rhs := isFunction(m, bindings); ok </span><span class="cov8" title="1">{
+                log.Printf("isFunction returned =&gt; :\n    %v\n    %#v\n    %v\n", ok, function, rhs)
+                var actualArgs, expandedResult yamly
+
+                if function.isEager() </span><span class="cov8" title="1">{
+                        actualArgs = rhs.expand(bindings)
+                }</span> else<span class="cov8" title="1"> { // lazy, quote
+                        actualArgs = rhs
+                }</span>
+                <span class="cov8" title="1">expandedResult = function.apply(m, actualArgs, bindings)
+                if function.isQuote() </span><span class="cov8" title="1">{
+                        return expandedResult
+                }</span>
+                <span class="cov8" title="1">return expandedResult.expand(bindings)</span>
+        }
+        // Just a normal map - not a function
+        <span class="cov8" title="1">for k, v := range m </span><span class="cov8" title="1">{
+
+                if kstr, ok := k.(stringy); ok </span><span class="cov8" title="1">{
+                        keyv, ok := expandMapKey(kstr, bindings)
+                        if ok </span><span class="cov8" title="1">{
+                                if _, ok := newdict[keyv]; ok </span><span class="cov0" title="0">{
+                                        panic(fmt.Sprintf("ERROR: duplicate map key '%v' computed from '%v' in %v", keyv, kstr, m))</span>
+                                }
+                                <span class="cov8" title="1">newdict[keyv] = v.expand(bindings)
+                                continue</span>
+                        }
+                }
+                <span class="cov8" title="1">interpKey := interpolate(k, bindings)
+                if interpKey != k </span><span class="cov8" title="1">{
+                        // string containing {{ }} - only these keys are expanded
+                        if _, ok := newdict[interpKey]; ok </span><span class="cov0" title="0">{
+                                panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interpKey, m))</span>
+                        }
+                        <span class="cov8" title="1">newdict[interpKey] = v.expand(bindings)
+                        continue</span>
+                } else<span class="cov8" title="1"> {
+                        log.Printf("not interpolating key %#v", k)
+                }</span>
+                <span class="cov8" title="1">if _, ok := newdict[k]; ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("ERROR: duplicate map key '%v' in %v", interpKey, m))</span>
+                }
+                <span class="cov8" title="1">expanded := v.expand(bindings)
+                if _, ok := expanded.(empty); !ok </span><span class="cov8" title="1">{ // Skip golang.EMPTY values
+                        newdict[k] = expanded
+                }</span>
+        }
+        <span class="cov8" title="1">return newdict</span>
+}
+
+func expandFile(filename string, bindings *env) error <span class="cov8" title="1">{
+        log.Printf("expandFile: filename %v\n", filename)
+
+        var dirForThisFile, path, priorDir string
+        var err error
+        priorFile, ok := bindings.lookup(stringy("__FILE__"))
+        if !ok </span><span class="cov0" title="0">{
+                priorFile = stringy("")
+        }</span>
+        <span class="cov8" title="1">d, ok := bindings.lookup(stringy("__DIR__"))
+        if !ok </span><span class="cov0" title="0">{
+                log.Printf("expandFile: __DIR__ =&gt; not bound\n")
+                pwd, err := os.Getwd()
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">abs, err := filepath.Abs(pwd)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">dirForThisFile = filepath.Dir(abs)</span>
+        } else<span class="cov8" title="1"> {
+                priorDir = string(d.(stringy))
+        }</span>
+
+        <span class="cov8" title="1">if filename == "-" </span><span class="cov0" title="0">{
+                path = "-"
+                dirForThisFile = "."
+        }</span> else<span class="cov8" title="1"> if strings.HasPrefix(filename, "/") </span><span class="cov0" title="0">{
+                path = filename
+                dirForThisFile = filepath.Dir(path)
+        }</span> else<span class="cov8" title="1"> {
+                path, err = filepath.Abs(filepath.Join(priorDir, filename)) // resolve relative paths
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">dirForThisFile = filepath.Dir(path)</span>
+        }
+        <span class="cov8" title="1">bindings.bind["__DIR__"] = stringy(dirForThisFile)
+        bindings.bind["__FILE__"] = stringy(filepath.Base(path))
+        log.Printf("expandFile: new __DIR__ =&gt; %v\n", dirForThisFile)
+        log.Printf("expandFile: new __FILE__ =&gt; %v\n", filepath.Base(path))
+
+        input, err := os.Open(path)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("open =&gt; %v %v %v\n", path, input, err)
+                return err
+        }</span>
+        <span class="cov8" title="1">err = expandStream(input, filename, bindings)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">bindings.bind["__DIR__"] = stringy(priorDir) // restore prior file
+        bindings.bind["__FILE__"] = priorFile
+        return nil</span>
+}
+
+func expandStream(input io.Reader, _ string, bindings *env) (err error) <span class="cov8" title="1">{
+        decoder := yaml.NewDecoder(input)
+        for </span><span class="cov8" title="1">{
+                var doc interface{}
+                err := decoder.Decode(&amp;doc)
+                if err == io.EOF </span><span class="cov8" title="1">{
+                        return nil
+                }</span> else<span class="cov8" title="1"> if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">ya := classify(doc)
+                expanded := ya.expand(bindings)
+                // fmt.Println(expanded)
+                if _, eok := expanded.(empty); eok </span><span class="cov8" title="1">{
+                        log.Printf("expandSteam: doc is empty\n")
+                        if documentCount &gt; 0 </span><span class="cov8" title="1">{
+                                documentCount++
+                        }</span>
+                        <span class="cov8" title="1">continue</span>
+                }
+                <span class="cov8" title="1">if _, eok := expanded.(nily); eok </span><span class="cov8" title="1">{
+                        log.Printf("expandSteam: doc is nil\n")
+                        if documentCount &gt; 0 </span><span class="cov8" title="1">{
+                                documentCount++
+                        }</span>
+                        <span class="cov8" title="1">continue</span>
+                }
+                <span class="cov8" title="1">if array, ok := expanded.(seqy); ok </span><span class="cov8" title="1">{
+                        if len(array) == 0 </span><span class="cov8" title="1">{
+                                log.Printf("expandSteam: doc is empty list\n")
+                                if documentCount &gt; 0 </span><span class="cov8" title="1">{
+                                        documentCount++
+                                }</span>
+                                <span class="cov8" title="1">continue</span>
+                        }
+                }
+                <span class="cov8" title="1">if mapz, ok := expanded.(mapy); ok </span><span class="cov8" title="1">{
+                        if len(mapz) == 0 </span><span class="cov8" title="1">{
+                                log.Printf("expandSteam: doc is empty map\n")
+                                if documentCount &gt; 0 </span><span class="cov8" title="1">{
+                                        documentCount++
+                                }</span>
+                                <span class="cov8" title="1">continue</span>
+                        }
+                }
+                <span class="cov8" title="1">if bindings.engine.outFormat == YAML </span><span class="cov8" title="1">{
+                        enc := yaml.NewEncoder(bindings.engine.output)
+                        enc.SetIndent(2)
+                        if documentCount &gt; 0 </span><span class="cov8" title="1">{
+                                _, _ = fmt.Fprintln(bindings.engine.output, "---")
+                        }</span>
+                        <span class="cov8" title="1">err = enc.Encode(expanded.declassify())
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                } else<span class="cov8" title="1"> if bindings.engine.outFormat == LINES </span><span class="cov0" title="0">{
+                        switch s := expanded.(type) </span>{
+                        case seqy:<span class="cov0" title="0">
+                                for _, item := range s </span><span class="cov0" title="0">{
+                                        fmt.Println(item.String())
+                                }</span>
+                        default:<span class="cov0" title="0">
+                                fmt.Println(s.String())</span>
+                        }
+
+                } else<span class="cov8" title="1"> {
+                        jsonTree := expanded.declassify(JSON)
+                        jenc := json.NewEncoder(bindings.engine.output)
+                        jenc.SetIndent("", "  ")
+                        err = jenc.Encode(jsonTree)
+                        if err != nil </span><span class="cov0" title="0">{
+                                log.Printf("expandSteam: json.Encode %v", err)
+                                return err
+                        }</span>
+                }
+                <span class="cov8" title="1">documentCount++</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package internal
+
+import (
+        "fmt"
+        "io"
+        "log"
+        "os"
+        "path/filepath"
+        "strings"
+
+        "gopkg.in/yaml.v3"
+)
+
+func includeBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        //    """
+        //    Sequentially expand a list of YAML files in the current environment.
+        //    return: None
+        //    """
+        log.Printf("includeBuiltin: %v %v\n", tree, args)
+        if _, nok := args.(nily); nok </span><span class="cov0" title="0">{
+                return args
+        }</span>
+        <span class="cov8" title="1">switch arg := args.(type) </span>{
+        case seqy:<span class="cov8" title="1">
+                if len(arg) == 0 </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("ERROR: include was expecting list of filenames, got %#v", args))</span>
+                }
+                <span class="cov8" title="1">for _, x := range arg </span><span class="cov8" title="1">{
+                        maybefile := x.expand(bindings)
+                        if filename, ok := maybefile.(stringy); ok </span><span class="cov8" title="1">{
+                                err := expandFile(string(filename), bindings)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        panic(fmt.Sprintf("%v", err))</span>
+                                }
+                        } else<span class="cov0" title="0"> {
+                                panic(fmt.Sprintf("ERROR: include was expecting string filename, got %v for %v in %v", maybefile, x, tree))</span>
+                        }
+                }
+        case stringy:<span class="cov8" title="1">
+                err := expandFile(string(arg), bindings)
+                if err != nil </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("%v", err))</span>
+                }
+        default:<span class="cov0" title="0">
+                panic(fmt.Sprintf("ERROR: include was expecting list of filenames, got %#v", args))</span>
+        }
+        <span class="cov8" title="1">return empty{}</span>
+}
+
+func loader(tree yamly, args yamly, bindings *env) (yamly, error) <span class="cov8" title="1">{
+        log.Printf("loadBuiltin %v %v", tree, args)
+        //    """
+        //    Read a file of data, no macro expansions.
+        //    :return: the data as read
+        //    """
+        filename, ok := args.(stringy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("ERROR: load was expecting a filename, got '%v'", args))</span>
+        }
+
+        // TOD DRY ... cf includeBuiltin
+        <span class="cov8" title="1">var currentDir, path string
+        var err error
+        cd, ok := bindings.lookup(stringy("__DIR__"))
+        log.Printf("__DIR__ =&gt; %v\n", cd)
+        if !ok </span><span class="cov0" title="0">{
+                pwd, err := os.Getwd()
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">currentDir = pwd</span>
+        } else<span class="cov8" title="1"> {
+                currentDir = string(cd.(stringy))
+        }</span>
+        <span class="cov8" title="1">if strings.HasPrefix(string(filename), "/") </span><span class="cov0" title="0">{
+                path = string(filename)
+        }</span> else<span class="cov8" title="1"> {
+                path, err = filepath.Abs(filepath.Join(currentDir, string(filename))) // resolve relative paths
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+        <span class="cov8" title="1">log.Printf("loadBuiltin path %v", path)
+        input, err := os.Open(path)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("open =&gt; %v %v %v\n", path, input, err)
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">result := seqy{}
+        decoder := yaml.NewDecoder(input)
+        for </span><span class="cov8" title="1">{
+                var doc interface{}
+                err = decoder.Decode(&amp;doc)
+                log.Printf("loadBuiltin doc %v", doc)
+                if err != nil </span><span class="cov8" title="1">{
+                        break</span>
+                }
+                <span class="cov8" title="1">result = append(result, classify(doc))</span>
+        }
+        <span class="cov8" title="1">if err != nil &amp;&amp; err != io.EOF </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">if len(result) == 1 </span><span class="cov8" title="1">{
+                return result[0], nil
+        }</span>
+        <span class="cov8" title="1">return result, nil</span>
+}
+
+func loadBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("loadBuiltin %v %v", tree, args)
+        result, err := loader(tree, args, bindings)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("ERROR: loadBuiltin '%v' %v", args, err))</span>
+        }
+        <span class="cov8" title="1">return result</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package internal
+
+import (
+        "fmt"
+        "log"
+        "math"
+
+        lua "github.com/yuin/gopher-lua"
+)
+
+// Cannot us Lua nil because that implies empty in tables. So use this singleton object instead
+var luanily = lua.LUserData{Value: "NILY", Env: nil, Metatable: nil}
+
+func (x nily) gopherluaify(*lua.LState) lua.LValue     <span class="cov8" title="1">{ return &amp;luanily }</span>
+func (e empty) gopherluaify(*lua.LState) lua.LValue    <span class="cov0" title="0">{ return lua.LString(e.String()) }</span>
+func (x inty) gopherluaify(*lua.LState) lua.LValue     <span class="cov8" title="1">{ return lua.LNumber(x) }</span>
+func (x float64y) gopherluaify(*lua.LState) lua.LValue <span class="cov8" title="1">{ return lua.LNumber(x) }</span>
+func (x booly) gopherluaify(*lua.LState) lua.LValue    <span class="cov8" title="1">{ return lua.LBool(x) }</span>
+func (x stringy) gopherluaify(*lua.LState) lua.LValue  <span class="cov8" title="1">{ return lua.LString(x) }</span>
+func (m mapy) gopherluaify(L *lua.LState) lua.LValue <span class="cov8" title="1">{
+        result := L.CreateTable(len(m), len(m))
+        result.Metatable = L.GetGlobal("mapy")
+        for k, v := range m </span><span class="cov8" title="1">{
+                result.RawSet(lua.LString(k.String()), v.gopherluaify(L))
+        }</span>
+        <span class="cov8" title="1">return result</span>
+}
+
+func (s seqy) gopherluaify(L *lua.LState) lua.LValue <span class="cov8" title="1">{
+        result := L.CreateTable(len(s), len(s))
+        result.Metatable = L.GetGlobal("seqy")
+        for i, v := range s </span><span class="cov8" title="1">{
+                result.Insert(i+1, v.gopherluaify(L))
+        }</span>
+        <span class="cov8" title="1">return result</span>
+}
+func (r macroFunction) gopherluaify(*lua.LState) lua.LValue    <span class="cov8" title="1">{ return lua.LString(r.String()) }</span>
+func (r compiledFunction) gopherluaify(*lua.LState) lua.LValue <span class="cov8" title="1">{ return lua.LString(r.String()) }</span>
+func (x unknowny) gopherluaify(*lua.LState) lua.LValue         <span class="cov0" title="0">{ return lua.LString(x.String()) }</span>
+
+func classifyLua(L *lua.LState, x lua.LValue) yamly <span class="cov8" title="1">{
+        switch x := x.(type) </span>{
+        case *lua.LUserData:<span class="cov8" title="1">
+                if x == &amp;luanily </span><span class="cov8" title="1">{
+                        return nily{}
+                }</span>
+                <span class="cov0" title="0">log.Printf("not classified %#v", x)
+                return unknowny{x: x}</span>
+
+        case *lua.LNilType:<span class="cov8" title="1">
+                return nily{}</span>
+        case lua.LNumber:<span class="cov8" title="1">
+
+                if float64(x) == float64(math.Trunc(float64(x))) </span><span class="cov8" title="1">{
+                        return inty(x)
+                }</span> else<span class="cov8" title="1"> {
+                        return float64y(x)
+                }</span>
+        case lua.LBool:<span class="cov8" title="1">
+                return booly(x)</span>
+        case lua.LString:<span class="cov8" title="1">
+                return stringy(x)</span>
+        case *lua.LTable:<span class="cov8" title="1">
+                allInts := true
+                keys := map[int]bool{}
+                closed := true
+                const MaxUint = ^uint(0)
+                const MaxInt = int(MaxUint &gt;&gt; 1)
+                minKey := MaxInt
+                maxKey := 0
+                length := 0
+
+                // Scan the table
+                L.ForEach(x, func(k lua.LValue, v lua.LValue) </span><span class="cov8" title="1">{
+                        length += 1
+                        if ln, ok := k.(lua.LNumber); ok </span><span class="cov8" title="1">{
+                                i := int(ln)
+                                keys[i] = true
+                                if i &lt; minKey </span><span class="cov8" title="1">{
+                                        minKey = i
+                                }</span>
+                                <span class="cov8" title="1">if i &gt; maxKey </span><span class="cov8" title="1">{
+                                        maxKey = i
+                                }</span>
+                        } else<span class="cov8" title="1"> {
+                                allInts = false
+                        }</span>
+                })
+                <span class="cov8" title="1">if length == 0 </span><span class="cov8" title="1">{ // Empty
+                        if x.Metatable == L.GetGlobal("mapy") </span><span class="cov8" title="1">{
+                                return mapy{}
+                        }</span> else<span class="cov8" title="1"> {
+                                return seqy{}
+                        }</span>
+                }
+                <span class="cov8" title="1">if allInts </span><span class="cov8" title="1">{ // Look for gaps in the key sequence
+                        for i := minKey; i &lt;= maxKey; i++ </span><span class="cov8" title="1">{
+                                if _, ok := keys[i]; !ok </span><span class="cov0" title="0">{
+                                        closed = false
+                                        break</span>
+                                }
+                        }
+                }
+                <span class="cov8" title="1">if allInts &amp;&amp; closed </span><span class="cov8" title="1">{
+                        log.Printf("makeseqy %d %d %d", minKey, maxKey, maxKey-minKey+1)
+                        result := make(seqy, maxKey-minKey+1)
+                        for i := minKey; i &lt;= maxKey; i++ </span><span class="cov8" title="1">{
+                                v := x.RawGetInt(i)
+                                result[i-1] = classifyLua(L, v)
+                        }</span>
+                        <span class="cov8" title="1">return result</span>
+                }
+                <span class="cov8" title="1">result := mapy{}
+                L.ForEach(x, func(k lua.LValue, v lua.LValue) </span><span class="cov8" title="1">{
+                        result[classifyLua(L, k)] = classifyLua(L, v)
+                }</span>)
+                <span class="cov8" title="1">return result</span>
+
+        default:<span class="cov0" title="0">
+                log.Printf("not classified %#v", x)
+                return unknowny{x: x}</span>
+        }
+}
+
+func gopherluaBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("gopherlua: %v", args)
+
+        assertSingleKey(tree)
+        argsmap, ok := args.(mapy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("execute: '%v' is not a valid args map", args))</span>
+        }
+
+        <span class="cov8" title="1">assertKeys(map[string]bool{"args": true, "script": true}, argsmap)
+        a := argsmap[stringy("args")]
+        s := argString(tree, argsmap, "script", "")
+
+        L := lua.NewState()
+        defer L.Close()
+
+        // Add additional types
+        L.SetGlobal("nily", &amp;luanily)
+        for _, mtn := range []string{"seqy", "mapy"} </span><span class="cov8" title="1">{
+                mt := L.NewTypeMetatable(mtn)
+                L.SetGlobal(mtn, mt)
+                if err := L.DoString(fmt.Sprintf("%[1]s['name']='%[1]s'; ", mtn)); err != nil </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("gopherlua:  %s", err))</span>
+                }
+        }
+        // // Convert argument to Lua format
+        //
+        <span class="cov8" title="1">tb := a.gopherluaify(L)
+        // Invoke Lua
+        //            First set the package.path to avoid disappointment.
+        //                 The default gopher-lua loads from /usr/local and we dont want random effects,
+        //                so we limit loading to the goyamp context.
+        //                LUA_PATH is always there if needed
+        //                 Always Add the directory holding this script to the Lua search path
+        script_dir := ""
+        if sy, ok := bindings.lookup(stringy("__DIR__")); ok </span><span class="cov8" title="1">{
+                sd, ok := sy.(stringy)
+                script_dir = string(sd)
+                if !ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("Was expecting __DIR__ to be a string, but got %v", script_dir))</span>
+                }
+        }
+
+        <span class="cov8" title="1">lua_path_setup := `
+                executable_directory = "` + goyampExecutablePath + `"
+                __DIR__ = "` + script_dir + `"
+                if os.getenv("LUA_PATH") ~= nil then
+                        package.path = os.getenv("LUA_PATH")
+                else
+                        package.path = "./?.lua;./?.lc;"..executable_directory.."/lib/?.lua;"..executable_directory.."/lib/?.lc"
+                end
+                if __DIR__ ~= "" then
+                        package.path = __DIR__.."/?.lua;"..package.path
+                end`
+        if err := L.DoString(lua_path_setup); err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("gopherlua:  %s", err))</span>
+        }
+        // Run init if it exists - fail silently
+        <span class="cov8" title="1">if err := L.DoString(`require('init')`); err != nil </span><span class="cov0" title="0">{
+                log.Printf("Warning: gopherlua error in init.lua, continuing: %s\n", err)
+        }</span>
+        // Now actually run the script string
+        <span class="cov8" title="1">L.SetGlobal("args", tb)
+        if err := L.DoString(s); err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("gopherlua eror: %s", err))</span>
+        }
+
+        // Process the response from the other interpreter
+        //
+        <span class="cov8" title="1">r := L.GetGlobal("result")
+        log.Printf("r: %v", r)
+        cr := classifyLua(L, r)
+        log.Printf("cr: %v", cr)
+
+        return cr</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package internal
+
+// Fail the current processing and exit the process.
+func panicBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov0" title="0">{
+        panic(args)</span>
+        // Compiler knows we're paniced so no return is required.
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package internal
+
+import (
+        "fmt"
+        "log"
+)
+
+func repeatMap(tree yamly, forvariablename stringy, keyvar yamly, rangeList seqy, body yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("repeatMap: %v %v %v %v", tree, forvariablename, rangeList, body)
+        //    """
+        //    Expand a repeat loop and return a map, with a parameterized key. Create a local environment for the
+        //    expansion, bind the for variable name to the iteration value each time round.
+        //    :param tree: The repeat form such as {repeat: {for: X, in: [1,2], key: 'Foo {{X}}', body: [stuff, X]}
+        //    :param bindings:
+        //    :return: The Expanse
+        //    """
+        result := mapy{}
+        for _, item := range rangeList </span><span class="cov8" title="1">{
+                bindings.bind[string(forvariablename)] = item
+                keyvalue := keyvar.expand(bindings)
+                if _, ok := result[keyvalue]; ok </span><span class="cov0" title="0">{
+                        panic(fmt.Sprintf("ERROR: key '%v' duplication in %v", keyvalue, tree))</span>
+                }
+                <span class="cov8" title="1">result[keyvalue] = body.expand(bindings)</span>
+        }
+        <span class="cov8" title="1">return result</span>
+}
+
+func repeatSequence(tree yamly, forvariablename stringy, rangeList seqy, body yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("repeatSequence: %v %v %v %v %v\n", tree, forvariablename, rangeList, body, bindings)
+        //def expandRepeatList(tree, statement, bindings):
+        //    """
+        //    Expand a repeat loop and return a list one item each time. Create a local environment for the
+        //    expansion, bind the for variable name to the iteration value each time round.
+        //    :param tree: The repeat form such as {repeat: {for: X, in: [1,2], body: [stuff, X]}
+        //    :param bindings:
+        //    :return: The Expanse
+        //    """
+        result := seqy{}
+        for _, item := range rangeList </span><span class="cov8" title="1">{
+                bindings.bind[string(forvariablename)] = item
+                result = append(result, body.expand(bindings))
+        }</span>
+        <span class="cov8" title="1">return result</span>
+}
+
+func repeatBuiltin(tree mapy, args yamly, bindings *env) yamly <span class="cov8" title="1">{
+        log.Printf("repeatBuiltin: %v %v %v\n", tree, args, bindings)
+        //    """
+        //    Expand a repeat macro, this function selects the appropriate expander for lists and maps.
+        //    If the repeat has the 'key' key, then execute as for maps, else lists.
+        //    :param tree: The repeat form such as {repeat: {for: X, in: [1,2], key: 'Foo {{X}}', body: [stuff, X]}
+        //    :param bindings:
+        //    :return: The Expanse
+        //    """
+        treemap, ok := args.(mapy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error repeat expects a map, got %v\n", tree))</span>
+        }
+        <span class="cov8" title="1">assertKeys(map[string]bool{"for": true, "in": true, "body": true, "key": false}, treemap)
+
+        forClause := treemap[stringy("for")]
+        forVariable, ok := forClause.(stringy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error repeat expects a map with string 'for', got %v", tree))</span>
+        }
+
+        <span class="cov8" title="1">inClause, ok := treemap[stringy("in")]
+        rangein := inClause.expand(bindings)
+        rangeinList, ok := rangein.(seqy)
+        if !ok </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("Syntax error in repeat 'in' is not a seqeunce, got %#v in %v", rangein, tree))</span>
+        }
+
+        <span class="cov8" title="1">body, ok := treemap[stringy("body")]
+        loopEnv := env{
+                engine: bindings.engine,
+                parent: bindings,
+                bind:   map[string]yamly{},
+        }
+        if keyvar, ok := treemap[stringy("key")]; ok </span><span class="cov8" title="1">{
+                return repeatMap(tree, forVariable, keyvar, rangeinList, body, &amp;loopEnv)
+        }</span>
+        <span class="cov8" title="1">return repeatSequence(tree, forVariable, rangeinList, body, &amp;loopEnv)</span>
+
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
